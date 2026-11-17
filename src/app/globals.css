@@ -153,6 +153,8 @@
   ::before,
   ::after {
     border-color: var(--border-default);
+    /* Transparent from the start, so buttons that transition colors don't fade an outline in on focus. */
+    outline-color: transparent;
   }
 
   body {
@@ -164,7 +166,8 @@
    * The transparent outline is only there so the focus shows in forced-colors (high contrast) mode.
    */
   :focus-visible {
-    outline: 2px solid transparent;
+    outline-style: solid;
+    outline-width: 2px;
     box-shadow: var(--focus-ring);
   }
 }

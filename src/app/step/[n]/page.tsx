@@ -7,6 +7,10 @@ import { getStepDisplayStates, parseStepNumber } from "@/lib/step-state";
 
 const { steps } = sampleAssignment;
 
+// This route may block on `params`: the data is in memory and every valid step is prerendered below,
+// so there is nothing to stream. Without this line, `next dev` warns that navigation may not be instant.
+export const instant = false;
+
 // Build /step/1 to /step/N ahead of time, N being the number of steps in the data.
 export function generateStaticParams() {
   return steps.map((_, index) => ({ n: String(index + 1) }));
