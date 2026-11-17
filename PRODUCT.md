@@ -45,4 +45,4 @@ Turn a dense assignment brief into manageable steps, help the student start, and
 5. **No pressure.** Time is optional and approximate, and nothing punishes a pause.
 
 ## Accessibility
-Target WCAG 2.2 AA (proposed; Aidan to confirm). Full keyboard operation with a visible focus ring on every control. Must work in a half-width laptop window (about 600px). Respect `prefers-reduced-motion`. Screen readers (VoiceOver, NVDA) are expected to work but have not been tested yet; see [docs/status.md](docs/status.md).
+Target WCAG 2.2 AA. Full keyboard operation with a visible focus ring on every control. Must work in a half-width laptop window (about 600px). Respect `prefers-reduced-motion`. Screen readers (VoiceOver, NVDA) are expected to work but have not been tested yet; see [docs/status.md](docs/status.md).

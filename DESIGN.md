@@ -4,7 +4,7 @@ Momentum's visual system and design rules, in the Google Stitch DESIGN.md format
 
 ## Overview
 
-**Creative North Star: "The annotated brief."** (Proposed; Aidan to confirm.) Ink on paper: near-black text and actions on white, gray for secondary information, and no accent color. The interface should read like a calm, well-marked page, not a dashboard.
+**Creative North Star: "The annotated brief."** Ink on paper: near-black text and actions on white, gray for secondary information, and no accent color. The interface should read like a calm, well-marked page, not a dashboard.
 
 The system optimizes for:
 - **Re-entry:** a returning student sees where they left off and the next action within one glance.
@@ -16,7 +16,7 @@ Operating Conditions (see PRODUCT.md) turn into these rules:
 - Misplaced trust is the second risk, so the final check describes itself as the student's own review and never as verification or submission.
 - The audience is mixed and overwhelmed, so there is one primary button per view, labels are visible text, and nothing is hidden behind hover or overflow menus.
 
-**Accessibility:** WCAG 2.2 AA target (proposed). Full keyboard operation, token focus ring on every control, `motion-reduce` respected.
+**Accessibility:** WCAG 2.2 AA target. Full keyboard operation, token focus ring on every control, `motion-reduce` respected.
 
 **Layout:**
 - Desktop first: 1440 design width, checked at 1280×800. Keep Mark complete within 700px of the top at 1280×800.
@@ -46,7 +46,7 @@ Operating Conditions (see PRODUCT.md) turn into these rules:
 
 ## Colors
 
-Light mode only. Neutral grayscale with no accent; emphasis comes from weight and near-black fills. The descriptive names are proposals.
+Light mode only. Neutral grayscale with no accent; emphasis comes from weight and near-black fills.
 
 | Token | Value | Name | Use |
 | --- | --- | --- | --- |
@@ -68,7 +68,7 @@ Light mode only. Neutral grayscale with no accent; emphasis comes from weight an
 
 Tailwind classes: `bg-surface-subtle`, `text-text-secondary`, `border-border-default`, `bg-action-primary`, and so on. Default Tailwind colors are removed, so only these exist.
 
-Contrast on white: Ink 18.9:1, Pencil 7.8:1, Faint pencil 4.7:1 (4.35:1 on `surface/subtle`, which is below AA for body text). `border/input` is 1.5:1 against white.
+Contrast on white: Ink 18.9:1, Pencil 7.8:1, Faint pencil 4.7:1 (4.35:1 on `surface/subtle`, which is below AA for body text). `border/input` is 1.48:1 against white, below the 3:1 non-text minimum where it is a field's only boundary (the text area at rest). Known issue, scheduled for M6.
 
 ## Typography
 

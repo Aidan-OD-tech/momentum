@@ -84,4 +84,12 @@ Known limit: once plans live in local storage, the server can't know how many st
 
 **`PRODUCT.md` and `DESIGN.md` at the repo root, for `/craft`.** (Aidan) `PRODUCT.md` holds only what `/craft` adds: Operating Conditions, voice, references, design principles, accessibility. It links to `docs/product.md` for scope and order of authority instead of repeating them. `DESIGN.md` replaces `docs/design-rules.md`, which is now a pointer; all of its rules carried over unchanged. Aidan supplied the Operating Conditions: lost work first, misplaced trust second; laptop first, often split screen, interrupted sessions; mixed literacy, overwhelmed.
 
-**Proposals in those files awaiting Aidan's confirmation.** (Claude) The "annotated brief" North Star, the descriptive color names, and the WCAG 2.2 AA target. No `DESIGN.json` sidecar: `tokens.css` stays the single source of values, so a second copy can't drift.
+**"The annotated brief" design direction and descriptive color names (Ink, Pencil, Margin, ...).** (Claude; signed off by Aidan, 2026-11-17) The names describe tokens; the token names in code are unchanged.
+
+**WCAG 2.2 AA is the accessibility target.** (Claude; signed off by Aidan, 2026-11-17)
+
+**No `DESIGN.json` sidecar.** (Claude; signed off by Aidan, 2026-11-17) `tokens.css` stays the single source of token values, so a second copy can't drift.
+
+**Known issue for M6: the text area's resting border is 1.48:1.** (Aidan, 2026-11-17) `border/input` (#d4d4d4) on white is below the 3:1 that WCAG 2.2 AA (1.4.11 Non-text Contrast) asks for when a border is the only thing showing where a field is. It affects the pause dialog's note field before it has focus (focus turns it `border/strong`). Address in M6 alongside `/craft risk`; not changed now.
+
+**`FEATURES.md` at the repo root.** (Aidan) The feature inventory for `/craft`. `docs/product.md` stays the source of truth for scope. FEATURES.md uses `built` / `planned` rather than /craft's `shipped`, because nothing is deployed yet.

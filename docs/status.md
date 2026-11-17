@@ -60,6 +60,7 @@ Screenshots in `docs/evidence/screenshots/`: `m2-home-paused-with-note`, `m2-hom
 - Every plan is a copy of the sample assignment until M3. Start a new assignment creates another copy.
 - Between-steps home (Core 10) and the "all done, not reviewed" home had no frame in the reference set; their headings are development copy.
 - Side panel chips use full requirement labels (differs from Panel 02); rail done steps are struck through (differs from frames, follows handoff). Both flagged in decisions.
+- The text area's resting border (`border/input` on white) is 1.48:1, below WCAG 2.2 AA's 3:1 for non-text contrast. To fix in M6 alongside `/craft risk` (see decisions).
 - `npm audit` reports a picomatch issue in dev tooling only (unchanged from M1).
 
 ### Next (M3)

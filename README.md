@@ -31,6 +31,7 @@ Routes: `/` home, `/step/n` working step, `/step/n/done` step complete, `/final`
 - [docs/product.md](docs/product.md): goal, MVP scope, order of authority
 - [PRODUCT.md](PRODUCT.md): users, Operating Conditions, voice and design principles
 - [DESIGN.md](DESIGN.md): tokens, components, layout and copy rules
+- [FEATURES.md](FEATURES.md): feature inventory with build status
 - [docs/status.md](docs/status.md): milestones, what is built and what was checked
 - [docs/decisions.md](docs/decisions.md): dated decisions
 - [CLAUDE.md](CLAUDE.md): rules for AI coding sessions
