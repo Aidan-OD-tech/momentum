@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 // The six icons from the handoff: 16px, 1.5 stroke. Drawn inline so there is no icon library.
 // They are decorative (aria-hidden); put the meaning in nearby text.
 
@@ -7,7 +9,7 @@ function Icon({ className, children }: IconProps & { children: React.ReactNode }
   return (
     <svg
       viewBox="0 0 16 16"
-      className={className ?? "size-4"}
+      className={cn("size-4", className)}
       fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
