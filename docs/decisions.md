@@ -99,3 +99,23 @@ Known limit: once plans live in local storage, the server can't know how many st
 **Plan building and Plan review and editing stay separate features.** (Aidan, 2026-11-17) They are distinct screens with different failure modes, both landing in M3.
 
 **FEATURES.md Marketing rows are written for the portfolio case study.** (Aidan, 2026-11-17)
+
+## M3 (pre-build sign-offs, 2026-11-17)
+
+**Between-steps home heading stays "Your next step".** (Aidan) It is fixed, not rotated. "Pick up where you left off" is used only in the paused state.
+
+**One backup key, `momentum:v1:unreadable`.** (Aidan) A later unreadable load overwrites the earlier backup. No backup history.
+
+**/craft scope recommendations for M3–M4 accepted.** (Aidan) From [reviews/2026-11-17-scope-m3-m4.md](reviews/2026-11-17-scope-m3-m4.md):
+- Don't build: the staged building checklist (Setup 02), regenerate, reordering steps, editing the plan after step 1 has started, editing a requirement's kind in the UI, brief validation beyond the empty check, auto-retry.
+- Simplify: one native `datetime-local` deadline field; one `ErrorCard` component for Errors 02 and 03; Add a step appends at the end and opens the edit card straight away; the "Requirements updated" notice is plain text with no history.
+- Delete step: only inside the edit card, no confirmation dialog. Figma Setup 04 agrees: "Delete step" is a tertiary button beside Cancel and Done editing, and there is no dialog frame.
+- A new requirement's kind is `substantive`.
+
+**"Use a sample brief" stays in M3, against scope item 8.** (Aidan) It is drawn in Figma R3 05 and Error 01, and it's the only way to get a plan before M4. No other demo path. Open question: remove it before the evaluation sessions? Decide before M4.
+
+**Cost guard and `/craft risk` deferred to M4.** (Aidan) The M3 preview has no generation route, so nothing can spend API credit. M4 adds a maximum brief length checked on the server and a simple per-IP rate limit, and runs `/craft risk` before the first deploy that includes the route.
+
+**AI disclosure line (scope item 14) deferred to M4.** (Aidan) In M3 nothing is sent anywhere, so the line would be false.
+
+**Text area border contrast (1.48:1) stays as it is in M3.** (Aidan) Still scheduled for M6.
