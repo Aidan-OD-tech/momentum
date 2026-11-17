@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Momentum
 
-## Getting Started
+Momentum helps students turn an assignment brief into steps and work through them one at a time. The student does the assignment in their own tools; Momentum only holds the plan and their progress. It is a course project for UX & Front-End Engineering.
 
-First, run the development server:
+Status: **not deployed yet.** Current milestone: **M1, foundation and working-step screen** (see [docs/status.md](docs/status.md)).
+
+## Requirements
+
+- Node.js 20.9 or later (built and checked on Node 24)
+- npm
+
+No API key or `.env` file is needed. M1 makes no network requests from app code.
+
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000 (opens /step/3)
+npm test         # Vitest
+npm run lint
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+M1 preview routes: `/step/1` to `/step/6` show each step of the sample assignment. Which steps count as done comes from the number in the URL; nothing is saved.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Docs
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [docs/MOMENTUM_CONTEXT.md](docs/MOMENTUM_CONTEXT.md): project context and rationale
+- [docs/product.md](docs/product.md): goal, MVP scope, order of authority
+- [docs/design-rules.md](docs/design-rules.md): tokens, components, layout and copy rules
+- [docs/status.md](docs/status.md): milestones, what is built and what was checked
+- [docs/decisions.md](docs/decisions.md): dated decisions
+- [CLAUDE.md](CLAUDE.md): rules for AI coding sessions
