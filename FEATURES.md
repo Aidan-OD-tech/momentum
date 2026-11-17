@@ -15,10 +15,7 @@ Momentum helps a student turn a dense assignment brief into manageable steps, st
 | Finishing | Final requirements check | Completed home and review | built |
 | Saving | Saved in this browser | | built |
 
-## Needs Review
-- Is "Saving" right as its own area, or should it be a supporting feature under Working through steps?
-- Should Plan building and Plan review be one major feature ("Turn a brief into a plan"), since students experience them as one moment?
-- The Marketing rows are written for a portfolio or case-study page, since there is no product site. Keep them, or drop the field?
+Marketing rows are written for the portfolio case study; Momentum has no product site.
 
 ## Planning
 

@@ -65,4 +65,4 @@ Screenshots in `docs/evidence/screenshots/`: `m2-home-paused-with-note`, `m2-hom
 
 ### Next (M3)
 
-Brief entry, building state, plan review and editing (estimates, add/edit/delete steps, edit requirements with the "Requirements updated" notice), error screens, preview deploy.
+Brief entry, building state, plan review and editing (estimates, add/edit/delete steps, edit requirements with the "Requirements updated" notice), error screens, preview deploy. Scope recommendations awaiting Aidan's review: [reviews/2026-11-17-scope-m3-m4.md](reviews/2026-11-17-scope-m3-m4.md).

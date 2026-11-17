@@ -93,3 +93,9 @@ Known limit: once plans live in local storage, the server can't know how many st
 **Known issue for M6: the text area's resting border is 1.48:1.** (Aidan, 2026-11-17) `border/input` (#d4d4d4) on white is below the 3:1 that WCAG 2.2 AA (1.4.11 Non-text Contrast) asks for when a border is the only thing showing where a field is. It affects the pause dialog's note field before it has focus (focus turns it `border/strong`). Address in M6 alongside `/craft risk`; not changed now.
 
 **`FEATURES.md` at the repo root.** (Aidan) The feature inventory for `/craft`. `docs/product.md` stays the source of truth for scope. FEATURES.md uses `built` / `planned` rather than /craft's `shipped`, because nothing is deployed yet.
+
+**Saving stays its own feature area.** (Aidan, 2026-11-17) Lost work is the primary risk in PRODUCT.md, so saving isn't folded under Working through steps.
+
+**Plan building and Plan review and editing stay separate features.** (Aidan, 2026-11-17) They are distinct screens with different failure modes, both landing in M3.
+
+**FEATURES.md Marketing rows are written for the portfolio case study.** (Aidan, 2026-11-17)
