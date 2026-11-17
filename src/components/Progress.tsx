@@ -3,14 +3,22 @@ import { cn } from "@/lib/utils";
 type ProgressProps = {
   done: number;
   total: number;
+  // Replaces the default "n of N steps done" text, e.g. to add "· Final check reviewed".
+  label?: string;
+  // The rail puts the text above the bar; cards put it below.
+  labelPosition?: "above" | "below";
 };
 
-// One segment per step, the first `done` filled, plus the text "n of N steps done".
-// Works for any total. The segments are decoration; the text carries the meaning for screen readers.
-export function Progress({ done, total }: ProgressProps) {
+export function progressLabel(done: number, total: number): string {
+  return `${done} of ${total} ${total === 1 ? "step" : "steps"} done`;
+}
+
+// One segment per step, the first `done` filled, plus a text line. Works for any total.
+// The segments are decoration; the text carries the meaning for screen readers.
+export function Progress({ done, total, label, labelPosition = "below" }: ProgressProps) {
   const filled = Math.min(Math.max(done, 0), total);
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn("flex gap-2", labelPosition === "above" ? "flex-col-reverse" : "flex-col")}>
       <div className="flex gap-1" aria-hidden="true">
         {Array.from({ length: total }, (_, index) => (
           <div
@@ -20,9 +28,7 @@ export function Progress({ done, total }: ProgressProps) {
           />
         ))}
       </div>
-      <p className="text-caption text-text-secondary">
-        {filled} of {total} {total === 1 ? "step" : "steps"} done
-      </p>
+      <p className="text-caption text-text-secondary">{label ?? progressLabel(filled, total)}</p>
     </div>
   );
 }

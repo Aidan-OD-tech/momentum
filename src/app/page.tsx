@@ -1,6 +1,10 @@
-import { redirect } from "next/navigation";
+import { WhenLoaded } from "@/lib/momentum-store";
+import { HomeScreen } from "@/components/screens/HomeScreen";
 
-// M1 only: the home screen is built in M2, so for now "/" opens the working step from the handoff's Core 01.
-export default function Home() {
-  redirect("/step/3");
+export default function HomePage() {
+  return (
+    <WhenLoaded>
+      <HomeScreen />
+    </WhenLoaded>
+  );
 }

@@ -1,9 +1,14 @@
+"use client";
+
 import { BriefRequirements } from "@/components/BriefRequirements";
 import { BulletItem } from "@/components/BulletItem";
 import { DoneWhen } from "@/components/DoneWhen";
+import { PauseDialog } from "@/components/PauseDialog";
+import { ReturnNote } from "@/components/ReturnNote";
 import { Timer } from "@/components/Timer";
 import { Button } from "@/components/ui/button";
 import { formatMinutes } from "@/lib/format";
+import { useFocusHeading } from "@/lib/use-focus-heading";
 import type { Requirement, Step } from "@/lib/types";
 
 type WorkingStepProps = {
@@ -11,19 +16,48 @@ type WorkingStepProps = {
   stepNumber: number;
   stepCount: number;
   requirements: Requirement[];
+  onMarkComplete: () => void;
+  onPauseDraftChange: (text: string) => void;
+  onFinishForNow: (text: string) => void;
+  onNoteHiddenChange: (hidden: boolean) => void;
 };
 
-// The main column of the working-step screen.
-export function WorkingStep({ step, stepNumber, stepCount, requirements }: WorkingStepProps) {
+// The main column of the working-step screen. A done step (opened from a URL) shows without
+// Mark complete, Pause for later or the timer.
+export function WorkingStep({
+  step,
+  stepNumber,
+  stepCount,
+  requirements,
+  onMarkComplete,
+  onPauseDraftChange,
+  onFinishForNow,
+  onNoteHiddenChange,
+}: WorkingStepProps) {
+  const headingRef = useFocusHeading<HTMLHeadingElement>(stepNumber);
+  const done = step.status === "done";
+
   return (
     <main className="flex w-full max-w-column flex-col gap-6">
       <header className="flex flex-col gap-2">
         <p className="text-caption text-text-tertiary">
           Step {stepNumber} of {stepCount} · about {formatMinutes(step.estimateMin)} for the full step
         </p>
-        <h1 className="text-display text-text-primary">{step.title}</h1>
+        <h1 ref={headingRef} tabIndex={-1} className="text-display text-text-primary focus-visible:shadow-none">
+          {step.title}
+        </h1>
         {step.intro && <p className="text-body-l text-text-secondary">{step.intro}</p>}
       </header>
+
+      {step.note && (
+        <ReturnNote
+          note={step.note}
+          savedAt={step.noteSavedAt}
+          variant={step.noteHidden ? "hidden" : "shown"}
+          onHide={() => onNoteHiddenChange(true)}
+          onShow={() => onNoteHiddenChange(false)}
+        />
+      )}
 
       <section className="flex flex-col gap-3">
         <h2 className="text-label text-text-secondary">What to do</h2>
@@ -36,20 +70,32 @@ export function WorkingStep({ step, stepNumber, stepCount, requirements }: Worki
 
       <DoneWhen criterion={step.doneWhen} />
 
-      <div className="flex flex-wrap gap-3">
-        {/* M2: mark the step done and go to the next step (or the final check after the last step). */}
-        <Button variant="primary">Mark complete</Button>
-        {/* M2: open the pause dialog with the optional note. */}
-        <Button variant="secondary">Pause for later</Button>
-      </div>
+      {done ? (
+        <p className="text-body text-text-secondary">You marked this step done.</p>
+      ) : (
+        <div className="flex flex-wrap gap-3">
+          <Button variant="primary" onClick={onMarkComplete}>
+            Mark complete
+          </Button>
+          <PauseDialog
+            stepNumber={stepNumber}
+            initialText={step.pauseDraft ?? step.note}
+            onDraftChange={onPauseDraftChange}
+            onFinish={onFinishForNow}
+          />
+        </div>
+      )}
 
       <div className="border-t border-border-default pt-4">
         <BriefRequirements requirements={requirements} />
       </div>
 
-      <div className="border-t border-border-default pt-4">
-        <Timer minutes={step.estimateMin} />
-      </div>
+      {!done && (
+        <div className="border-t border-border-default pt-4">
+          {/* Keyed by step, so moving to another step starts with the timer off. */}
+          <Timer key={step.id} minutes={step.estimateMin} />
+        </div>
+      )}
     </main>
   );
 }

@@ -29,6 +29,9 @@ export type Step = {
   note: string;
   noteSavedAt: string | null;
   noteHidden: boolean;
+  // Text typed in the pause dialog but not saved with Finish for now. Kept apart from `note`
+  // so a refresh doesn't lose it. Undefined means there is no draft.
+  pauseDraft?: string;
 };
 
 export type AssignmentStatus = "active" | "completed";
