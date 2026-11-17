@@ -56,7 +56,7 @@ Known limit: once plans live in local storage, the server can't know how many st
 
 ### Screens
 
-**Undo from the final check.** (Aidan) A footer row matching Core 09: "Step 6 is marked done." with a tertiary Undo, shown while `lastUndo` is set and the review isn't finished. It returns to that step in progress. Not drawn in Figma at the time of the prompt; a reference screenshot, `docs/reference/figma/a1-final-check-undo.png`, was added during M2 and the build matches it.
+**Undo from the final check.** (Aidan) A footer row matching Core 09: "Step 6 is marked done." with a tertiary Undo, shown while `lastUndo` is set and the review isn't finished. It returns to that step in progress. Not drawn in Figma at the time of the prompt. The frame now exists in Momentum v2 on the page "Design additions (post-R3)" (node `35:1708`), frame "A1 · Final check — undo last step" (node `35:1709`). Its screenshot is `docs/reference/figma/a1-final-check-undo.png`, and the build matches it.
 
 **Start a new assignment creates a fresh copy of the sample plan.** (Aidan) The completed record stays in `assignments`. In M3 this becomes "open brief entry" (`// M3` in `reducer.ts` and `HomeScreen.tsx`).
 
