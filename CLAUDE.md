@@ -2,7 +2,7 @@
 
 Aidan owns the product and must be able to explain and change every line. Keep code small, plain and well named.
 
-Read first: [docs/MOMENTUM_CONTEXT.md](docs/MOMENTUM_CONTEXT.md), the handoff PDF in `docs/reference/`, [docs/design-rules.md](docs/design-rules.md) and [docs/status.md](docs/status.md). Also see [AGENTS.md](AGENTS.md): this Next.js version differs from older ones, so check `node_modules/next/dist/docs/` before relying on memory.
+Read first: [docs/MOMENTUM_CONTEXT.md](docs/MOMENTUM_CONTEXT.md), the handoff PDF in `docs/reference/`, [PRODUCT.md](PRODUCT.md) (users, Operating Conditions, voice, principles), [DESIGN.md](DESIGN.md) (tokens, components, layout and copy rules), [FEATURES.md](FEATURES.md) (feature inventory; [docs/product.md](docs/product.md) wins on scope) and [docs/status.md](docs/status.md). Also see [AGENTS.md](AGENTS.md): this Next.js version differs from older ones, so check `node_modules/next/dist/docs/` before relying on memory.
 
 ## Rules
 

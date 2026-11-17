@@ -1,32 +1,43 @@
 import { describe, expect, it } from "vitest";
-import { getStepDisplayStates, parseStepNumber } from "@/lib/step-state";
+import { reducer } from "@/lib/reducer";
+import { inProgressStepNumber, nextStepNumber, parseStepParam, substantiveFirst } from "@/lib/step-state";
+import { makeData } from "@/test/fixtures";
 
-describe("getStepDisplayStates", () => {
-  it("n = 1: first step current, the rest upcoming", () => {
-    expect(getStepDisplayStates(6, 1)).toEqual(["current", "upcoming", "upcoming", "upcoming", "upcoming", "upcoming"]);
+describe("parseStepParam", () => {
+  it("accepts plain positive whole numbers, with no upper limit from the sample plan", () => {
+    expect(parseStepParam("1")).toBe(1);
+    expect(parseStepParam("9")).toBe(9);
   });
 
-  it("n = 3: two done, step 3 current, three upcoming", () => {
-    expect(getStepDisplayStates(6, 3)).toEqual(["done", "done", "current", "upcoming", "upcoming", "upcoming"]);
-  });
-
-  it("n = last: all earlier steps done", () => {
-    expect(getStepDisplayStates(6, 6)).toEqual(["done", "done", "done", "done", "done", "current"]);
-  });
-
-  it("works for plans that don't have six steps", () => {
-    expect(getStepDisplayStates(4, 4)).toEqual(["done", "done", "done", "current"]);
-    expect(getStepDisplayStates(9, 2).filter((state) => state === "done")).toHaveLength(1);
+  it.each(["0", "-1", "abc", "", "03", "1.5", "1e1", " 3"])("rejects %j", (param) => {
+    expect(parseStepParam(param)).toBeNull();
   });
 });
 
-describe("parseStepNumber", () => {
-  it("accepts whole numbers from 1 to the step count", () => {
-    expect(parseStepNumber("1", 6)).toBe(1);
-    expect(parseStepNumber("6", 6)).toBe(6);
+describe("step lookups", () => {
+  it("home resumes the lowest-numbered step in progress", () => {
+    let data = makeData(6);
+    data = reducer(data, { type: "openStep", n: 5 });
+    data = reducer(data, { type: "openStep", n: 2 });
+    expect(inProgressStepNumber(data.assignments[0])).toBe(2);
   });
 
-  it.each(["0", "7", "-1", "abc", "", "03", "3.5", "1e1", " 3"])("rejects %j", (param) => {
-    expect(parseStepNumber(param, 6)).toBeNull();
+  it("next step looks after the given step first, then from the start", () => {
+    let data = makeData(4);
+    for (const n of [1, 3]) data = reducer(data, { type: "completeStep", n });
+    expect(nextStepNumber(data.assignments[0], 3)).toBe(4);
+    data = reducer(data, { type: "completeStep", n: 4 });
+    expect(nextStepNumber(data.assignments[0], 4)).toBe(2);
+    data = reducer(data, { type: "completeStep", n: 2 });
+    expect(nextStepNumber(data.assignments[0], 2)).toBeNull();
+  });
+
+  it("orders requirements substantive first", () => {
+    const ordered = substantiveFirst([
+      { id: "a", kind: "submission", label: "" },
+      { id: "b", kind: "format", label: "" },
+      { id: "c", kind: "substantive", label: "" },
+    ]);
+    expect(ordered.map((r) => r.id)).toEqual(["c", "b", "a"]);
   });
 });

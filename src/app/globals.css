@@ -5,7 +5,7 @@
  * Expose the tokens in tokens.css to Tailwind.
  * The "initial" lines remove Tailwind's default colors, radii, shadows and type sizes,
  * so only Momentum's tokens exist as classes (for example there is no bg-blue-500 or rounded-xl).
- * Spacing keeps Tailwind's 4px unit; the allowed steps are listed in docs/design-rules.md.
+ * Spacing keeps Tailwind's 4px unit; the allowed steps are listed in DESIGN.md.
  */
 @theme inline {
   --color-*: initial;
@@ -65,9 +65,18 @@
   --spacing-button: var(--size-button);
   --spacing-button-text: var(--size-button-text);
   --container-rail: var(--size-rail);
+  --spacing-checkbox: var(--size-checkbox);
+  --spacing-logo: var(--size-logo);
+  --spacing-badge: var(--size-badge);
   --container-column: var(--size-column);
+  --container-home: var(--size-home);
+  --container-complete-card: var(--size-complete-card);
+  --container-dialog: var(--size-dialog);
+  --container-side-panel: var(--size-side-panel);
 
-  /* Below this width the rail stacks above the main column (breakpoint "wide:" applies above it) */
+  /* sm: at 600px and up, dialogs and the side panel stop being full width.
+     wide: at 960px and up, the rail sits beside the main column instead of above it. */
+  --breakpoint-sm: 37.5rem;
   --breakpoint-wide: 60rem;
 
   --font-sans: var(--font-inter), system-ui, sans-serif;

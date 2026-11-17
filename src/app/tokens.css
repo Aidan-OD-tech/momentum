@@ -38,11 +38,18 @@
   --dialog-shadow: 0 12px 32px rgb(0 0 0 / 0.12);
   --side-panel-shadow: -8px 0 32px rgb(0 0 0 / 0.1); /* used from M2 */
 
-  /* Named layout sizes (spacing steps 4 to 64 come from Tailwind's 4px unit, see docs/design-rules.md) */
+  /* Named layout sizes (spacing steps 4 to 64 come from Tailwind's 4px unit, see DESIGN.md) */
   --size-top-bar: 64px;
   --size-rail: 220px;
   --size-column: 640px;
   --size-step-padding-top: 40px;
   --size-button: 44px; /* primary and secondary buttons */
   --size-button-text: 32px; /* tertiary text-link buttons */
+  --size-home: 720px; /* home and completed home column */
+  --size-complete-card: 560px; /* step-complete card */
+  --size-dialog: 520px; /* pause dialog */
+  --size-side-panel: 520px; /* Plan / Original brief panel */
+  --size-checkbox: 20px;
+  --size-logo: 20px; /* the square in the wordmark */
+  --size-badge: 24px; /* numbered step badge in the plan */
 }
