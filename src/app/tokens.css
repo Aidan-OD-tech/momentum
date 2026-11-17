@@ -38,7 +38,7 @@
   --dialog-shadow: 0 12px 32px rgb(0 0 0 / 0.12);
   --side-panel-shadow: -8px 0 32px rgb(0 0 0 / 0.1); /* used from M2 */
 
-  /* Named layout sizes (spacing steps 4 to 64 come from Tailwind's 4px unit, see docs/design-rules.md) */
+  /* Named layout sizes (spacing steps 4 to 64 come from Tailwind's 4px unit, see DESIGN.md) */
   --size-top-bar: 64px;
   --size-rail: 220px;
   --size-column: 640px;

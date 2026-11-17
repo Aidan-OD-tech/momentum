@@ -5,7 +5,7 @@
  * Expose the tokens in tokens.css to Tailwind.
  * The "initial" lines remove Tailwind's default colors, radii, shadows and type sizes,
  * so only Momentum's tokens exist as classes (for example there is no bg-blue-500 or rounded-xl).
- * Spacing keeps Tailwind's 4px unit; the allowed steps are listed in docs/design-rules.md.
+ * Spacing keeps Tailwind's 4px unit; the allowed steps are listed in DESIGN.md.
  */
 @theme inline {
   --color-*: initial;

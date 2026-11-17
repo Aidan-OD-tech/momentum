@@ -79,3 +79,9 @@ Known limit: once plans live in local storage, the server can't know how many st
 **Step title uses Display (32/40).** (Aidan) Figma's working-step title is 40px tall.
 
 **Sample copy from Figma.** (Aidan) The brief (Setup 01, Panel 02) and the intros and What to do for steps 1 (Setup 06), 4 (Core 11) and 6 (Core 12) use the Figma copy. Steps 2 and 5 keep development copy. Each piece is labeled in `sample-assignment.ts`.
+
+## Design docs (2026-11-17)
+
+**`PRODUCT.md` and `DESIGN.md` at the repo root, for `/craft`.** (Aidan) `PRODUCT.md` holds only what `/craft` adds: Operating Conditions, voice, references, design principles, accessibility. It links to `docs/product.md` for scope and order of authority instead of repeating them. `DESIGN.md` replaces `docs/design-rules.md`, which is now a pointer; all of its rules carried over unchanged. Aidan supplied the Operating Conditions: lost work first, misplaced trust second; laptop first, often split screen, interrupted sessions; mixed literacy, overwhelmed.
+
+**Proposals in those files awaiting Aidan's confirmation.** (Claude) The "annotated brief" North Star, the descriptive color names, and the WCAG 2.2 AA target. No `DESIGN.json` sidecar: `tokens.css` stays the single source of values, so a second copy can't drift.
