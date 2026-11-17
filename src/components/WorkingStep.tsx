@@ -21,7 +21,7 @@ export function WorkingStep({ step, stepNumber, stepCount, requirements }: Worki
         <p className="text-caption text-text-tertiary">
           Step {stepNumber} of {stepCount} · about {formatMinutes(step.estimateMin)} for the full step
         </p>
-        <h1 className="text-heading-l text-text-primary">{step.title}</h1>
+        <h1 className="text-display text-text-primary">{step.title}</h1>
         {step.intro && <p className="text-body-l text-text-secondary">{step.intro}</p>}
       </header>
 

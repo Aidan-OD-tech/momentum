@@ -16,9 +16,15 @@
 
 **Icons are inline SVG, not lucide-react.** Six small icons; no dependency.
 
-**Step title uses Heading L (24/32).** The brief said "Heading L or Display; match Core 01", but Core 01 could not be read. Switching is one class in `WorkingStep.tsx`.
+**Step title uses Heading L (24/32).** The brief said "Heading L or Display; match Core 01", but Core 01 could not be read. Switching is one class in `WorkingStep.tsx`. *Superseded 2026-11-17, below.*
 
 **Step route is `/step/[n]` with `export const instant = false`.** Next 16 with Cache Components warns in dev that a route reading `params` may not navigate instantly. All data is in memory, so the route opts out.
+
+**Step title uses Display (32/40).** (Aidan, 2026-11-17) Figma's working-step title is 40px tall. Replaces the M1 Heading L choice.
+
+**Sample copy from Figma.** (Aidan, 2026-11-17) The brief (Setup 01, Panel 02) and the intros and What to do for steps 1 (Setup 06), 4 (Core 11) and 6 (Core 12) now use the Figma copy. Steps 2 and 5 keep development copy; each piece is labeled in `sample-assignment.ts`.
+
+**Add `Step.completedSummary?: string`.** The line under "Step N done." (Core 09). Omitted when missing.
 
 **Disable Cache Components.** (Aidan, 2026-11-17) Removed `cacheComponents` and `partialPrefetching` from `next.config.ts` and the `instant = false` export from the step route. Reason: with Cache Components on, the first request to an invalid step returned HTTP 200 with the Not found page (later requests returned 404). Verified on `npm run build && npm start` with curl: `/step/abc`, `/step/0`, `/step/03`, `/step/-1` and `/step/1.5` each return 404 on the first request.
 Known limit: once plans live in local storage, the server can't know how many steps a plan has. A well-formed number past the end of the stored plan (e.g. `/step/9` on a six-step plan) shows the Not found content from the client and cannot return HTTP 404. Plans are not capped at six steps to get around this.

@@ -1,5 +1,5 @@
 // Data model from the handoff ("Suggested local data model"): one versioned object.
-// Two additions beyond the handoff, both recorded in docs/decisions.md: Step.intro and Requirement.shortLabel.
+// Additions beyond the handoff are recorded in docs/decisions.md.
 
 export type RequirementKind = "substantive" | "format" | "submission";
 
@@ -21,6 +21,8 @@ export type Step = {
   whatToDo: string[];
   // The criterion only. The "Done when" label is added by the component.
   doneWhen: string;
+  // The line under "Step N done." on the step-complete screen. Omitted when missing.
+  completedSummary?: string;
   estimateMin: number;
   status: StepStatus;
   // Empty string means no note.
