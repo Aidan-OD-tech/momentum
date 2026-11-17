@@ -7,8 +7,8 @@ Legend: **planned** (not started), **implemented** (written, not independently c
 | | Milestone | State |
 | --- | --- | --- |
 | M1 | Foundation and working-step screen | verified and merged (PR #1) |
-| M2 | Core loop on sample data with persistence: home, working step, pause and notes, completion and undo, timer, side panels, final check, completed home, review | implemented and verified on branch `feat/m2-core-loop`; awaiting Aidan's review |
-| M3 | Brief entry, building, plan review and editing, error screens, preview deploy | planned |
+| M2 | Core loop on sample data with persistence: home, working step, pause and notes, completion and undo, timer, side panels, final check, completed home, review | verified and merged (PR #2) |
+| M3 | Brief entry, building, plan review and editing, error screens, preview deploy | implemented and verified locally on branch `feat/m3-plan-entry-and-review` (not pushed); preview deploy not done yet (Aidan) |
 | M4 | AI generation (server-side, structured output) | planned |
 | M5 | Evaluation (heuristic evaluation, task-based feedback) | planned |
 | M6 | Fixes from evaluation | planned |
@@ -20,7 +20,7 @@ Next.js app, tokens, primitives, Momentum components and the working-step screen
 
 ## M2
 
-Branch `feat/m2-core-loop`. Not pushed, not deployed. Decisions: [decisions.md](decisions.md), section M2.
+Merged in PR #2. Decisions: [decisions.md](decisions.md), section M2. The record below is as verified at merge.
 
 ### Built
 
@@ -57,12 +57,57 @@ Screenshots in `docs/evidence/screenshots/`: `m2-home-paused-with-note`, `m2-hom
 ### Known limitations
 
 - `/step/9` on a six-step plan returns HTTP 200 with client Not found (see decisions).
-- Every plan is a copy of the sample assignment until M3. Start a new assignment creates another copy.
+- Every plan was a copy of the sample assignment in M2 (resolved in M3: Start a new assignment opens brief entry).
 - Between-steps home (Core 10) and the "all done, not reviewed" home had no frame in the reference set; their headings are development copy.
 - Side panel chips use full requirement labels (differs from Panel 02); rail done steps are struck through (differs from frames, follows handoff). Both flagged in decisions.
 - The text area's resting border (`border/input` on white) is 1.48:1, below WCAG 2.2 AA's 3:1 for non-text contrast. To fix in M6 alongside `/craft risk` (see decisions).
 - `npm audit` reports a picomatch issue in dev tooling only (unchanged from M1).
 
-### Next (M3)
+## M3
 
-Brief entry, building state, plan review and editing (estimates, add/edit/delete steps, edit requirements with the "Requirements updated" notice), error screens, preview deploy. Scope recommendations awaiting Aidan's review: [reviews/2026-11-17-scope-m3-m4.md](reviews/2026-11-17-scope-m3-m4.md).
+Branch `feat/m3-plan-entry-and-review`, off `main` after PR #2. Not pushed, not deployed. Decisions: [decisions.md](decisions.md), sections "M3 (pre-build sign-offs)" and "M3". Scope: [reviews/2026-11-17-scope-m3-m4.md](reviews/2026-11-17-scope-m3-m4.md), accepted by Aidan.
+
+### Built
+
+- Data: assignment status `review` (plan exists, not started; the only editable state). Optional `briefDraft`, still storage version 1. No first-run seeding: an empty store shows brief entry and writes nothing until the student acts.
+- Reducer actions: `setBriefDraft`, `createPlan` (typed deadline wins; blank keeps the plan's), `updateStep`, `addStep`, `deleteStep`, `updateRequirements` (review only, never touches steps), `startPlan`. `startNewAssignment` now leads to brief entry and keeps the completed record.
+- `PlanSource` interface with `samplePlanSource` (TEMPORARY: sample brief only, `sampleOnly` for anything else) and a development-only `?simulate=unreadable|failed|slow`.
+- `/`: brief entry (R3 05, Error 01), one building state (R3 04) with Cancel, Errors 02 and 03 through one `ErrorCard`. The draft is saved as the student types (400 ms after typing pauses).
+- `/plan`: plan review (Setup 03), step edit card with stepper (Setup 04), Add a step, Delete step, requirements edit card (Setup 05), "Requirements updated" notice (R3 03), Panel 03 via the existing side panel. Redirects to `/` with no plan or once started.
+- Started-plan routes (`/step/n`, `/step/n/done`, `/final`, `/review`) send the browser to `/` when there is no started plan.
+- New shared parts: `TextInput`, `TextArea`, `FieldError`, `AlertIcon`, `EstimateStepper`, width tokens `building` (480) and `error-card` (560), `aria-disabled` on the primary Button, optional Edit on `PlanStepRow`.
+
+### Verified (2026-11-17, Node 24.21.0, Chrome via Playwright)
+
+| Check | Result |
+| --- | --- |
+| Baseline on the fresh branch before changes | lint, tsc, 74 tests, build: pass |
+| `npm run lint`, `npx tsc --noEmit` | pass |
+| `npm test` | 16 files, 130 tests pass. New: reducer M3 actions (incl. 9 steps down to 1, then run step 1 to the final review), M2-shaped data loads unchanged, `briefDraft` round trip, sample source (exact, reflowed with straight quotes, other text), `?simulate=` ignored unless `NODE_ENV` is development, requirement row merging, brief entry and errors with an injected source (11), plan review (11) |
+| `npm run build` | passes with no environment variables and no `.env` files; `/plan` is a new static route |
+| HTTP codes, `npm start` + curl | `/`, `/plan`, `/step/1`, `/step/1/done`, `/final`, `/review`: 200. `/step/abc`, `/step/0`: **404** |
+| Walkthrough on the production build | **59/59** checks pass, covering checks 1–10 and 12–14 of the M3 prompt: empty storage shows entry, no indicator, nothing written; empty submit shows Error 01 with 0 network requests and focus in the text area; own text and deadline survive reload, then the sample-only notice with text kept; sample brief with a deadline override reaches `/plan`, due text and chip match the override, indicator shows, draft cleared; step 3 edit (Cancel discards and returns focus; Done saves title, item and time; other steps byte-identical; total updates; Start step 1 `aria-disabled` with a described reason); add step 7 then delete it; requirements change/add/remove, notice, steps unchanged, Review steps focuses the heading, and the final check later lists the edited requirements; Panel 03 on the Brief tab, Escape returns focus; Start step 1 opens step 1 and `/plan` then redirects to `/`; finishing all six steps and Start a new assignment leads to entry with the completed record kept; storage failure on plan review shows "Couldn’t save in this browser", never "Saved", and the edited plan runs in memory; no console errors |
+| `?simulate=` | development: unreadable → Error 02 (heading focused), failed → Error 03 (Try again runs again), slow → building, Cancel back with text. Production build: all three ignored, the sample builds a plan |
+| Keyboard | Entry order: Use a sample brief → text area → deadline (Chrome gives each date part its own stop) → Break it down. Error 01 by Enter. Edit step 2 by Tab and Enter, focus in Step title; stepper by keyboard (− keeps focus at 5 via `aria-disabled`); Done editing returns focus to Edit step 2; requirements card opens in Requirement 1, Cancel returns focus to Edit; Start step 1 reachable by Tab while disabled; Error 02/03 actions and Cancel by Enter |
+| Narrow width | no horizontal overflow at 375 px on brief entry and on plan review with a step edit card open |
+| Start step 1, 1280×800, nothing open (measurement for the case study, not a criterion) | top of the button **1315 px** from the top of the page: below the fold, reached by scrolling |
+
+Screenshots in `docs/evidence/screenshots/`: `m3-brief-entry-empty`, `m3-error01-empty`, `m3-sample-only-notice`, `m3-building` (dev, `?simulate=slow`; shows the Next dev indicator), `m3-error02-unreadable` and `m3-error03-build-failed` (dev, simulated), `m3-plan-review` (with a deadline override of Dec 11), `m3-edit-step-3`, `m3-edit-requirements`, `m3-requirements-updated`, `m3-panel03-brief`, `m3-edit-step-375` (all `.png`). The preview URL screenshot waits for the URL.
+
+### Not verified
+
+- The Vercel preview: not deployed yet (Aidan's step; see [deploy.md](deploy.md)).
+- Safari, Firefox and screen readers (VoiceOver, NVDA). Live regions (building status, the notice, the stepper value) were checked in the DOM only.
+- Real `prefers-reduced-motion` (the spinner has `motion-reduce:animate-none`, not observed).
+
+### Known limitations
+
+- **The sample-only source.** Only the sample brief builds a plan; other text shows a temporary notice. M4 replaces it.
+- **No AI disclosure line yet** (deferred to M4 because nothing is sent anywhere in M3).
+- **Chip copy gap.** Plan review chips show `shortLabel ?? label`, so they read "1,500 words", "APA 7th" and the full substantive and submission labels. Figma R3 03 shows other short forms ("Clear position on the assigned question", "Submit via Turnitin").
+- **Deadline override vs the submission requirement.** The sample's submission requirement has its date in its text ("Submit through Turnitin by Fri, Dec 4, 5:00 PM"), so with an override the plan shows that chip beside "Due Fri, Dec 11". The final-check reminder has the same text. Nothing rewrites requirement text.
+- Editing a requirement's label clears its short label, so it drops out of the collapsed "From your brief" line on the working step (it still shows when expanded).
+- Error screens hide the save indicator (handoff decision 4); the Figma error frames show "Saved in this browser".
+- Building and the error cards sit 64 px below the top bar (the largest spacing step); Figma has about 160 px (building) and 96 px (errors).
+- `/step/9` past the end of a plan is still a client Not found with HTTP 200 (from M2).
+- Untested in Safari, Firefox and screen readers.

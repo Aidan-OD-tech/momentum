@@ -22,7 +22,7 @@ Operating Conditions (see PRODUCT.md) turn into these rules:
 - Desktop first: 1440 design width, checked at 1280×800. Keep Mark complete within 700px of the top at 1280×800.
 - Top bar: 64px (`h-top-bar`), 32px side padding, 1px bottom border.
 - Working step: 220px rail (`w-rail`), 64px gap, 640px column (`max-w-column`), centered, 40px top padding (`pt-step-top`), 24px between main sections (`gap-6`). Below 960px (`wide:`) the rail stacks above the column.
-- Home and completed home: 720 column (`max-w-home`). Final check: 640 (`max-w-column`). Step-complete card: 560 (`max-w-complete-card`) on `surface/subtle`.
+- Home, completed home, brief entry and plan review: 720 column (`max-w-home`). Final check: 640 (`max-w-column`). Step-complete card: 560 (`max-w-complete-card`) on `surface/subtle`. Building: 480 (`max-w-building`). Error card: 560 (`max-w-error-card`) on `surface/subtle`.
 - Spacing uses Tailwind's 4px unit, these steps only:
 
 | Tailwind | 0 | 1 | 2 | 3 | 4 | 6 | 8 | 12 | 16 |
@@ -107,7 +107,17 @@ Every control shows the token focus ring on `:focus-visible` (2px white inner, 4
 - Tertiary: underlined `text-link`. Hover: `text/secondary`. Disabled: `text/tertiary`.
 - Use one primary per view. Undo, Hide note and Show note are tertiary.
 
-**Text area** (pause dialog note). `border/input`, `rounded-sm`, `text-body-l`, `text/tertiary` placeholder. Focus: the border turns `border/strong` instead of showing the ring (handoff: "Focused or active input"). Its draft is stored separately from the saved note and survives close and reload.
+**Text input and text area** (`ui/text-field.tsx`; the pause dialog's text area predates it). `border/input`, `rounded-sm`, `text-body-l`, `text/tertiary` placeholder; inputs are 44px (`h-button`). Focus: the border turns `border/strong` instead of showing the ring (handoff: "Focused or active input"). Invalid: `aria-invalid` (border `border/strong`) plus a `FieldError` below (alert icon and message), linked by `aria-describedby`; focus moves to the first invalid field. Every field has a visible label; list fields (What to do, requirements) use screen-reader labels such as "What to do, item 2". Drafts are kept: the pause note apart from the saved note, the brief in `briefDraft`.
+
+**Aria-disabled.** A button that must stay reachable while unavailable (Start step 1 during an edit; the stepper's − at 5) uses `aria-disabled="true"`, not `disabled`, and ignores clicks. Start step 1 links its reason with `aria-describedby`.
+
+**Edit cards** (plan review: step, requirements). `border/strong`, `rounded-lg`, inline in place of what they edit. One open at a time; Start step 1 waits. Cancel discards and returns focus to the trigger. Delete step is tertiary inside the card, with no dialog, and is hidden on the last step.
+
+**Estimate stepper.** − / "N min" / +, 5-minute steps, minimum 5. Buttons named "Decrease time" and "Increase time"; the value is a polite live region.
+
+**Error card** (Errors 02, 03). Alert icon, Heading L focused on arrival, body, optional bullets, primary and secondary actions, "Your text is still here."
+
+**Building.** Heading L, one line, a status row with an indeterminate spinner (still under reduced motion) and a tertiary Cancel. No stages, counts or save indicator.
 
 **Checkbox** (`ui/checkbox.tsx`, final check). 20px (`size-checkbox`), `border/strong` outline, `rounded-sm`. Checked: Ink fill with a Paper check. Always labeled; Space toggles.
 
@@ -127,7 +137,7 @@ Every control shows the token focus ring on `:focus-visible` (2px white inner, 4
 
 **Timer.** Off by default, with five states. Hiding it doesn't pause it, and no timer action completes a step.
 
-**Save status** (top bar). "Saved in this browser" only after a confirmed write; "Couldn’t save in this browser" when a write fails.
+**Save status** (top bar). "Saved in this browser" only after a confirmed write; "Couldn’t save in this browser" when a write fails. Hidden on brief entry, building and the errors, until a plan exists (handoff decision 4).
 
 **Sizes:** plan badge 24px (`size-badge`), wordmark square 20px (`size-logo`).
 

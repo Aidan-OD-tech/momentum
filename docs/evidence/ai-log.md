@@ -27,3 +27,18 @@ Records what AI tools produced and where Aidan changed, corrected or decided. Ke
 ### Aidan's corrections and decisions (M2)
 
 (Add entries here.)
+
+## M3: brief entry and plan review (2026-11-17)
+
+- Implemented by Claude Code from Aidan's written M3 prompt (sent in three parts), with the ten M3 Figma exports Aidan placed in `docs/reference/figma/`, and the `/craft scope` review Aidan accepted.
+- Claude Code's own corrections during M3, found by its tests or browser walkthrough:
+  - The plan review focus helper called `scrollIntoView`, which the test environment lacks; removed, since `focus()` already scrolls.
+  - The first walkthrough run failed on its own selectors (a label lookup matched "Remove requirement 2" as well as the field) and on a tab-order check that didn't allow for Chrome's per-part stops in the date field. Both were test-script errors, not app bugs; the script was fixed and re-run (59/59).
+  - A screenshot showed Start step 1 grey after closing the requirements card. Checked in the browser: the button was enabled; the screenshot had caught its colour transition. The screenshot was retaken after the transition.
+- Choices Claude Code made where the prompt and frames were silent are listed in [../decisions.md](../decisions.md), "M3 · Claude Code's choices (pending Aidan)".
+
+### Aidan's corrections and decisions (M3)
+
+- Accepted the `/craft scope` recommendations, with "Use a sample brief" kept for M3 against scope item 8, and the cost guard, `/craft risk` and the disclosure line deferred to M4.
+- Delete step without a dialog; new requirements are substantive.
+

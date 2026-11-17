@@ -2,7 +2,7 @@
 
 Momentum helps students turn an assignment brief into steps and work through them one at a time. The student does the assignment in their own tools; Momentum only holds the plan and their progress. It is a course project for UX & Front-End Engineering.
 
-Status: **not deployed yet.** Current milestone: **M2, core loop on sample data with browser persistence** (M1 merged) (see [docs/status.md](docs/status.md)).
+Status: **not deployed yet** (preview steps: [docs/deploy.md](docs/deploy.md)). Current milestone: **M3, brief entry and plan review** (M1 and M2 merged) (see [docs/status.md](docs/status.md)).
 
 ## Requirements
 
@@ -21,9 +21,11 @@ npm run lint
 npm run build
 ```
 
-The first visit starts a copy of the sample assignment ("Urban green spaces essay"). Brief entry and plan review come in M3. To start over, clear this site's local storage.
+The first visit shows brief entry. Until M4 adds real plan generation, only the sample brief ("Use a sample brief", "Urban green spaces essay") can be turned into a plan; other text shows a notice. To start over, clear this site's local storage.
 
-Routes: `/` home, `/step/n` working step, `/step/n/done` step complete, `/final` final check, `/review` review a completed assignment.
+In development only, `/?simulate=unreadable`, `failed` or `slow` replaces the plan source, to see the error and building screens. A production build ignores it.
+
+Routes: `/` brief entry or home, `/plan` plan review, `/step/n` working step, `/step/n/done` step complete, `/final` final check, `/review` review a completed assignment.
 
 ## Docs
 
