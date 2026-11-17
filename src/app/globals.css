@@ -1,0 +1,173 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+/*
+ * Expose the tokens in tokens.css to Tailwind.
+ * The "initial" lines remove Tailwind's default colors, radii, shadows and type sizes,
+ * so only Momentum's tokens exist as classes (for example there is no bg-blue-500 or rounded-xl).
+ * Spacing keeps Tailwind's 4px unit; the allowed steps are listed in docs/design-rules.md.
+ */
+@theme inline {
+  --color-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --text-*: initial;
+  --breakpoint-*: initial;
+
+  /* Color: bg-surface-page, text-text-secondary, border-border-default, ... */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-on-primary: var(--text-on-primary);
+  --color-surface-page: var(--surface-page);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-border-default: var(--border-default);
+  --color-border-input: var(--border-input);
+  --color-border-strong: var(--border-strong);
+  --color-action-primary: var(--action-primary);
+  --color-action-primary-hover: var(--action-primary-hover);
+  --color-progress-track: var(--progress-track);
+  --color-progress-fill: var(--progress-fill);
+  --color-overlay-scrim: var(--overlay-scrim);
+
+  /* shadcn's semantic names, mapped onto the tokens above (see :root below) */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Radius: rounded-sm, rounded-md, rounded-lg (rounded-full is built in) */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  /* Effects: shadow-dialog, shadow-side-panel (the focus ring is applied in the base layer below) */
+  --shadow-dialog: var(--dialog-shadow);
+  --shadow-side-panel: var(--side-panel-shadow);
+
+  /* Named sizes. Heights and padding use the spacing namespace, widths use the container namespace. */
+  --spacing-top-bar: var(--size-top-bar);
+  --spacing-step-top: var(--size-step-padding-top);
+  --spacing-button: var(--size-button);
+  --spacing-button-text: var(--size-button-text);
+  --container-rail: var(--size-rail);
+  --container-column: var(--size-column);
+
+  /* Below this width the rail stacks above the main column (breakpoint "wide:" applies above it) */
+  --breakpoint-wide: 60rem;
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+}
+
+/*
+ * Type styles. One utility each: size, line height, weight and letter spacing together.
+ * Source: handoff "Type (Inter)". Link has no entry here because it also needs an underline;
+ * see the text-link utility further down.
+ */
+@theme inline {
+  --text-display: 32px;
+  --text-display--line-height: 40px;
+  --text-display--font-weight: 600;
+  --text-display--letter-spacing: -0.02em;
+
+  --text-heading-l: 24px;
+  --text-heading-l--line-height: 32px;
+  --text-heading-l--font-weight: 600;
+  --text-heading-l--letter-spacing: -0.01em;
+
+  --text-heading-m: 18px;
+  --text-heading-m--line-height: 26px;
+  --text-heading-m--font-weight: 600;
+  --text-heading-m--letter-spacing: -0.005em;
+
+  --text-body-l: 16px;
+  --text-body-l--line-height: 26px;
+  --text-body-l--font-weight: 400;
+
+  --text-body-l-strong: 16px;
+  --text-body-l-strong--line-height: 26px;
+  --text-body-l-strong--font-weight: 500;
+
+  --text-body: 14px;
+  --text-body--line-height: 22px;
+  --text-body--font-weight: 400;
+
+  --text-body-strong: 14px;
+  --text-body-strong--line-height: 22px;
+  --text-body-strong--font-weight: 500;
+
+  --text-caption: 13px;
+  --text-caption--line-height: 20px;
+  --text-caption--font-weight: 400;
+
+  --text-label: 12px;
+  --text-label--line-height: 16px;
+  --text-label--font-weight: 600;
+}
+
+/* Link: Body Strong, underlined. For text-link buttons only. */
+@utility text-link {
+  @apply text-body-strong underline underline-offset-2;
+}
+
+/*
+ * shadcn's semantic variables, pointed at Momentum's tokens.
+ * Only the ones M1 can map are kept; dark theme, chart and sidebar variables are gone on purpose.
+ */
+:root {
+  --background: var(--surface-page);
+  --foreground: var(--text-primary);
+  --card: var(--surface-page);
+  --card-foreground: var(--text-primary);
+  --popover: var(--surface-page);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--action-primary);
+  --primary-foreground: var(--text-on-primary);
+  --secondary: var(--surface-subtle);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--surface-subtle);
+  --muted-foreground: var(--text-tertiary);
+  --accent: var(--surface-subtle);
+  --accent-foreground: var(--text-primary);
+  --border: var(--border-default);
+  --input: var(--border-input);
+  --ring: var(--border-strong);
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--border-default);
+    /* Transparent from the start, so buttons that transition colors don't fade an outline in on focus. */
+    outline-color: transparent;
+  }
+
+  body {
+    @apply bg-surface-page font-sans text-body text-text-primary antialiased;
+  }
+
+  /*
+   * One focus style for every control: the token ring on :focus-visible.
+   * The transparent outline is only there so the focus shows in forced-colors (high contrast) mode.
+   */
+  :focus-visible {
+    outline-style: solid;
+    outline-width: 2px;
+    box-shadow: var(--focus-ring);
+  }
+}
