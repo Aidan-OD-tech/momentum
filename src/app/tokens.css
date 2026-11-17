@@ -45,4 +45,11 @@
   --size-step-padding-top: 40px;
   --size-button: 44px; /* primary and secondary buttons */
   --size-button-text: 32px; /* tertiary text-link buttons */
+  --size-home: 720px; /* home and completed home column */
+  --size-complete-card: 560px; /* step-complete card */
+  --size-dialog: 520px; /* pause dialog */
+  --size-side-panel: 520px; /* Plan / Original brief panel */
+  --size-checkbox: 20px;
+  --size-logo: 20px; /* the square in the wordmark */
+  --size-badge: 24px; /* numbered step badge in the plan */
 }
