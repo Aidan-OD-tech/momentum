@@ -2,14 +2,15 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { type SaveStatus, TopBar } from "@/components/TopBar";
-import { createFirstRunData } from "@/data/sample-assignment";
 import { type Action, getActiveAssignment, reducer } from "@/lib/reducer";
 import { load, save } from "@/lib/storage";
+import { useRedirect } from "@/lib/use-redirect";
 import type { Assignment, MomentumData } from "@/lib/types";
 
 type MomentumStore = {
   data: MomentumData;
-  assignment: Assignment;
+  // The open assignment, or undefined when there is none (brief entry).
+  assignment: Assignment | undefined;
   saveStatus: SaveStatus;
   // True only right after a confirmed Finish for now. Kept in memory, so a reload clears it.
   progressSaved: boolean;
@@ -22,11 +23,23 @@ type MomentumStore = {
 
 const MomentumContext = createContext<MomentumStore | null>(null);
 
-export function useMomentum(): MomentumStore {
+// The store, once local storage has been read. Use inside <WhenLoaded>.
+export function useMomentumData(): MomentumStore {
   const store = useContext(MomentumContext);
-  if (!store) throw new Error("useMomentum must be used inside <MomentumProvider>");
+  if (!store) throw new Error("useMomentumData must be used inside <WhenLoaded>");
   return store;
 }
+
+// The store for screens that need an open assignment (working step, final check, review, home).
+// Their pages wrap them in <WhenStarted>, which guarantees one.
+export function useMomentum(): MomentumStore & { assignment: Assignment } {
+  const store = useMomentumData();
+  const { assignment } = store;
+  if (!assignment) throw new Error("useMomentum needs an open assignment; wrap the screen in <WhenStarted>");
+  return { ...store, assignment };
+}
+
+const EMPTY_DATA: MomentumData = { version: 1, activeAssignmentId: null, assignments: [] };
 
 // Holds Momentum's data for the whole app and keeps it in local storage.
 // The data is null until storage has been read in the browser, so the server render never depends on it.
@@ -48,15 +61,15 @@ export function MomentumProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const result = load();
     canWrite.current = result.ok;
-    // First run (or nothing readable): start with the sample assignment. M3 replaces this with brief entry.
-    const initial = result.data ?? createFirstRunData();
+    // First run (or nothing readable): no assignment, so "/" shows brief entry. Nothing is written
+    // until the student does something, so no save indicator shows yet.
+    const initial = result.data ?? EMPTY_DATA;
     dataRef.current = initial;
     // Local storage exists only in the browser, so it is read here, after the first render, rather than
     // during render: that keeps the server HTML and the first client render identical (no hydration mismatch).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setData(initial);
-    if (!result.data) write(initial);
-  }, [write]);
+  }, []);
 
   const act = useCallback(
     (action: Action): boolean => {
@@ -77,7 +90,7 @@ export function MomentumProvider({ children }: { children: React.ReactNode }) {
   const markProgressSaved = useCallback(() => setProgressSaved(true), []);
 
   const assignment = data ? getActiveAssignment(data) : undefined;
-  const store = data && assignment ? { data, assignment, saveStatus, progressSaved, act, saveNow, markProgressSaved } : null;
+  const store = data ? { data, assignment, saveStatus, progressSaved, act, saveNow, markProgressSaved } : null;
 
   // Children always render, so the server still renders each page (and a page that calls notFound()
   // gets a real 404). Screens wait for the data inside <WhenLoaded>.
@@ -89,6 +102,10 @@ export function MomentumProvider({ children }: { children: React.ReactNode }) {
 export function WhenLoaded({ children }: { children: React.ReactNode }) {
   const store = useContext(MomentumContext);
   if (store) return children;
+  return <Loading />;
+}
+
+function Loading() {
   return (
     <>
       <TopBar mode="home" />
@@ -97,4 +114,14 @@ export function WhenLoaded({ children }: { children: React.ReactNode }) {
       </p>
     </>
   );
+}
+
+// For the screens of a started plan (/step/n, /step/n/done, /final, /review). With no open assignment,
+// or a plan still in review, it sends the browser to "/", which shows brief entry or plan review.
+export function WhenStarted({ children }: { children: React.ReactNode }) {
+  const store = useContext(MomentumContext);
+  const started = Boolean(store?.assignment && store.assignment.status !== "review");
+  useRedirect(store && !started ? "/" : null);
+  if (!store || !started) return <Loading />;
+  return children;
 }
