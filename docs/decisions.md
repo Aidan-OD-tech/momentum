@@ -20,6 +20,5 @@
 
 **Step route is `/step/[n]` with `export const instant = false`.** Next 16 with Cache Components warns in dev that a route reading `params` may not navigate instantly. All data is in memory, so the route opts out.
 
-## Open
-
-**Cache Components (scaffold default) and invalid step numbers.** With it on, the first request to an unknown step (`/step/8`) returns HTTP 200 with the Not found page; later requests return 404. With `cacheComponents` and `partialPrefetching` removed from `next.config.ts` and `dynamicParams = false` set on the route, every request returned 404 (tried locally, then reverted). Cache Components also keeps hidden routes mounted, which may matter for the M2 pause dialog. Aidan to decide whether to keep it.
+**Disable Cache Components.** (Aidan, 2026-11-17) Removed `cacheComponents` and `partialPrefetching` from `next.config.ts` and the `instant = false` export from the step route. Reason: with Cache Components on, the first request to an invalid step returned HTTP 200 with the Not found page (later requests returned 404). Verified on `npm run build && npm start` with curl: `/step/abc`, `/step/0`, `/step/03`, `/step/-1` and `/step/1.5` each return 404 on the first request.
+Known limit: once plans live in local storage, the server can't know how many steps a plan has. A well-formed number past the end of the stored plan (e.g. `/step/9` on a six-step plan) shows the Not found content from the client and cannot return HTTP 404. Plans are not capped at six steps to get around this.
