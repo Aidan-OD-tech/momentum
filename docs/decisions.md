@@ -136,34 +136,36 @@ Known limit: once plans live in local storage, the server can't know how many st
 
 **Step and requirement edit rules.** (Aidan) Estimates in steps of 5, minimum 5. A new step starts empty at 15 min. Title and Done when required. Delete is hidden on the last step. Editing a requirement edits its full label and clears its short label. The "Requirements updated" notice is kept in memory only.
 
-### Claude Code's choices (Claude Code, pending Aidan)
+### Claude Code's choices
 
-**Add a step adds nothing until Done editing.** The new step's card is a draft; Cancel leaves the plan unchanged, so an empty step can never be saved. `addStep` receives the finished step.
+Each entry is marked: "(Claude Code; accepted by Aidan, 2026-11-18)" or "(Claude Code, pending Aidan)".
 
-**The notice shows only when the requirements actually changed.** Done with no change closes the card without "Requirements updated", which would otherwise be untrue.
+**Add a step adds nothing until Done editing.** (Claude Code; accepted by Aidan, 2026-11-18) The new step's card is a draft; Cancel leaves the plan unchanged, so an empty step can never be saved. `addStep` receives the finished step.
 
-**While an edit card is open, all edit triggers are hidden** (row Edit links, requirements Edit, Add a step), so only one edit can be open. Setup 04 and 05 hide the row Edit links but still show Add a step and the requirements Edit.
+**The notice shows only when the requirements actually changed.** (Claude Code; accepted by Aidan, 2026-11-18) Done with no change closes the card without "Requirements updated", which would otherwise be untrue.
 
-**"Finish editing to start." is screen-reader text only**, linked to Start step 1 by `aria-describedby`. The frames show only a greyed button. Start step 1 uses `aria-disabled` so it stays focusable; the stepper's − does the same at 5 so focus isn't lost.
+**While an edit card is open, all edit triggers are hidden** (Claude Code, pending Aidan) (row Edit links, requirements Edit, Add a step), so only one edit can be open. Setup 04 and 05 hide the row Edit links but still show Add a step and the requirements Edit.
 
-**Focus after edits:** Done or Cancel returns focus to that step's Edit; adding a step focuses its new Edit; Cancel on a new step returns to Add a step; Delete moves focus to the "Suggested steps" heading; removing an item or requirement focuses the next field or the Add button.
+**"Finish editing to start." is screen-reader text only** (Claude Code; accepted by Aidan, 2026-11-18), linked to Start step 1 by `aria-describedby`. The frames show only a greyed button. Start step 1 uses `aria-disabled` so it stays focusable; the stepper's − does the same at 5 so focus isn't lost.
 
-**Simulated `slow` never resolves on its own**; Cancel settles it. `failed` and `unreadable` resolve at once.
+**Focus after edits:** (Claude Code, pending Aidan) Done or Cancel returns focus to that step's Edit; adding a step focuses its new Edit; Cancel on a new step returns to Add a step; Delete moves focus to the "Suggested steps" heading; removing an item or requirement focuses the next field or the Add button.
 
-**A source that throws counts as `failed`** (Error 03).
+**Simulated `slow` never resolves on its own** (Claude Code, pending Aidan); Cancel settles it. `failed` and `unreadable` resolve at once.
 
-**New width tokens** `--size-building` (480) and `--size-error-card` (560) from the handoff's layout list, rather than reusing the step-complete width for the error card.
+**A source that throws counts as `failed`** (Claude Code, pending Aidan) (Error 03).
 
-**`AlertIcon`** (circle with an exclamation mark), drawn from the error frames; it isn't in the handoff's icon list.
+**New width tokens** (Claude Code; accepted by Aidan, 2026-11-18) `--size-building` (480) and `--size-error-card` (560) from the handoff's layout list, rather than reusing the step-complete width for the error card.
 
-**`TextInput`, `TextArea`, `FieldError` primitives.** The pause dialog's text area is unchanged (not refactored onto `TextArea` in this milestone).
+**`AlertIcon`** (Claude Code; accepted by Aidan, 2026-11-18) (circle with an exclamation mark), drawn from the error frames; it isn't in the handoff's icon list.
 
-**The draft saves 400 ms after typing pauses**, and immediately on Break it down.
+**`TextInput`, `TextArea`, `FieldError` primitives.** (Claude Code, pending Aidan) The pause dialog's text area is unchanged (not refactored onto `TextArea` in this milestone).
 
-### Open
+**The draft saves 400 ms after typing pauses** (Claude Code, pending Aidan), and immediately on Break it down.
 
-**Remove "Use a sample brief" before the evaluation sessions?** (Aidan, decide before M4.)
+### Settled by Aidan (2026-11-18)
 
-**Chip copy gap.** Plan review chips show the short label if there is one, otherwise the full label; Figma R3 03 uses short forms that match neither ("Clear position on the assigned question", "Submit via Turnitin"). Needs Aidan's call on whether requirements get a separate chip label.
+**Dated submission requirement vs a deadline override: leave the requirement text as it is in M3.** (Aidan) With an override, "Submit through Turnitin by Fri, Dec 4, 5:00 PM" can sit beside "Due Fri, Dec 11". No regex rewriting of the sample's text: M4's extraction will take dates from whatever brief is pasted.
 
-**Submission requirement text contains the date.** With a deadline override, "Submit through Turnitin by Fri, Dec 4, 5:00 PM" sits beside "Due Fri, Dec 11". Options: leave it (the student can edit it), or keep dates out of requirement text in M4's generated plans.
+**Chip copy gap: leave `shortLabel ?? label` for M3.** (Aidan) Figma R3 03's short forms ("Clear position on the assigned question", "Submit via Turnitin") are not copied in. M4's prompt will generate matching `label` and `shortLabel` values.
+
+**"Use a sample brief" stays for M3.** (Aidan) Revisit right after M4's live AI route is verified: keep it as an optional helper, or hide it during the M5 evaluation sessions.

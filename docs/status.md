@@ -96,16 +96,16 @@ Screenshots in `docs/evidence/screenshots/`: `m3-brief-entry-empty`, `m3-error01
 
 ### Not verified
 
-- The Vercel preview: not deployed yet (Aidan's step; see [deploy.md](deploy.md)).
+- **The M3 preview.** Aidan deployed https://momentum-five-xi.vercel.app (2026-11-18), but the smoke test shows it serves `main` (M2), not this branch: `/` 200, **`/plan` 404**, `/step/abc` 404, and the page has no M3 brief entry. The branch is pushed (`3ef1435`); its own Vercel preview URL is needed for the smoke test (checks 1, 4, 9).
 - Safari, Firefox and screen readers (VoiceOver, NVDA). Live regions (building status, the notice, the stepper value) were checked in the DOM only.
 - Real `prefers-reduced-motion` (the spinner has `motion-reduce:animate-none`, not observed).
 
 ### Known limitations
 
-- **The sample-only source.** Only the sample brief builds a plan; other text shows a temporary notice. M4 replaces it.
+- **The sample-only source.** Only the sample brief builds a plan; other text shows a temporary notice. M4 replaces it. "Use a sample brief" stays; Aidan revisits it after M4's live route is verified.
 - **No AI disclosure line yet** (deferred to M4 because nothing is sent anywhere in M3).
-- **Chip copy gap.** Plan review chips show `shortLabel ?? label`, so they read "1,500 words", "APA 7th" and the full substantive and submission labels. Figma R3 03 shows other short forms ("Clear position on the assigned question", "Submit via Turnitin").
-- **Deadline override vs the submission requirement.** The sample's submission requirement has its date in its text ("Submit through Turnitin by Fri, Dec 4, 5:00 PM"), so with an override the plan shows that chip beside "Due Fri, Dec 11". The final-check reminder has the same text. Nothing rewrites requirement text.
+- **Chip copy gap.** Plan review chips show `shortLabel ?? label`, so they read "1,500 words", "APA 7th" and the full substantive and submission labels. Figma R3 03 shows other short forms ("Clear position on the assigned question", "Submit via Turnitin"). Settled by Aidan: leave for M3; M4's prompt generates matching labels.
+- **Deadline override vs the submission requirement.** The sample's submission requirement has its date in its text ("Submit through Turnitin by Fri, Dec 4, 5:00 PM"), so with an override the plan shows that chip beside "Due Fri, Dec 11". The final-check reminder has the same text. Nothing rewrites requirement text. Settled by Aidan: leave in M3; M4 extracts dates from the pasted brief.
 - Editing a requirement's label clears its short label, so it drops out of the collapsed "From your brief" line on the working step (it still shows when expanded).
 - Error screens hide the save indicator (handoff decision 4); the Figma error frames show "Saved in this browser".
 - Building and the error cards sit 64 px below the top bar (the largest spacing step); Figma has about 160 px (building) and 96 px (errors).
