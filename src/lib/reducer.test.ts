@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { createSamplePlan } from "@/data/sample-assignment";
 import { getActiveAssignment, reducer, type Action } from "@/lib/reducer";
 import { load, save } from "@/lib/storage";
 import { allStepsDone, countDoneSteps } from "@/lib/step-state";
 import type { MomentumData } from "@/lib/types";
-import { makeData, memoryStorage } from "@/test/fixtures";
+import { makeAssignment, makeData, memoryStorage } from "@/test/fixtures";
 
 const AT = "2026-11-17T10:00:00.000Z";
 const run = (data: MomentumData, ...actions: Action[]) => actions.reduce(reducer, data);
@@ -135,6 +136,66 @@ describe("final checks and new assignments", () => {
     expect(data.assignments.map((a) => [a.id, a.status])).toEqual([["a1", "completed"]]);
     // No open assignment: "/" shows brief entry.
     expect(data.activeAssignmentId).toBeNull();
+  });
+});
+
+describe("several assignments (M7)", () => {
+  // Three assignments of 1, 3 and 9 steps; a1 is open.
+  const several = (): MomentumData => ({
+    version: 1,
+    activeAssignmentId: "a1",
+    assignments: [makeAssignment("a1", 1), makeAssignment("a2", 3), makeAssignment("a3", 9)],
+  });
+  const byId = (data: MomentumData, id: string) => data.assignments.find((a) => a.id === id)!;
+
+  it("openAssignment opens a different assignment and changes no assignment", () => {
+    const before = several();
+    const after = reducer(before, { type: "openAssignment", id: "a3" });
+    expect(after.activeAssignmentId).toBe("a3");
+    expect(after.assignments).toEqual(before.assignments);
+  });
+
+  it("openAssignment returns the same object for an unknown id or the one already open", () => {
+    const data = several();
+    expect(reducer(data, { type: "openAssignment", id: "nope" })).toBe(data);
+    expect(reducer(data, { type: "openAssignment", id: "a1" })).toBe(data);
+  });
+
+  it("after openAssignment, step actions change only the newly open assignment", () => {
+    const before = several();
+    const after = run(
+      before,
+      { type: "openAssignment", id: "a2" },
+      { type: "openStep", n: 1 },
+      { type: "completeStep", n: 1 },
+      { type: "openStep", n: 2 },
+      { type: "finishForNow", n: 2, noteText: "halfway", at: AT },
+    );
+    expect(byId(after, "a2").steps.map((s) => s.status)).toEqual(["done", "inProgress", "upcoming"]);
+    expect(byId(after, "a2").steps[1].note).toBe("halfway");
+    expect(byId(after, "a1")).toEqual(byId(before, "a1"));
+    expect(byId(after, "a3")).toEqual(byId(before, "a3"));
+  });
+
+  it("createPlan with others present (one in review, one active) appends and opens the new one, leaving the rest alone", () => {
+    const review = makeAssignment("r1", 3, { status: "review" });
+    const activeOne = run(
+      { version: 1, activeAssignmentId: "a1", assignments: [makeAssignment("a1", 9)] },
+      { type: "openStep", n: 1 },
+    ).assignments[0];
+    const before: MomentumData = { version: 1, activeAssignmentId: "r1", assignments: [review, activeOne] };
+    const after = reducer(before, {
+      type: "createPlan",
+      id: "new",
+      plan: createSamplePlan(),
+      brief: "another brief",
+      deadlineOverride: "",
+      at: AT,
+    });
+    expect(after.assignments.map((a) => a.id)).toEqual(["r1", "a1", "new"]);
+    expect(after.activeAssignmentId).toBe("new");
+    expect(active(after).status).toBe("review");
+    expect(after.assignments.slice(0, 2)).toEqual(before.assignments);
   });
 });
 

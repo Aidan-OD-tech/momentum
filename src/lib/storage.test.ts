@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { load, save, STORAGE_KEY, UNREADABLE_KEY } from "@/lib/storage";
-import { makeData, memoryStorage } from "@/test/fixtures";
+import type { MomentumData } from "@/lib/types";
+import { makeAssignment, makeData, memoryStorage } from "@/test/fixtures";
 
 describe("storage", () => {
   it("returns no data, ok, when nothing is stored", () => {
@@ -46,6 +47,35 @@ describe("storage", () => {
     const storage = memoryStorage({ [STORAGE_KEY]: JSON.stringify(data) });
     expect(load(storage)).toEqual({ data, ok: true });
     expect(storage.getItem(UNREADABLE_KEY)).toBeNull();
+  });
+
+  it("loads today's shape unchanged (one completed, one active, a briefDraft): no migration for M7", () => {
+    const completed = makeAssignment("done", 3, { status: "completed", completedAt: "2026-11-10T09:00:00.000Z", finalReviewedAt: "2026-11-10T09:00:00.000Z" });
+    const data: MomentumData = {
+      version: 1,
+      activeAssignmentId: "a1",
+      assignments: [completed, makeAssignment("a1")],
+      briefDraft: { text: "Next brief", deadline: "" },
+    };
+    const storage = memoryStorage({ [STORAGE_KEY]: JSON.stringify(data) });
+    expect(load(storage)).toEqual({ data, ok: true });
+    expect(storage.getItem(UNREADABLE_KEY)).toBeNull();
+  });
+
+  it("round-trips four assignments in mixed states (review, active, active, completed)", () => {
+    const storage = memoryStorage();
+    const data: MomentumData = {
+      version: 1,
+      activeAssignmentId: "a2",
+      assignments: [
+        makeAssignment("a1", 1, { status: "review", deadline: undefined, planCreatedAt: "2026-11-18T09:00:00.000Z" }),
+        makeAssignment("a2", 3, { status: "active", deadline: "2026-12-04" }),
+        makeAssignment("a3", 9, { status: "active", firstStepStartedAt: "2026-11-17T09:00:00.000Z" }),
+        makeAssignment("a4", 6, { status: "completed", completedAt: "2026-11-16T09:00:00.000Z" }),
+      ],
+    };
+    expect(save(data, storage)).toBe(true);
+    expect(load(storage)).toEqual({ data, ok: true });
   });
 
   it("keeps briefDraft through save and load", () => {
