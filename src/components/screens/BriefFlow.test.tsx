@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { HomeRoute } from "@/components/screens/HomeRoute";
 import { sampleAssignment } from "@/data/sample-assignment";
@@ -98,18 +98,18 @@ describe("brief entry", () => {
     renderApp(<HomeRoute />);
     type("a".repeat(BRIEF_COUNT_FROM - 1));
     expect(screen.queryByText(/of 12,000 characters/)).not.toBeInTheDocument();
-    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    expect(within(screen.getByRole("main")).getByRole("status")).toBeEmptyDOMElement();
 
     type("a".repeat(11_200));
     expect(screen.getByText("11,200 of 12,000 characters")).toBeInTheDocument();
     expect(brief()).toHaveAccessibleDescription("11,200 of 12,000 characters");
     // The live region says it once on crossing, and doesn't change with each keystroke.
-    expect(screen.getByRole("status")).toHaveTextContent("Your brief is close to the 12,000-character limit.");
+    expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent("Your brief is close to the 12,000-character limit.");
     type("a".repeat(11_201));
-    expect(screen.getByRole("status")).toHaveTextContent("Your brief is close to the 12,000-character limit.");
+    expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent("Your brief is close to the 12,000-character limit.");
 
     type("a".repeat(MAX_BRIEF_CHARS));
-    expect(screen.getByRole("status")).toHaveTextContent("Your brief has reached the 12,000-character limit.");
+    expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent("Your brief has reached the 12,000-character limit.");
   });
 
   it("a stored draft over the limit isn't sent; it shows an error and keeps the text", () => {
@@ -141,7 +141,7 @@ describe("building and errors", () => {
     type("Some brief");
     breakItDown();
     expect(await screen.findByRole("heading", { name: "Building your plan" })).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("Working on it");
+    expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent("Working on it");
     expect(screen.getByRole("main").textContent).not.toMatch(/\d/);
   });
 
