@@ -3,7 +3,7 @@ import { FIRST_STEP_EVENT, MINUTE_BUCKETS } from "@/lib/first-step-event";
 import { allowEventRequest, clientIp } from "@/lib/server/rate-limit";
 
 // POST /api/event: receives Momentum's one usage event, first_step_started, and writes one log line,
-// e.g. "[api/event] event=first_step_started stepCount=6 bucket=2–5". It stores nothing. The counts
+// e.g. "[api/event] event=first_step_started stepCount=6 bucket=2–5 env=production". It stores nothing. The counts
 // are read in the Vercel logs (docs/evidence/measurement.md).
 //
 // Answers: 204 accepted; 400 not exactly this event and these two fields; 413 body too long;
@@ -37,7 +37,10 @@ export async function POST(request: Request) {
   if (!parsed.success) return reject(400, "invalid-body");
 
   const { event, stepCount, minutesSincePlanCreated } = parsed.data;
-  console.info(`[api/event] event=${event} stepCount=${stepCount} bucket=${minutesSincePlanCreated}`);
+  // VERCEL_ENV (production, preview or development) is set by Vercel, so preview and test traffic
+  // can be filtered out of the production numbers. Locally it is unset: "unknown".
+  const env = process.env.VERCEL_ENV ?? "unknown";
+  console.info(`[api/event] event=${event} stepCount=${stepCount} bucket=${minutesSincePlanCreated} env=${env}`);
   return new Response(null, { status: 204 });
 }
 

@@ -22,13 +22,23 @@ beforeEach(() => {
   logs = [];
   vi.spyOn(console, "info").mockImplementation((...args) => void logs.push(args.join(" ")));
 });
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllEnvs();
+});
 
 describe("POST /api/event", () => {
-  it("accepts the event and logs one line with only the allowed fields", async () => {
+  it("accepts the event and logs one line with only the allowed fields and the Vercel environment", async () => {
+    vi.stubEnv("VERCEL_ENV", "preview");
     const response = await post(valid);
     expect(response.status).toBe(204);
-    expect(logs).toEqual(["[api/event] event=first_step_started stepCount=6 bucket=2–5"]);
+    expect(logs).toEqual(["[api/event] event=first_step_started stepCount=6 bucket=2–5 env=preview"]);
+  });
+
+  it("logs env=unknown outside Vercel", async () => {
+    vi.stubEnv("VERCEL_ENV", undefined);
+    await post(valid);
+    expect(logs).toEqual(["[api/event] event=first_step_started stepCount=6 bucket=2–5 env=unknown"]);
   });
 
   it.each(["<2", "5–15", ">15"])("accepts the bucket %s", async (bucket) => {
