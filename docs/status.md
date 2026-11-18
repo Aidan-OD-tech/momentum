@@ -9,7 +9,7 @@ Legend: **planned** (not started), **implemented** (written, not independently c
 | M1 | Foundation and working-step screen | verified and merged (PR #1) |
 | M2 | Core loop on sample data with persistence: home, working step, pause and notes, completion and undo, timer, side panels, final check, completed home, review | verified and merged (PR #2) |
 | M3 | Brief entry, building, plan review and editing, error screens, preview deploy | verified and merged (PR #3) |
-| M4 | AI generation (server-side, structured output) | implemented on branch `feat/m4-ai-generation`; route, limits and UI verified locally with a mocked model and against the real API's error paths; **live plan output not yet verified** (the OpenAI project has no credit) |
+| M4 | AI generation (server-side, structured output) | implemented on branch `feat/m4-ai-generation`; **verified locally** with mocked tests and live checks 1–9 against `gpt-6.1-terra`; Vercel preview not yet checked |
 | M5 | Evaluation (heuristic evaluation, task-based feedback) | planned |
 | M6 | Fixes from evaluation | planned |
 | M7 | Docs and case study | planned |
@@ -152,21 +152,23 @@ Branch `feat/m4-ai-generation`, off `main` after PR #3. Not pushed, not deployed
 | Live check 7 (rate limit) | six submits in the browser (Break it down, then Try again ×5): responses 502 ×5, then **429**, Error 03 each time |
 | Live check 8 (no key) | server started with `OPENAI_API_KEY` empty: Error 03, Edit the brief keeps the text; log line `[api/plan] 502 missing OPENAI_API_KEY 1ms` |
 | Brief entry, keyboard | Use a sample brief → text area → deadline (date parts) → Break it down. The disclosure line is a plain `<p>`, not focusable. Count appears at 10,800, not at 10,799; linked by `aria-describedby`; live region text changes only on crossing; typing stops at 12,000; pasting 13,000 characters keeps the first 12,000 |
-| Real API, model access | with the key in `.env.local`: `gpt-6.1-terra` → OpenAI **429 `credit_balance_exhausted`**; `gpt-4.1-mini` and `gpt-4o-mini` → **403 `model_not_found`**. Each showed Error 03 |
+| Real API, model access (before credit) | `gpt-6.1-terra` → OpenAI **429 `credit_balance_exhausted`**; `gpt-4.1-mini` and `gpt-4o-mini` → **403 `model_not_found`**. Each showed Error 03 |
+| Live checks 1–5 and 9 (after credit, `gpt-6.1-terra`) | **all pass**; details, briefs and actual output in [evidence/generation-checks.md](evidence/generation-checks.md). 1: sample brief → every requirement, none invented, Fri, Dec 4, 5:00 PM, substantive first. 2: lab report and reflective portfolio (development briefs) checked requirement by requirement, none missing or invented; the portfolio's final date chosen over the draft date. 3: recipe → 422, Error 02, brief kept. 4: injection → normal plan, no essay text or sources. 5: no date → no deadline; the field's date wins. 9: edit a step, complete every step (count from the plan), final check lists the plan's non-submission requirements, home "All steps done" |
+| Timings | 9 plans in **10.0–13.9 s**; recipe refused in 3.0–3.3 s |
 
-Screenshots in `docs/evidence/screenshots/`: `m4-brief-entry` (full page, with the disclosure line), `m4-near-limit-count`.
+Screenshots in `docs/evidence/screenshots/`: `m4-brief-entry` (full page, with the disclosure line), `m4-near-limit-count`, `m4-building`, `m4-plan-review-sample`, `m4-plan-review-second`, `m4-error02-recipe`.
 
 ### Not verified
 
-- **Live checks 1–5 and 9, and the preview checks:** blocked until the OpenAI project has credit. No real plan has been generated yet, so model output quality, invented requirements, deadline extraction, prompt-injection resistance, timings and the "under a minute" copy are all unchecked. Screenshots still to take: building during a successful request, plan review from the sample brief and from a second brief, Error 02 from a recipe.
-- The default model in `src/lib/server/openai.ts` (`gpt-4.1-mini`) isn't available on this OpenAI project; it is replaced once a model is confirmed.
+- **The Vercel preview:** checks 1, 3 and 7 and the curl checks, after Aidan pushes.
 - Safari, Firefox and screen readers (live regions checked in the DOM only).
 
 ### Known limitations
 
 - **Rate limiting is best effort**: memory is per Vercel instance and resets on a cold start. The hard cost guard is the OpenAI project's monthly budget limit (docs/deploy.md). Requests that fail at OpenAI still count toward the limit.
 - **Prompt-injection resistance is checked by hand, not proven.** The tests check only that the brief sits inside the delimiters.
-- **Model output varies between runs.** The same brief can give different steps, labels and estimates.
+- **Model output varies between runs.** The same brief gave 6, 5 and 6 steps in three runs, with different labels and estimates. Generated estimates for the sample brief (6 h 25 min to 6 h 50 min) are about twice the hand-written plan's 3 h 20 min, and generated plans add a "Submit" step.
+- **"Done when turnitin…"**: `doneWhenSentence` lowercases the first letter, which breaks a criterion that starts with a proper noun. Generated requirement labels also end in full stops, which show in chips. Seen in live output, not fixed.
 - **Pasting more than 12,000 characters keeps the first 12,000** (browser `maxLength`). The count shows "12,000 of 12,000 characters" and the live region says the limit was reached, but nothing says text was cut.
 - "Try again in a moment" on Error 03 can be up to 10 minutes when the cause is the rate limit.
 - "Today" in the model message is the server's UTC date.

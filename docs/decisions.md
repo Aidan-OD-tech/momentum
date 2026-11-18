@@ -176,6 +176,8 @@ All accepted by Aidan on 2026-11-18. The four defaults first (Add a step draft, 
 
 **OpenAI Structured Outputs through `OPENAI_API_KEY`.** (Aidan) The key is read only in `src/lib/server/openai.ts` (`import "server-only"`); no `NEXT_PUBLIC_` variable holds it. The model comes from `OPENAI_MODEL` (set to `gpt-6.1-terra` in `.env.local` and Vercel), with a default in code.
 
+**Model: `gpt-6.1-terra`, also the code default.** (Aidan, 2026-11-18, after adding credit and a $5 monthly budget cap on the OpenAI project) `DEFAULT_MODEL` in `src/lib/server/openai.ts` matches `OPENAI_MODEL`, so a missing variable doesn't fall back to a model the project can't use. Live checks with it: [evidence/generation-checks.md](evidence/generation-checks.md).
+
 **Limits.** (Aidan) Brief: 1 to 12,000 characters after trimming, from one constant (`src/lib/brief-limits.ts`); over it, 413 `tooLong`. Rate limit: 5 requests per 10 minutes per IP (first `x-forwarded-for` entry), plus 100 per hour overall; over it, 429 `rateLimited`. Model call stopped after 45 s (504) or when the browser cancels. `maxDuration` 60 (Vercel Hobby and Pro both allow up to 300 s with Fluid compute, checked 2026-11-18). No retries (scope item 7), no repair pass (scope item 15).
 - Limitation: the rate limiter lives in memory, so on Vercel it is per instance and resets on a cold start. Best effort, not a guarantee. The hard cost guard is the monthly budget limit on the OpenAI project, which Aidan sets (docs/deploy.md). Vercel overwrites `X-Forwarded-For`, so callers can't spoof it there.
 
@@ -216,7 +218,7 @@ From [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.
 
 ### Open for Aidan
 
-- **The model and the code default.** On 2026-11-18 the project answered `gpt-6.1-terra` with 429 `credit_balance_exhausted`, and `gpt-4.1-mini` and `gpt-4o-mini` with 403 `model_not_found`. The default stays `gpt-4.1-mini` until a model is confirmed with credit.
 - **Disclosure wording** (above).
-- **Building copy** "This usually takes under a minute": check against real timings.
+- **Building copy** "This usually takes under a minute": 9 local plans took 10.0–13.9 s, and the recipe 3 s (developer checks). True in every run so far; the wording is Aidan's call.
+- **Seen in live output, not changed** (would need Aidan's go-ahead, and some touch prompt tuning, out of scope unless needed): generated estimates for the sample brief are about twice the hand-written plan's; plans add a "Submit" step although submission is a reminder; `doneWhenSentence` lowercases a leading proper noun ("Done when turnitin…"); generated labels end in full stops, which show in chips.
 - **"Use a sample brief" for M5:** keep it or hide it during the sessions.
