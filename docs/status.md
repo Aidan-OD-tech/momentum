@@ -11,8 +11,12 @@ Legend: **planned** (not started), **implemented** (written, not independently c
 | M3 | Brief entry, building, plan review and editing, error screens, preview deploy | verified and merged (PR #3) |
 | M4 | AI generation (server-side, structured output) | verified and merged (PR #4) |
 | M5 | Evaluation readiness: sample-brief flag, one tracked event, heuristic and accessibility review, session templates | verified and merged (PR #5); sessions and VoiceOver pending (Aidan) |
-| M6 | Fixes from evaluation | implemented on branch `feat/m6-fixes`; **verified** locally on the production build (see M6); wording approved by Aidan (2026-11-18); not pushed; Vercel preview checks and VoiceOver pending |
-| M7 | Docs and case study | planned |
+| M6 | Fixes from evaluation | verified and merged (PR #6); VoiceOver pending |
+| M7a | Several assignments: data and ordering (logic only) | implemented and **verified** on branch `feat/m7a-multi-assignment-model` (see M7a); not pushed |
+| M7b | Several assignments: prioritized home list | planned |
+| M7c | Several assignments: upload a week's briefs in one go | planned |
+| M7d | Several assignments: see Aidan's M7 plan (not in this repo) | planned |
+| — | Docs and case study (was the M7 row; where it goes now is for Aidan to confirm) | planned |
 
 ## M1 summary
 
@@ -299,3 +303,32 @@ Screenshots in `docs/evidence/screenshots/`: `m6-<screen>-1280.png` and `m6-<scr
 - Each screen renders its own top bar, so a save failure that happens as the screen changes may not be announced (M7 candidate).
 - The rate-limit line says "about 10 minutes"; the hourly cap can make the wait longer.
 
+
+## M7a
+
+Several assignments, step 1: data and ordering only. No screen, route, CSS or `/api/plan` change. Decisions: [decisions.md](decisions.md), "M7".
+
+### Built
+
+- `openAssignment` action in `src/lib/reducer.ts`.
+- `src/lib/priority.ts`: `remainingMinutes`, `currentAssignments` (home-list order), `finishedAssignments`.
+- `parseDeadline` in `src/lib/format.ts`, shared by `formatDeadline` and the ordering.
+- `makeAssignment` test fixture.
+- No storage migration: still `version: 1` under `momentum:v1`.
+
+### Verified (2026-11-18, Node 24.21.0)
+
+| Check | Result |
+| --- | --- |
+| `npm test` | 283 passed (257 before; +26: priority 20, reducer 4, storage 2) |
+| `npx tsc --noEmit`, `npm run lint`, `npm run build` | clean |
+| Hand flow on `npm run dev` (scripted with Playwright, `/api/plan` and `/api/event` answered by the script): brief → plan review → Start step 1 → pause with a note → home | completed with no console errors; step 1 in progress with its note in storage |
+| Same flow on `main`, screenshots compared | brief, plan review, pause dialog and home after pause: **0 differing pixels** at 1280 px |
+
+### Not verified
+
+- Anything a student can see with several assignments: no screen shows more than one yet (M7b).
+
+### Known limitations
+
+- Two tabs on different assignments switch each other, because the open assignment is one shared value (for M7b).

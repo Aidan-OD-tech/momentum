@@ -356,3 +356,25 @@ From the [compose and responsive review](reviews/2026-11-18-compose-responsive-m
 - **Save status across a route change:** each screen renders its own top bar. A failure that happens as the student moves screens (for example Mark complete → step complete) arrives already filled on the new screen, and screen readers often skip that, as with "Progress saved". Moving the top bar into the layout would fix both. Check with VoiceOver first.
 - **Estimate stepper +/− boundary** (WCAG 1.4.11): check whether the stepper's − and + buttons need a visible 3:1 boundary of their own. (Aidan, 2026-11-18)
 - **Deadline calendar button focus:** Chrome's calendar button inside the deadline field shows Chrome's blue ring, not the token ring or `border/strong`. It's visible, so 2.4.7 passes, but it's inconsistent ([accessibility.md](evidence/accessibility.md), "Keyboard pass, M6").
+
+## M7: several assignments (Aidan, 2026-11-18)
+
+**Aidan's product decision, not participant feedback.** A student can keep several assignments at once, see them on a prioritized home list (M7b) and upload a week's briefs in one go (M7c). This reverses the professor's recommendation to "defer … multiple-assignment management" ([MOMENTUM_CONTEXT.md](MOMENTUM_CONTEXT.md)) and the [product.md](product.md) Out list, which now lists it as In. No session or participant asked for it. Dashboards, calendars, time analytics and adaptive scheduling stay Out.
+
+### M7a: data and ordering (logic only, no screen changes)
+
+- **No storage migration.** `MomentumData` already held `assignments: Assignment[]` and `activeAssignmentId` from M2, and `createPlan` already appended. So `version: 1` and the `momentum:v1` key stay, and no required field was added. Tests pin that today's data (one completed, one active, a `briefDraft`) loads unchanged and that four assignments in mixed states round-trip.
+- **`openAssignment`** sets `activeAssignmentId` to an existing assignment and never changes an assignment. An unknown id or the one already open returns the same object, so nothing is written. `startNewAssignment` is unchanged.
+- **Home-list order** (`src/lib/priority.ts`), deadline first:
+  1. Assignments with a valid deadline before those without.
+  2. Earliest deadline first. A date-only deadline counts as 23:59 that day. An invalid deadline counts as none. A passed deadline isn't special-cased: it is simply earliest.
+  3. Same deadline: more remaining minutes first. A step in progress counts in full, because Momentum doesn't track partial work.
+  4. No deadline: earlier `planCreatedAt` first; plans from before M5 (no `planCreatedAt`) last.
+  5. Anything still tied keeps its stored order.
+  Finished assignments are listed newest `completedAt` first.
+- **Why not a slack or "start-by" score** (deadline minus remaining work): the M7 plan recommends deadline-first. Claude Code's reasoning: a slack score would rest on the model's estimates, which M5 found run about twice the sample's (H-04). A list that reorders as estimates change is harder to trust and explain than "due soonest first". Remaining minutes are only used to break a tie. Aidan may revisit.
+- **One deadline parser:** `formatDeadline`'s regex and validity rules are now `parseDeadline` in `src/lib/format.ts`, used by both, so the list and the label can't disagree about what is a valid date.
+
+### Known limit (for M7b)
+
+Which assignment is open is one shared value in storage. Two tabs on different assignments switch each other: when one opens an assignment, the other tab's `storage` listener loads that choice. M7b must decide how to handle this.
