@@ -2,19 +2,24 @@ const WEEKDAYS_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-// "2026-12-04T17:00" -> "Fri, Dec 4, 5:00 PM".
+// "2026-12-04T17:00" -> "Fri, Dec 4, 5:00 PM". A date with no time, "2026-12-04" -> "Fri, Dec 4"
+// (a brief that gives no time; M4 risk decision A).
 // Built by hand from the date parts so the result is the same on the server and in the browser,
-// whatever the time zone or locale. Returns null if the text is not a valid date and time.
+// whatever the time zone or locale. Returns null if the text is not a valid date.
 export function formatDeadline(deadline: string): string | null {
-  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(deadline);
+  const match = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/.exec(deadline);
   if (!match) return null;
-  const [year, month, day, hour, minute] = match.slice(1).map(Number);
+  const [year, month, day] = match.slice(1, 4).map(Number);
   const date = new Date(year, month - 1, day);
-  // Rejects dates that don't exist, like month 13 or Feb 30, and hours or minutes out of range.
-  if (date.getMonth() !== month - 1 || date.getDate() !== day || hour > 23 || minute > 59) return null;
+  // Rejects dates that don't exist, like month 13 or Feb 30.
+  if (date.getMonth() !== month - 1 || date.getDate() !== day) return null;
+  const datePart = `${WEEKDAYS_SHORT[date.getDay()]}, ${MONTHS[month - 1]} ${day}`;
+  if (match[4] === undefined) return datePart;
+  const [hour, minute] = [Number(match[4]), Number(match[5])];
+  if (hour > 23 || minute > 59) return null;
   const hour12 = hour % 12 === 0 ? 12 : hour % 12;
   const period = hour < 12 ? "AM" : "PM";
-  return `${WEEKDAYS_SHORT[date.getDay()]}, ${MONTHS[month - 1]} ${day}, ${hour12}:${String(minute).padStart(2, "0")} ${period}`;
+  return `${datePart}, ${hour12}:${String(minute).padStart(2, "0")} ${period}`;
 }
 
 // 30 -> "30 min"

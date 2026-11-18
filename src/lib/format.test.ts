@@ -19,6 +19,11 @@ describe("formatDeadline", () => {
     expect(formatDeadline("2026-12-04T12:30")).toBe("Fri, Dec 4, 12:30 PM");
   });
 
+  it("shows a date with no time as the date alone", () => {
+    expect(formatDeadline("2026-12-04")).toBe("Fri, Dec 4");
+    expect(formatDeadline("2026-02-30")).toBeNull();
+  });
+
   it("returns null for text that is not a real date and time", () => {
     expect(formatDeadline("soon")).toBeNull();
     expect(formatDeadline("2026-02-30T10:00")).toBeNull();
