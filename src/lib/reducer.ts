@@ -14,6 +14,8 @@ export type Action =
   | { type: "toggleFinalCheck"; requirementId: string }
   | { type: "finishReview"; at: string }
   | { type: "startNewAssignment" }
+  // Several assignments (M7).
+  | { type: "openAssignment"; id: string }
   // Brief entry and plan review (M3).
   | { type: "setBriefDraft"; draft: BriefDraft }
   | { type: "createPlan"; id: string; plan: PlanDraft; brief: string; deadlineOverride: string; at: string }
@@ -51,6 +53,11 @@ export function reducer(data: MomentumData, action: Action): MomentumData {
   if (action.type === "startNewAssignment") {
     // No open assignment means "/" shows brief entry. The completed record stays in `assignments`.
     return { ...data, activeAssignmentId: null };
+  }
+  if (action.type === "openAssignment") {
+    // Only changes which assignment is open, never the assignments themselves.
+    const exists = data.assignments.some((a) => a.id === action.id);
+    return !exists || data.activeAssignmentId === action.id ? data : { ...data, activeAssignmentId: action.id };
   }
   if (action.type === "setBriefDraft") {
     // No stored draft counts as an empty one, so a first visit writes nothing until the student types.

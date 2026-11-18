@@ -6,9 +6,9 @@ Help a student turn a dense assignment brief into manageable steps, start workin
 
 ## MVP
 
-In: one active assignment; pasted-text brief and optional deadline; summary, requirements, editable steps with approximate estimates and "Done when"; full plan and original brief access; optional timer (off by default); per-step return notes and pause/resume; step completion and undo; final requirements check; completed home; honest loading, error, empty and success states.
+In: multiple-assignment management (M7, Aidan 2026-11-18): several assignments kept at once, one open at a time; pasted-text brief and optional deadline; summary, requirements, editable steps with approximate estimates and "Done when"; full plan and original brief access; optional timer (off by default); per-step return notes and pause/resume; step completion and undo; final requirements check; completed home; honest loading, error, empty and success states.
 
-Out: PDF import, accounts, cloud sync, multiple-assignment management, calendars, streaks, adaptive scheduling, document editing or verification, submission integrations. Momentum never submits or verifies anything.
+Out: PDF import, accounts, cloud sync, dashboards, calendars, time analytics, streaks, adaptive scheduling, document editing or verification, submission integrations. Momentum never submits or verifies anything.
 
 Storage is browser-local only. Plan generation (M4) is a server-side model call; the API key never reaches the browser.
 
