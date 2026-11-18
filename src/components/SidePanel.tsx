@@ -80,7 +80,13 @@ function PanelBody({ tab, onTabChange }: { tab: PanelTab; onTabChange: (tab: Pan
             <PlanStepRow key={step.id} number={index + 1} step={step} />
           ))}
         </ol>
-        <p className="text-caption text-text-tertiary">To change steps, edit the plan from the plan review.</p>
+        {/* Plan review is the only place steps can be edited, and it can't be reached once the plan has
+            started (decisions.md, M3 "Don't build"). Started-plan wording pending Aidan's approval (M6). */}
+        <p className="text-caption text-text-tertiary">
+          {assignment.status === "review"
+            ? "To change steps, edit the plan from the plan review."
+            : "Steps can’t be changed after you start."}
+        </p>
       </TabsContent>
 
       <TabsContent value="brief" className="flex flex-col gap-4">
