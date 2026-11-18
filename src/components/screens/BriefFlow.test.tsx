@@ -186,7 +186,8 @@ describe("building and errors", () => {
     type("Half a brief");
     breakItDown();
     const heading = await screen.findByRole("heading", { name: "We couldn’t find clear requirements in that text." });
-    expect(heading).toHaveFocus();
+    // Focus moves in an effect after the card renders, so wait for it rather than racing it.
+    await waitFor(() => expect(heading).toHaveFocus());
     expect(screen.getByText("Your text is still here.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Edit the brief" }));
     expect(brief()).toHaveValue("Half a brief");
@@ -210,7 +211,8 @@ describe("building and errors", () => {
     renderApp(<HomeRoute />, apiPlanSource);
     type("A brief");
     breakItDown();
-    expect(await screen.findByRole("heading", { name: "We couldn’t build your plan just now." })).toHaveFocus();
+    const heading = await screen.findByRole("heading", { name: "We couldn’t build your plan just now." });
+    await waitFor(() => expect(heading).toHaveFocus());
     expect(screen.getByText("Too many plans were built from this network. Try again in about 10 minutes.")).toBeInTheDocument();
     expect(screen.queryByText(/Something went wrong on our side/)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Edit the brief" })).toBeInTheDocument();
