@@ -2,6 +2,7 @@ import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { HomeRoute } from "@/components/screens/HomeRoute";
 import { sampleAssignment } from "@/data/sample-assignment";
+import { BRIEF_COUNT_FROM, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
 import type { BuildResult, PlanSource } from "@/lib/plan-source";
 import { STORAGE_KEY } from "@/lib/storage";
 import { router } from "@/test/navigation-mock";
@@ -67,16 +68,49 @@ describe("brief entry", () => {
     expect(calls).toHaveLength(0);
   });
 
-  it("other text with the sample source shows the sample-only notice and keeps the text", async () => {
+  it("shows the disclosure line as plain text near Break it down, and no sample-only notice", () => {
     renderApp(<HomeRoute />);
-    type("My own brief");
-    breakItDown();
-    expect(await screen.findByText(/This preview can only build the sample plan/)).toBeInTheDocument();
-    expect(brief()).toHaveValue("My own brief");
-    expect(screen.queryByText(/couldn’t find clear requirements/)).not.toBeInTheDocument();
+    expect(
+      screen.getByText("To build your plan, your brief is sent to OpenAI. Your plan and progress stay in this browser. No account needed."),
+    ).toBeVisible();
+    expect(screen.queryByText(/This preview can only build the sample plan/)).not.toBeInTheDocument();
   });
 
-  it("the sample brief builds a plan in review and goes to /plan, clearing the draft", async () => {
+  it("the text area stops at the limit", () => {
+    renderApp(<HomeRoute />);
+    expect(brief()).toHaveAttribute("maxLength", String(MAX_BRIEF_CHARS));
+  });
+
+  it("shows a quiet character count only within 10% of the limit, linked to the field", () => {
+    renderApp(<HomeRoute />);
+    type("a".repeat(BRIEF_COUNT_FROM - 1));
+    expect(screen.queryByText(/of 12,000 characters/)).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+
+    type("a".repeat(11_200));
+    expect(screen.getByText("11,200 of 12,000 characters")).toBeInTheDocument();
+    expect(brief()).toHaveAccessibleDescription("11,200 of 12,000 characters");
+    // The live region says it once on crossing, and doesn't change with each keystroke.
+    expect(screen.getByRole("status")).toHaveTextContent("Your brief is close to the 12,000-character limit.");
+    type("a".repeat(11_201));
+    expect(screen.getByRole("status")).toHaveTextContent("Your brief is close to the 12,000-character limit.");
+
+    type("a".repeat(MAX_BRIEF_CHARS));
+    expect(screen.getByRole("status")).toHaveTextContent("Your brief has reached the 12,000-character limit.");
+  });
+
+  it("a stored draft over the limit isn't sent; it shows an error and keeps the text", () => {
+    const long = "a".repeat(MAX_BRIEF_CHARS + 50);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, activeAssignmentId: null, assignments: [], briefDraft: { text: long, deadline: "" } }));
+    const { source, calls } = stub("never");
+    renderApp(<HomeRoute />, source);
+    breakItDown();
+    expect(screen.getByText("Your brief is longer than 12,000 characters. Shorten it to build a plan.")).toBeInTheDocument();
+    expect(brief()).toHaveValue(long);
+    expect(calls).toHaveLength(0);
+  });
+
+  it("a built plan opens in review and goes to /plan, clearing the draft", async () => {
     renderApp(<HomeRoute />);
     type(sampleAssignment.brief);
     fireEvent.change(screen.getByLabelText(/Deadline/), { target: { value: "2026-12-10T09:30" } });

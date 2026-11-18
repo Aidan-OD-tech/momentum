@@ -6,6 +6,7 @@ import { BriefEntryScreen } from "@/components/screens/BriefEntryScreen";
 import { BuildingScreen } from "@/components/screens/BuildingScreen";
 import { TopBar } from "@/components/TopBar";
 import { sampleAssignment } from "@/data/sample-assignment";
+import { MAX_BRIEF_CHARS } from "@/lib/brief-limits";
 import { useMomentumData } from "@/lib/momentum-store";
 import { simulatedSource, usePlanSource, type BuildResult } from "@/lib/plan-source";
 
@@ -26,8 +27,7 @@ export function BriefFlow() {
   const [text, setText] = useState(data.briefDraft?.text ?? "");
   const [deadline, setDeadline] = useState(data.briefDraft?.deadline ?? "");
   const [phase, setPhase] = useState<Phase>({ name: "entry", focus: "heading" });
-  const [emptyError, setEmptyError] = useState(false);
-  const [sampleOnly, setSampleOnly] = useState(false);
+  const [entryError, setEntryError] = useState<"empty" | "tooLong" | null>(null);
   const [focusKey, setFocusKey] = useState(0);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const build = useRef<AbortController | null>(null);
@@ -58,14 +58,19 @@ export function BriefFlow() {
   }
 
   async function submit() {
-    setSampleOnly(false);
     if (!text.trim()) {
       // Error 01: nothing to send, so no request.
-      setEmptyError(true);
+      setEntryError("empty");
       backToEntry();
       return;
     }
-    setEmptyError(false);
+    if (text.trim().length > MAX_BRIEF_CHARS) {
+      // Only a draft saved before the limit existed can get here; the text area stops at the limit.
+      setEntryError("tooLong");
+      backToEntry();
+      return;
+    }
+    setEntryError(null);
     saveDraft(text, deadline);
 
     const controller = new AbortController();
@@ -83,9 +88,6 @@ export function BriefFlow() {
 
     if (result.ok) {
       act({ type: "createPlan", id: crypto.randomUUID(), plan: result.plan, brief: text, deadlineOverride: deadline });
-    } else if (result.reason === "sampleOnly") {
-      setSampleOnly(true);
-      backToEntry();
     } else {
       setPhase({ name: "error", reason: result.reason });
     }
@@ -135,16 +137,16 @@ export function BriefFlow() {
       deadline={deadline}
       onTextChange={(next) => {
         setText(next);
-        if (next.trim()) setEmptyError(false);
+        if (entryError === "empty" && next.trim()) setEntryError(null);
+        if (entryError === "tooLong" && next.trim().length <= MAX_BRIEF_CHARS) setEntryError(null);
       }}
       onDeadlineChange={setDeadline}
       onUseSample={() => {
         setText(sampleAssignment.brief);
-        setEmptyError(false);
+        setEntryError(null);
       }}
       onSubmit={submit}
-      emptyError={emptyError}
-      sampleOnly={sampleOnly}
+      error={entryError}
       focus={phase.focus}
       focusKey={focusKey}
     />
