@@ -4,8 +4,8 @@ import OpenAI from "openai";
 // The only place that reads the OpenAI key. Never import this file from browser code: the
 // "server-only" import above makes the build fail if anything tries.
 
-// Used when OPENAI_MODEL isn't set. Chosen in M4's live checks (see docs/decisions.md).
-export const DEFAULT_MODEL = "gpt-4.1-mini";
+// Used when OPENAI_MODEL isn't set. Aidan's choice for M4 (see docs/decisions.md).
+export const DEFAULT_MODEL = "gpt-6.1-terra";
 
 // Enough for a 12-step plan with room to spare, small enough to bound the cost of one request.
 export const MAX_OUTPUT_TOKENS = 4_000;
