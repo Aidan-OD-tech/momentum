@@ -57,3 +57,24 @@ Records what AI tools produced and where Aidan changed, corrected or decided. Ke
 ### Aidan's corrections and decisions (M4)
 
 - Accepted risk items A, B and C (2026-11-18).
+
+## M5: evaluation readiness (2026-11-18)
+
+- Implemented by Claude Code from Aidan's written M5 prompt: the sample-brief flag, the `first_step_started` event and `POST /api/event`, the measure definition, the heuristic evaluation **draft**, the accessibility pass, `/craft risk` and `/craft signal`, and the session README and template.
+- Claude Code checked Vercel's current docs instead of memory. Custom events need Pro or Enterprise, and Hobby keeps runtime logs for 1 hour. Aidan confirmed the plan (Hobby), which decided the route.
+- **What Claude Code did not do:**
+  - It wrote no participant findings, quotes, counts or results; the feedback files and the "Observed in sessions" tables are empty for Aidan.
+  - It did not use a screen reader; it wrote a VoiceOver script for Aidan.
+  - Its keyboard pass was scripted key presses, not a person at a keyboard.
+  - The heuristic evaluation is an AI expert review, marked "Reviewed by Aidan: no".
+- Claude Code's own corrections during M5:
+  - Its keyboard script first reported no focus indicator on the deadline field. It had read the style before the border's transition ended; re-checked after 600 ms (dark border present) and recorded as a script artifact, not a finding.
+  - Its first keyboard script failed on its own step loop (it looked for Mark complete on a step-complete screen); rewritten and re-run.
+  - Lint warnings in two new tests (unused parameters in `fetch` spies) were fixed by typing the spies as `fetch`.
+  - The VoiceOver script first suggested a Safari private window to trigger a save failure; local storage works there, so it was changed to blocking site data in Chrome.
+- The browser checks answered `/api/plan` with the sample plan, so no OpenAI requests were made in M5, and the API key wasn't read.
+
+### Aidan's corrections and decisions (M5)
+
+- The project is on Vercel Hobby, so the event uses `POST /api/event` (2026-11-18).
+- Closed the M4 building-copy item (keep "under a minute") and added "Today" in UTC to the M6 candidates (2026-11-18).

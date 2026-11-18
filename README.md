@@ -2,7 +2,7 @@
 
 Momentum helps students turn an assignment brief into steps and work through them one at a time. The student does the assignment in their own tools; Momentum only holds the plan and their progress. It is a course project for UX & Front-End Engineering.
 
-Production: https://momentum-five-xi.vercel.app (serves `main`). Current milestone: **M4, real plan generation** on branch `feat/m4-ai-generation` (M1–M3 merged). See [docs/status.md](docs/status.md).
+Production: https://momentum-five-xi.vercel.app (serves `main`). Current milestone: **M5, evaluation readiness** on branch `feat/m5-evaluation` (M1–M4 merged): the sample-brief flag, one anonymous event, the heuristic and accessibility review, and session templates. See [docs/status.md](docs/status.md).
 
 ## Requirements
 
@@ -11,7 +11,7 @@ Production: https://momentum-five-xi.vercel.app (serves `main`). Current milesto
 
 Plan building needs an OpenAI API key on the server: put `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`) in `.env.local`, which git ignores. Steps, including the Vercel settings and the budget limit: [docs/deploy.md](docs/deploy.md). Without a key everything else works, and building a plan shows Error 03.
 
-The one network request the app makes is `POST /api/plan`, which sends the pasted brief to OpenAI through the server. Progress is saved only in this browser's local storage (key `momentum:v1`).
+The app makes two kinds of request. `POST /api/plan` sends the pasted brief to OpenAI through the server. `POST /api/event` sends one anonymous count when a plan's first step is started (a time band and a step count, no text; production builds only; see [docs/evidence/measurement.md](docs/evidence/measurement.md)). Progress is saved only in this browser's local storage (key `momentum:v1`).
 
 ## Run it
 
@@ -24,7 +24,7 @@ npm run build
 npm run check:bundle   # after a build: fails if the key or api.openai.com reached browser files
 ```
 
-The first visit shows brief entry. "Use a sample brief" fills in the sample brief ("Urban green spaces essay"); Break it down then sends it to the model like any other brief. To start over, clear this site's local storage.
+The first visit shows brief entry. "Use a sample brief" appears only when `NEXT_PUBLIC_SHOW_SAMPLE_BRIEF=true` (for example in `.env.local`, or `NEXT_PUBLIC_SHOW_SAMPLE_BRIEF=true npm run dev`). It fills in the sample brief ("Urban green spaces essay"); Break it down then sends it to the model like any other brief. To start over, clear this site's local storage.
 
 In development only, `/?simulate=unreadable`, `failed` or `slow` replaces the plan source, to see the error and building screens. A production build ignores it.
 
@@ -39,4 +39,5 @@ Routes: `/` brief entry or home, `/plan` plan review, `/step/n` working step, `/
 - [FEATURES.md](FEATURES.md): feature inventory with build status
 - [docs/status.md](docs/status.md): milestones, what is built and what was checked
 - [docs/decisions.md](docs/decisions.md): dated decisions
+- [docs/evidence/](docs/evidence/): measurement, heuristic evaluation, accessibility pass, session feedback
 - [CLAUDE.md](CLAUDE.md): rules for AI coding sessions

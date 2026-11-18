@@ -16,6 +16,12 @@ From M4 the app needs one secret, `OPENAI_API_KEY`, used only by the server rout
 3. **Budget limit on OpenAI.** In the OpenAI dashboard, open the project the key belongs to and set a **monthly budget limit** (Settings → Limits). This is the only hard cap on spending: the route's rate limit lives in memory and is best effort on Vercel (see [decisions.md](decisions.md), M4). Also check that the project has **credit** and **access to the model** you use; without them the route answers 502 and the app shows Error 03.
 4. **Never commit `.env.local`.** Before each commit, `git status` should not list it. If a key is ever exposed, revoke it in the OpenAI dashboard and create a new one.
 
+## Steps for Aidan (M5)
+
+1. **Sample-brief flag.** Leave `NEXT_PUBLIC_SHOW_SAMPLE_BRIEF` **unset** in Vercel for Production and Preview during the sessions: "Use a sample brief" is then hidden. For the case-study demo, add it with the value `true` and redeploy. The value is built into the page, so a change needs a new deployment. It isn't a secret.
+2. **Analytics.** Nothing to enable. The project is on Hobby, where Web Analytics custom events aren't included, so the event goes to Momentum's own `POST /api/event` and shows in **Logs** (filter Environment: production, search `event=first_step_started`). Hobby keeps logs for **1 hour**: see [evidence/measurement.md](evidence/measurement.md).
+3. **After pushing `feat/m5-evaluation`:** on the preview, confirm the button is hidden, build one plan, press Start step 1, and check that one `[api/event] event=first_step_started …` line appears in Logs (Environment: preview). Then reload and reopen step 1: no second line.
+
 ## Checks after a deploy (Claude Code, once the URL exists)
 
 - `curl -s -o /dev/null -w "%{http_code}" -X POST <url>/api/plan` with no body: **400**.

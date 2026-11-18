@@ -2,7 +2,7 @@
 
 What Momentum does, feature by feature. [docs/product.md](docs/product.md) is the source of truth for scope: if this file and it disagree, product.md wins and this file gets fixed. What has been checked, and how, is in [docs/status.md](docs/status.md).
 
-**Status values used here.** `built`: in code (M1–M3 merged to `main`; M4 on `feat/m4-ai-generation`). What is verified, and how, is in docs/status.md. `planned`: in the MVP, not in code yet. (This replaces /craft's "shipped", which means "in production"; nothing is deployed yet.)
+**Status values used here.** `built`: in code (M1–M4 merged to `main`; M5 on `feat/m5-evaluation`). What is verified, and how, is in docs/status.md. `planned`: in the MVP, not in code yet. (This replaces /craft's "shipped", which means "in production".)
 
 ## Summary
 Momentum helps a student turn a dense assignment brief into manageable steps, start working, and return after a pause without rebuilding their context. It holds one active assignment at a time and saves it in the student's browser. The student does the work in their own tools; Momentum never sees, checks or submits it. There are three areas: planning (brief to plan), working through steps, and finishing with a final requirements check. Saving honestly in the browser runs underneath all three.
@@ -14,6 +14,7 @@ Momentum helps a student turn a dense assignment brief into manageable steps, st
 | Working through steps | Working step, Pause and return notes | Step completion and undo, Optional timer, Full plan and original brief | built |
 | Finishing | Final requirements check | Completed home and review | built |
 | Saving | Saved in this browser | | built |
+| Measurement | One anonymous event, `first_step_started` | | built (M5) |
 
 Marketing rows are written for the portfolio case study; Momentum has no product site.
 
@@ -30,7 +31,7 @@ Marketing rows are written for the portfolio case study; Momentum has no product
 | One-liner | Paste your assignment brief and an optional deadline. |
 | Short | The student pastes the brief text and can add a deadline. PDF import is out of scope. |
 | Marketing | Paste the brief as you got it. Add a deadline if you have one. |
-| Technical | `/` with no open assignment. Pasted text and a native `datetime-local` deadline that overrides the plan's. The only checks are "not empty" (Error 01, no request) and the 12,000-character limit (`maxLength`, with a quiet count within 10% of it). The draft is saved in `briefDraft` as the student types and survives reload, failure and Cancel. One caption line discloses that the brief is sent to OpenAI. "Use a sample brief" fills the sample text only (keeping it for M5 is an open question). |
+| Technical | `/` with no open assignment. Pasted text and a native `datetime-local` deadline that overrides the plan's. The only checks are "not empty" (Error 01, no request) and the 12,000-character limit (`maxLength`, with a quiet count within 10% of it). The draft is saved in `briefDraft` as the student types and survives reload, failure and Cancel. One caption line discloses that the brief is sent to OpenAI. "Use a sample brief" fills the sample text only, and shows only when `NEXT_PUBLIC_SHOW_SAMPLE_BRIEF` is `"true"` (hidden for the M5 sessions). |
 
 ### Plan building
 
@@ -153,3 +154,18 @@ Marketing rows are written for the portfolio case study; Momentum has no product
 | Short | Every change is written to local storage. "Saved in this browser" appears only after a confirmed write; if writing fails, the app keeps working in memory and says "Couldn’t save in this browser". No accounts or cloud sync. |
 | Marketing | No account needed. Your progress stays in this browser, and if saving ever fails, Momentum tells you. |
 | Technical | One versioned key, `momentum:v1`. Unreadable data is copied to `momentum:v1:unreadable` before starting fresh. If storage can't be read or backed up, the app stops writing for the session so nothing is overwritten. Writes happen after each reducer change in `momentum-store.tsx`. |
+
+## Measurement
+
+> **Area summary:** One count that says whether a plan led to starting step 1, sent without any of the student's text. What it measures and how to read it: [docs/evidence/measurement.md](docs/evidence/measurement.md).
+
+### First step started
+
+| Field | Value |
+|-------|-------|
+| Scale | supporting |
+| Status | built (M5) |
+| One-liner | Counts, anonymously, when a plan's first step is started. |
+| Short | When Start step 1 is pressed for the first time on a plan, Momentum sends how long after the plan was made (in four bands) and how many steps it has. Nothing else. Brief entry says so. |
+| Marketing | Momentum counts anonymous usage, such as when a plan’s first step is started, and nothing you write. |
+| Technical | `src/lib/first-step-event.ts` builds `{ event: "first_step_started", minutesSincePlanCreated: "<2" \| "2–5" \| "5–15" \| ">15", stepCount }` from `planCreatedAt` while `firstStepStartedAt` is unset, and posts it only from a production build. `POST /api/event` (strict zod schema, 256 characters, its own rate limit) logs one line and stores nothing. Read in the Vercel logs (Hobby: 1 hour retention). No Web Analytics, no page views, no third-party tracker. |
