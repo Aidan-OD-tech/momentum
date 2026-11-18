@@ -183,7 +183,7 @@ All accepted by Aidan on 2026-11-18. The four defaults first (Add a step draft, 
 
 **Status mapping.** (Aidan, with risk item B) 200 plan; 422 `unreadable` → Error 02 (refusal, `readable: false`, no substantive or format requirement, 0 or more than 12 steps, output that fails the schema); everything else → Error 03: 400, 413, 429, 502 (missing key, API or network error, reply cut off at the token limit), 504. The client also treats network errors and Cancel as `failed`.
 
-**`samplePlanSource`, `sampleOnly` and its notice are removed.** (Aidan) "Use a sample brief" only fills the text area. `?simulate=` stays, development only. Whether to keep "Use a sample brief" for M5 is open (below).
+**`samplePlanSource`, `sampleOnly` and its notice are removed.** (Aidan) "Use a sample brief" only fills the text area. `?simulate=` stays, development only. It is hidden during the M5 sessions (below).
 
 ### /craft risk items accepted (Aidan, 2026-11-18)
 
@@ -192,9 +192,9 @@ From [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.
 - **B. A reply cut off at the token limit is Error 03** (502 `failed`), not Error 02, because the brief wasn't the problem. Output limit 4,000 tokens.
 - **C. Several dates:** the instructions say to use the final submission date as the deadline.
 
-### Claude Code's choices (pending Aidan)
+### Claude Code's choices
 
-**Disclosure merged with the M3 line.** (Claude Code) "No account needed. Your plan stays in this browser." repeated "stays in this browser", so brief entry now has one caption line: "To build your plan, your brief is sent to OpenAI. Your plan and progress stay in this browser. No account needed." The first two sentences are Aidan's development copy; the wording still needs his approval. Nothing is said about OpenAI's retention or training.
+**Disclosure merged with the M3 line.** (Claude Code; wording approved by Aidan, below) "No account needed. Your plan stays in this browser." repeated "stays in this browser", so brief entry now has one caption line: "To build your plan, your brief is sent to OpenAI. Your plan and progress stay in this browser. No account needed." The first two sentences are Aidan's development copy. Nothing is said about OpenAI's retention or training.
 
 **`responses.create` with `zodTextFormat`, then one `JSON.parse` and one `safeParse`.** (Claude Code) The SDK's `responses.parse` throws on a schema mismatch, which would look like an API failure; parsing in the route keeps "unreadable" and "failed" apart and shows the single parse attempt.
 
@@ -216,9 +216,26 @@ From [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.
 
 **Bundle check matches the shape of a key** (Claude Code) (`sk-` followed by 20 or more key characters), not a bare `sk-`, which React's `mask-type` attribute contains. It also fails on `OPENAI_API_KEY` and `api.openai.com`, and prints which rule matched, never the text.
 
+### Settled by Aidan (2026-11-18, after the live checks)
+
+**Model.** Keep `gpt-6.1-terra` as both `OPENAI_MODEL` and the code default (above).
+
+**Disclosure wording.** Keep the merged single line: "To build your plan, your brief is sent to OpenAI. Your plan and progress stay in this browser. No account needed."
+
+**Estimates and step count: no prompt tuning.** Generated estimates for the sample brief (about 6.5 h) are about twice the hand-written plan's 3 h 20 min, and the same brief gives 5 or 6 steps between runs. Logged as expected run-to-run variation, and a point to observe in the M5 sessions.
+
+**"Use a sample brief" is hidden during the M5 evaluation sessions.** Participants get the brief text and paste it, so pasting is tested directly. This deviates from Figma R3 05, which draws the button; it is backed by [/craft scope](reviews/2026-11-17-scope-m3-m4.md) item 8. How (removal or a flag) is decided when M5 starts; nothing changes in M4.
+
+**Building copy.** Keep "This usually takes under a minute." for now. If the Vercel preview runs also stay around 10–15 s, it may change to "This usually takes about 15 seconds."
+
+**Three fixes from the live output.**
+- **"Done when" uses the criterion as written.** `doneWhenSentence` no longer lowercases the first letter, and the instructions ask the model to start each criterion lowercase unless it begins with a proper noun (such as Turnitin). The sample plan's criteria are stored lowercase to match, so they read as before.
+  - (Claude Code, follows from the fix) The working step's "Done when" well shows the criterion on its own as a sentence, so it capitalizes the first letter (`capitalizeFirst`); capitalizing never breaks a proper noun.
+- **No full stops at the end of requirement labels.** `toPlanDraft` removes them from labels and short labels, so chips don't end in punctuation. Full stops inside a label stay ("Dec. 4").
+- **No step for submitting.** The instructions say never to create one, because submission is already a reminder. As a backstop, `toPlanDraft` drops any step whose title starts with "Submit" (any case) before giving IDs and counting steps, so a plan still needs 1 to 12 steps after the drop; a plan of only Submit steps is unreadable (Error 02).
+
 ### Open for Aidan
 
-- **Disclosure wording** (above).
-- **Building copy** "This usually takes under a minute": 9 local plans took 10.0–13.9 s, and the recipe 3 s (developer checks). True in every run so far; the wording is Aidan's call.
-- **Seen in live output, not changed** (would need Aidan's go-ahead, and some touch prompt tuning, out of scope unless needed): generated estimates for the sample brief are about twice the hand-written plan's; plans add a "Submit" step although submission is a reminder; `doneWhenSentence` lowercases a leading proper noun ("Done when turnitin…"); generated labels end in full stops, which show in chips.
-- **"Use a sample brief" for M5:** keep it or hide it during the sessions.
+- **Building copy:** revisit after the preview timings (above).
+- **How to hide "Use a sample brief"** for M5: at the start of M5.
+- (Claude Code) **Side effects of the fixes, seen in one live run:** the reflective portfolio plan no longer has a step for reading peer feedback between the first draft and the final revision (the earlier run's "Submit the draft and review feedback" step); its revision step still exists. And a criterion that the student types with a capital in the edit card ("You have…") now reads "Done when You have…" on plan review, step complete and home.

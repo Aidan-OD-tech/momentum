@@ -136,6 +136,7 @@ Branch `feat/m4-ai-generation`, off `main` after PR #3. Not pushed, not deployed
 - `apiPlanSource` replaces the M3 sample-only source and its notice: 200 → plan, 422 → Error 02, anything else (and network errors and Cancel) → Error 03.
 - Brief entry: `maxLength` 12,000 from one constant; a quiet count ("11,200 of 12,000 characters") within 10% of it, linked to the field; a polite live region that speaks once near the limit and once at it; one disclosure line merged with "No account needed"; a development-copy error if a stored draft is already over the limit (no request).
 - `formatDeadline` shows a date-only deadline as "Fri, Dec 4".
+- Fixes after the live checks (Aidan's decisions): "Done when" uses the criterion as written (the model starts it lowercase unless it begins with a proper noun; the working step's well capitalizes it); requirement labels lose a final full stop; no Submit steps (instructions, plus `toPlanDraft` drops steps whose title starts with "Submit" before counting 1–12).
 - `npm run check:bundle` (`scripts/check-bundle.mjs`).
 
 ### Verified (2026-11-18, Node 24.21.0, Chrome via Playwright on `npm run build && npm start`)
@@ -155,6 +156,7 @@ Branch `feat/m4-ai-generation`, off `main` after PR #3. Not pushed, not deployed
 | Real API, model access (before credit) | `gpt-6.1-terra` → OpenAI **429 `credit_balance_exhausted`**; `gpt-4.1-mini` and `gpt-4o-mini` → **403 `model_not_found`**. Each showed Error 03 |
 | Live checks 1–5 and 9 (after credit, `gpt-6.1-terra`) | **all pass**; details, briefs and actual output in [evidence/generation-checks.md](evidence/generation-checks.md). 1: sample brief → every requirement, none invented, Fri, Dec 4, 5:00 PM, substantive first. 2: lab report and reflective portfolio (development briefs) checked requirement by requirement, none missing or invented; the portfolio's final date chosen over the draft date. 3: recipe → 422, Error 02, brief kept. 4: injection → normal plan, no essay text or sources. 5: no date → no deadline; the field's date wins. 9: edit a step, complete every step (count from the plan), final check lists the plan's non-submission requirements, home "All steps done" |
 | Timings | 9 plans in **10.0–13.9 s**; recipe refused in 3.0–3.3 s |
+| After the three fixes | `npm test` 20 files, **183 tests** pass (new: full stops removed from labels and short labels; Submit steps dropped before IDs; 13 steps with one Submit → 12, valid; only a Submit step → unreadable; `doneWhenSentence` keeps a proper noun's capital; `capitalizeFirst`; the two new instruction lines). Lint, tsc, build and `check:bundle` pass. Live, 2 requests (sample and portfolio briefs, 14.9 s and 13.7 s): every criterion starts lowercase, no label ends in a full stop, no Submit step. No criterion started with a proper noun in these runs, so that case is checked by unit test only |
 
 Screenshots in `docs/evidence/screenshots/`: `m4-brief-entry` (full page, with the disclosure line), `m4-near-limit-count`, `m4-building`, `m4-plan-review-sample`, `m4-plan-review-second`, `m4-error02-recipe`.
 
@@ -167,8 +169,9 @@ Screenshots in `docs/evidence/screenshots/`: `m4-brief-entry` (full page, with t
 
 - **Rate limiting is best effort**: memory is per Vercel instance and resets on a cold start. The hard cost guard is the OpenAI project's monthly budget limit (docs/deploy.md). Requests that fail at OpenAI still count toward the limit.
 - **Prompt-injection resistance is checked by hand, not proven.** The tests check only that the brief sits inside the delimiters.
-- **Model output varies between runs.** The same brief gave 6, 5 and 6 steps in three runs, with different labels and estimates. Generated estimates for the sample brief (6 h 25 min to 6 h 50 min) are about twice the hand-written plan's 3 h 20 min, and generated plans add a "Submit" step.
-- **"Done when turnitin…"**: `doneWhenSentence` lowercases the first letter, which breaks a criterion that starts with a proper noun. Generated requirement labels also end in full stops, which show in chips. Seen in live output, not fixed.
+- **Model output varies between runs.** The same brief gave 5 or 6 steps, with different labels and estimates. Generated estimates for the sample brief (about 6.5 h) are about twice the hand-written plan's 3 h 20 min. Accepted by Aidan without prompt tuning; observe in M5.
+- **A capital typed by the student stays.** "You have…" typed in the step edit card reads "Done when You have…" outside the working step.
+- **The Submit backstop is blunt.** It drops any step titled "Submit…", even one that also covers other work (an earlier portfolio plan had "Submit the draft and review feedback").
 - **Pasting more than 12,000 characters keeps the first 12,000** (browser `maxLength`). The count shows "12,000 of 12,000 characters" and the live region says the limit was reached, but nothing says text was cut.
 - "Try again in a moment" on Error 03 can be up to 10 minutes when the cause is the rate limit.
 - "Today" in the model message is the server's UTC date.

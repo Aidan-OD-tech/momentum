@@ -202,6 +202,17 @@ Browser, sample brief, fresh storage: review → Edit step 2, change its title, 
 
 `docs/evidence/screenshots/`: `m4-building` (during the 11.8 s sample run), `m4-plan-review-sample`, `m4-plan-review-second` (lab report), `m4-error02-recipe`. All 1280 px wide, full page.
 
+## 2026-11-18, after the three fixes: 2 requests
+
+Aidan's fixes from the issues above: criteria start lowercase unless they begin with a proper noun, no final full stops on labels, no Submit step (instructions plus a backstop in `toPlanDraft`).
+
+| Brief | Status | Time | Steps | Result |
+| --- | --- | --- | --- | --- |
+| Sample brief | 200 | 14.9 s | 5 | every criterion starts lowercase ("you have at least five relevant peer-reviewed sources…"); no label ends in "."; no Submit step; all brief requirements present, plus "Support the position with peer-reviewed evidence" as a second substantive line (it is in the brief) |
+| Reflective portfolio | 200 | 13.7 s | 5 | same three rules hold; both submission dates kept as reminders, final date as the deadline. The earlier run's "Submit the draft and review feedback" step is gone and no step covers reading the peer feedback; "Revise and check the portfolio" remains |
+
+No criterion started with a proper noun in either run, so "Turnitin confirms…" keeping its capital is checked by unit test only.
+
 ## Still to run
 
 The Vercel preview, once Aidan pushes: checks 1, 3 and 7, plus the curl checks (400 and 413).
