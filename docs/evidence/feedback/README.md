@@ -1,10 +1,10 @@
 # Session feedback
 
-Task-based sessions with at least two people (course requirement). **Aidan runs the sessions and fills in these files himself.** One file per participant, copied from [session-template.md](session-template.md) and named `p1.md`, `p2.md`, … Use participant codes, never names.
+Task-based sessions with at least two people (course requirement). **Aidan runs the sessions and fills in these files himself.** One file per participant, copied from [session-template.md](session-template.md) and named `P<n>-<date>.md` (for example `P1-2026-11-20.md`), as the session guide says. Use participant codes, never names.
 
-Nothing in this folder is written by Claude Code except this README and the empty template. No findings, quotes, counts or results are filled in for Aidan.
+Nothing in this folder is written by Claude Code except this README and the empty template. Aidan added the session guide. No findings, quotes, counts or results are filled in for Aidan.
 
-The session plan and observation sheet live in Aidan's session guide (`handoffs/m5-session-guide.md` in the Claude project, not in this repo). The template follows the three evaluation tasks in [MOMENTUM_CONTEXT.md](../../MOMENTUM_CONTEXT.md). **If the guide's sheet differs, the guide wins: change the template to match it before the first session.**
+The session plan, tasks, questions and observation sheet are in Aidan's [session-guide.md](session-guide.md). The template copies the guide's observation sheet exactly, plus a section for the Vercel log lines. If the two ever differ, the guide wins.
 
 ## Before each session
 
