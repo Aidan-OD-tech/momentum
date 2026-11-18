@@ -242,7 +242,7 @@ From [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.
 
 ### M6 candidates
 
-- **"Done when" prefix in the step editor.** A criterion the student types with a capital in the edit card ("You have…") reads "Done when You have…" on plan review, step complete and home. Idea: show "Done when" as a fixed prefix before the field, so the student writes the rest of the sentence. No UI change in M4.
+- ~~**"Done when" prefix in the step editor.**~~ *Moved to "watch in sessions" (H-06) by Aidan, 2026-11-18; not committed M6 work.* A criterion the student types with a capital in the edit card ("You have…") reads "Done when You have…" on plan review, step complete and home. Idea: show "Done when" as a fixed prefix before the field, so the student writes the rest of the sentence. No UI change in M4.
 - **"Today" in UTC.** (Aidan, at the M4 merge) Send the browser's local date with `POST /api/plan`, so a relative due date ("this Friday") resolves correctly for a US evening request, when the server's UTC date is already tomorrow.
 
 ## M5 (2026-11-18)
@@ -274,9 +274,11 @@ From [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.
 
 **Heuristic evaluation reviewed.** (Aidan, 2026-11-18) H-01 confirmed as severity 3. H-04, H-07 and the severity-1 items are "watch in sessions", not committed M6 work.
 
+**Session guide and template.** (Aidan, 2026-11-18) The guide is in the repo as [evidence/feedback/session-guide.md](evidence/feedback/session-guide.md). `session-template.md` uses its observation sheet's fields exactly, plus a separate section for the Vercel log lines (README step 4).
+
 ### Open for Aidan
 
-- **Session template vs the session guide:** the guide (`handoffs/m5-session-guide.md`) isn't on disk. Once it is pasted, copy it to `evidence/feedback/session-guide.md` and align `session-template.md` with its observation sheet headings.
+- None for M5 beyond running the sessions, the VoiceOver script and the preview check. Severities other than H-01 stay "(proposed)" until after the sessions.
 
 ### M6 candidates (accepted by Aidan, 2026-11-18, in this order)
 
@@ -293,4 +295,4 @@ From the heuristic evaluation (H-), the accessibility pass (WCAG numbers) and th
 **Watch in sessions** (not committed M6 work; promoted only if participants run into them):
 - H-04 estimates about twice the sample's;
 - H-07 Start step 1 below the fold;
-- severity 1: H-06 "Done when You…" (also listed under M4's M6 candidates), H-10 Undo cleared after moving on, H-11 clearing the note deletes it, H-12 Escape in edit cards, H-13 rail Tab order, H-14 visible "Finish editing to start." (signal 7), H-15 "this browser on this computer" copy (risk 2), H-16 silent fresh start.
+- severity 1: H-06 "Done when You…" (moved here from M4's M6 candidates), H-10 Undo cleared after moving on, H-11 clearing the note deletes it, H-12 Escape in edit cards, H-13 rail Tab order, H-14 visible "Finish editing to start." (signal 7), H-15 "this browser on this computer" copy (risk 2), H-16 silent fresh start.
