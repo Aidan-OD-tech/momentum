@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "@/app/api/plan/route";
-import { MAX_BRIEF_CHARS } from "@/lib/brief-limits";
+import { briefLength, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
 import { getOpenAIClient } from "@/lib/server/openai";
 import { resetPlanRateLimit } from "@/lib/server/rate-limit";
 import { modelPlan } from "@/test/model-plan";
@@ -182,6 +182,12 @@ describe("POST /api/plan: request checks", () => {
 
   it("a brief exactly at the limit is accepted", async () => {
     expect((await post({ brief: "a".repeat(MAX_BRIEF_CHARS) })).status).toBe(200);
+  });
+
+  it("counts length as brief entry does (briefLength): surrounding whitespace doesn't count", async () => {
+    const brief = "a".repeat(MAX_BRIEF_CHARS) + "   \n";
+    expect(briefLength(brief)).toBe(MAX_BRIEF_CHARS);
+    expect((await post({ brief })).status).toBe(200);
   });
 
   it("the 6th request from one IP in 10 minutes is 429; another IP still works", async () => {

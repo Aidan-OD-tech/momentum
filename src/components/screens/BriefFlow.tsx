@@ -6,7 +6,7 @@ import { BriefEntryScreen } from "@/components/screens/BriefEntryScreen";
 import { BuildingScreen } from "@/components/screens/BuildingScreen";
 import { TopBar } from "@/components/TopBar";
 import { sampleAssignment } from "@/data/sample-assignment";
-import { MAX_BRIEF_CHARS } from "@/lib/brief-limits";
+import { briefLength, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
 import { showSampleBrief } from "@/lib/flags";
 import { useMomentumData } from "@/lib/momentum-store";
 import { simulatedSource, usePlanSource, type BuildResult } from "@/lib/plan-source";
@@ -65,8 +65,8 @@ export function BriefFlow() {
       backToEntry();
       return;
     }
-    if (text.trim().length > MAX_BRIEF_CHARS) {
-      // Only a draft saved before the limit existed can get here; the text area stops at the limit.
+    if (briefLength(text) > MAX_BRIEF_CHARS) {
+      // The over-limit message is already showing; this moves focus back to the brief.
       setEntryError("tooLong");
       backToEntry();
       return;
@@ -139,7 +139,7 @@ export function BriefFlow() {
       onTextChange={(next) => {
         setText(next);
         if (entryError === "empty" && next.trim()) setEntryError(null);
-        if (entryError === "tooLong" && next.trim().length <= MAX_BRIEF_CHARS) setEntryError(null);
+        if (entryError === "tooLong" && briefLength(next) <= MAX_BRIEF_CHARS) setEntryError(null);
       }}
       onDeadlineChange={setDeadline}
       onUseSample={
@@ -151,7 +151,8 @@ export function BriefFlow() {
           : undefined
       }
       onSubmit={submit}
-      error={entryError}
+      // Over the limit shows the message straight away (a paste is no longer cut at the limit).
+      error={entryError ?? (briefLength(text) > MAX_BRIEF_CHARS ? "tooLong" : null)}
       focus={phase.focus}
       focusKey={focusKey}
     />

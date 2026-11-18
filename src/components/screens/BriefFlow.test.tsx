@@ -89,9 +89,34 @@ describe("brief entry", () => {
     expect(screen.queryByText(/This preview can only build the sample plan/)).not.toBeInTheDocument();
   });
 
-  it("the text area stops at the limit", () => {
-    renderApp(<HomeRoute />);
-    expect(brief()).toHaveAttribute("maxLength", String(MAX_BRIEF_CHARS));
+  it("a 13,000-character paste is kept whole and shows the over-limit message straight away (H-02)", () => {
+    const { source, calls } = stub("never");
+    renderApp(<HomeRoute />, source);
+    expect(brief()).not.toHaveAttribute("maxLength");
+    const pasted = "a".repeat(12_991) + "Due Dec 4"; // 13,000 characters, the due date at the end
+    type(pasted);
+    expect(brief()).toHaveValue(pasted);
+    expect(screen.getByText("13,000 of 12,000 characters")).toBeInTheDocument();
+    const message = "Your brief is longer than 12,000 characters. Shorten it to build a plan.";
+    expect(screen.getByText(message, { selector: "#brief-error" })).toBeInTheDocument();
+    expect(brief()).toHaveAttribute("aria-invalid", "true");
+    expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent(message);
+    breakItDown();
+    expect(calls).toHaveLength(0);
+    expect(brief()).toHaveValue(pasted);
+
+    type("a".repeat(MAX_BRIEF_CHARS));
+    expect(screen.queryByText(message, { selector: "#brief-error" })).not.toBeInTheDocument();
+  });
+
+  it("counts the brief as the server does, without leading and trailing whitespace", () => {
+    const { source, calls } = stub("never");
+    renderApp(<HomeRoute />, source);
+    type("a".repeat(MAX_BRIEF_CHARS) + "   \n");
+    expect(screen.getByText("12,000 of 12,000 characters")).toBeInTheDocument();
+    expect(screen.queryByText(/longer than 12,000/)).not.toBeInTheDocument();
+    breakItDown();
+    expect(calls).toHaveLength(1);
   });
 
   it("shows a quiet character count only within 10% of the limit, linked to the field", () => {
@@ -118,7 +143,7 @@ describe("brief entry", () => {
     const { source, calls } = stub("never");
     renderApp(<HomeRoute />, source);
     breakItDown();
-    expect(screen.getByText("Your brief is longer than 12,000 characters. Shorten it to build a plan.")).toBeInTheDocument();
+    expect(screen.getByText("Your brief is longer than 12,000 characters. Shorten it to build a plan.", { selector: "#brief-error" })).toBeInTheDocument();
     expect(brief()).toHaveValue(long);
     expect(calls).toHaveLength(0);
   });
