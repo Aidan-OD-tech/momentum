@@ -17,7 +17,8 @@
   --surface-sunken: #fafafa;
 
   --border-default: #e5e5e5;
-  --border-input: #d4d4d4;
+  --border-input: #949494; /* text fields only: 3.03:1 on white (WCAG 1.4.11) */
+  --border-rule: #d4d4d4; /* secondary buttons, stepper, upcoming badge, dashed note row */
   --border-strong: #111111;
 
   --action-primary: #111111;

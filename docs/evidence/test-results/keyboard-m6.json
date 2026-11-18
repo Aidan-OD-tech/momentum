@@ -1,0 +1,2423 @@
+{
+  "note": "Keyboard-only pass on the production build of feat/m6-fixes, 2026-11-18, Chrome via Playwright (m6-scripts/keyboard-m6.mjs): the M5 pass plus Shift+Tab from each h1 and the done-step view reached from step 3s rail. Each stop: key, focused element, focus indicator seen 60 ms after the key (ring or dark field border), inside the viewport, size.",
+  "runs": [
+    {
+      "width": 1280,
+      "log": {
+        "brief entry": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "textarea \"Paste the full instructions: what to make, length,\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "688×304"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "textarea \"Paste the full instructions: what to make, length,\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "688×304"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "NONE",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Break it down\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "139×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"Turn an assignment brief into small, doable steps.\"; horizontal overflow: false",
+            "Shift+Tab from the h1: a \"Momentum, home\" (focus visible: ring)"
+          ]
+        },
+        "plan review": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit requirements\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "121×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Add a step\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "72×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 4\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 5\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 6\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Start step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "123×44"
+            },
+            {
+              "key": "Tab",
+              "name": "(body)"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit requirements\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit requirements\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "121×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Add a step\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "72×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"what-to-do-0\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "572×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Remove item 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "54×32"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"what-to-do-1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "572×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Remove item 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "54×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Add an item\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "80×32"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"step-done-when\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "638×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Decrease time\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "32×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Increase time\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "32×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Delete step\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "76×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Cancel\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "96×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 4\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 5\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 6\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Start step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "123×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"Urban green spaces essay\"; horizontal overflow: false",
+            "Shift+Tab from the h1: a \"Momentum, home\" (focus visible: ring)",
+            "Edit step 1 opens with focus on: input \"step-title\"",
+            "Escape inside the step edit card: card still open = true",
+            "after Cancel focus is on: button \"Edit step 1\""
+          ]
+        },
+        "working step": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "button \"Original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "87×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Pause for later\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "147×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"From your brief1,500 words · 5+ peer-reviewed sour\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "640×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Start a 5 min timer\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "122×32"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"1. Restate the prompt\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "220×30"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View full plan\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "90×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "87×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Pause for later\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "147×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"From your brief1,500 words · 5+ peer-reviewed sour\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "640×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Start a 5 min timer\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "122×32"
+            },
+            {
+              "key": "Tab",
+              "name": "(body)"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"1. Restate the prompt\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "220×30"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View full plan\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "90×32"
+            },
+            {
+              "key": "ArrowRight",
+              "name": "button[tab] \"Original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "111×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Close\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "32×32"
+            },
+            {
+              "key": "Tab",
+              "name": "div[tabpanel] \"Requirements we foundTakes a clear position on whe\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "472×704"
+            },
+            {
+              "key": "Tab",
+              "name": "button[tab] \"Original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "111×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Close\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "32×32"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"Restate the prompt\"; horizontal overflow: false",
+            "Shift+Tab from the h1: button \"Original brief\" (focus visible: ring)",
+            "side panel opens with focus on: button[tab] \"Plan\"",
+            "ArrowRight in tabs: button[tab] \"Original brief\"",
+            "Tab inside the panel stays inside: true",
+            "Escape closes the panel; focus returns to: button \"View full plan\""
+          ]
+        },
+        "pause dialog": {
+          "stops": [
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Pause for later\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "147×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Keep working\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "142×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Finish for now\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "142×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Close\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "32×32"
+            },
+            {
+              "key": "Tab",
+              "name": "textarea \"Reading source 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "472×96"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Keep working\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "142×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Keep working\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "142×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Finish for now\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "142×44"
+            }
+          ],
+          "notes": [
+            "dialog opens with focus on: textarea \"For example: thesis drafted, still need the third \"",
+            "Escape closes the dialog; focus returns to: button \"Pause for later\"",
+            "reopened with Enter; draft kept: true"
+          ]
+        },
+        "home after pause": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Resume step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "144×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View full plan\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "140×44"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Resume step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "144×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Resume step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "144×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"Pick up where you left off\"; horizontal overflow: false",
+            "Shift+Tab from the h1: a \"Momentum, home\" (focus visible: ring)"
+          ]
+        },
+        "step complete": {
+          "stops": [
+            {
+              "key": "Tab",
+              "name": "button \"Hide note\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "64×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Shift+Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Finish for now\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Undo\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "36×32"
+            },
+            {
+              "key": "Tab",
+              "name": "(body)"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Finish for now\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Undo\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "36×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Hide note\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "64×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Pause for later\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "147×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"From your brief1,500 words · 5+ peer-reviewed sour\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "640×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Start a 30 min timer\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "132×32"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Done: 1. Restate the prompt\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "220×30"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 4\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 5\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 6\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"Step 1 done.\"; horizontal overflow: false",
+            "Shift+Tab from the h1: a \"Momentum, home\" (focus visible: ring)",
+            "Undo by Enter returned to /step/1"
+          ]
+        },
+        "done step": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "button \"Original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "87×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Hide note\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "64×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Back to step 3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "145×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"From your brief1,500 words · 5+ peer-reviewed sour\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "640×32"
+            },
+            {
+              "key": "Tab",
+              "name": "(body)"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Done: 1. Restate the prompt\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "220×30"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Done: 2. Find five sources\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "220×30"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"In progress: 3. Draft a thesis and outline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "220×30"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View full plan\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "90×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "87×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Hide note\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "64×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Hide note\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "64×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Back to step 3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "145×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"Restate the prompt\"; horizontal overflow: false",
+            "Shift+Tab from the h1: button \"Original brief\" (focus visible: ring)",
+            "Tab presses from the h1 to \"Back to step 3\": 2",
+            "Enter on Back to step 3 opened /step/3; focus: h1 \"Draft a thesis and outline\""
+          ]
+        },
+        "final check": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r4\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Finish review\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "136×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View full plan\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "140×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Undo\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "36×32"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r4\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Finish review\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "136×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"All 6 steps done.\"; horizontal overflow: false",
+            "Shift+Tab from the h1: a \"Momentum, home\" (focus visible: ring)",
+            "Space ticks the first checkbox: true"
+          ]
+        },
+        "completed home": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Review assignment\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "179×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Start a new assignment\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "205×44"
+            },
+            {
+              "key": "Tab",
+              "name": "(body)"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Review assignment\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "179×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"All steps done\"; horizontal overflow: false",
+            "Shift+Tab from the h1: a \"Momentum, home\" (focus visible: ring)"
+          ]
+        }
+      },
+      "smallTargets": {
+        "brief entry": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "plan review": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "working step": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "pause dialog": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "home after pause": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "step complete": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "done step": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "final check": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          },
+          {
+            "name": "check-r1",
+            "w": 20,
+            "h": 20
+          },
+          {
+            "name": "check-r2",
+            "w": 20,
+            "h": 20
+          },
+          {
+            "name": "check-r3",
+            "w": 20,
+            "h": 20
+          },
+          {
+            "name": "check-r4",
+            "w": 20,
+            "h": 20
+          }
+        ],
+        "completed home": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ]
+      }
+    },
+    {
+      "width": 600,
+      "log": {
+        "brief entry": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "textarea \"Paste the full instructions: what to make, length,\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "568×304"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "textarea \"Paste the full instructions: what to make, length,\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "568×304"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"deadline\"",
+              "visible": "NONE",
+              "inViewport": true,
+              "size": "254×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Break it down\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "139×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"Turn an assignment brief into small, doable steps.\"; horizontal overflow: false",
+            "Shift+Tab from the h1: a \"Momentum, home\" (focus visible: ring)"
+          ]
+        },
+        "plan review": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit requirements\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "121×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Add a step\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "72×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 4\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 5\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 6\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Start step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "123×44"
+            },
+            {
+              "key": "Tab",
+              "name": "(body)"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit requirements\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit requirements\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "121×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Add a step\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "72×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"what-to-do-0\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "452×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Remove item 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "54×32"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"what-to-do-1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "452×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Remove item 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "54×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Add an item\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "80×32"
+            },
+            {
+              "key": "Tab",
+              "name": "input \"step-done-when\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "518×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Decrease time\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "32×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Increase time\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "32×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Delete step\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "76×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Cancel\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "96×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 4\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 5\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Edit step 6\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "25×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Start step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "123×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"Urban green spaces essay\"; horizontal overflow: false",
+            "Shift+Tab from the h1: a \"Momentum, home\" (focus visible: ring)",
+            "Edit step 1 opens with focus on: input \"step-title\"",
+            "Escape inside the step edit card: card still open = true",
+            "after Cancel focus is on: button \"Edit step 1\""
+          ]
+        },
+        "working step": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "button \"Original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "87×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Pause for later\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "147×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"From your brief1,500 words · 5+ peer-reviewed sour\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "568×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Start a 5 min timer\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "122×32"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"1. Restate the prompt\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "568×30"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View full plan\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "90×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "87×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Pause for later\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "147×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"From your brief1,500 words · 5+ peer-reviewed sour\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "568×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Start a 5 min timer\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "122×32"
+            },
+            {
+              "key": "Tab",
+              "name": "(body)"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"1. Restate the prompt\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "568×30"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View full plan\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "90×32"
+            },
+            {
+              "key": "ArrowRight",
+              "name": "button[tab] \"Original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "111×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Close\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "32×32"
+            },
+            {
+              "key": "Tab",
+              "name": "div[tabpanel] \"Requirements we foundTakes a clear position on whe\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "472×704"
+            },
+            {
+              "key": "Tab",
+              "name": "button[tab] \"Original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "111×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Close\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "32×32"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"Restate the prompt\"; horizontal overflow: false",
+            "Shift+Tab from the h1: button \"Original brief\" (focus visible: ring)",
+            "side panel opens with focus on: button[tab] \"Plan\"",
+            "ArrowRight in tabs: button[tab] \"Original brief\"",
+            "Tab inside the panel stays inside: true",
+            "Escape closes the panel; focus returns to: button \"View full plan\""
+          ]
+        },
+        "pause dialog": {
+          "stops": [
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Pause for later\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "147×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Keep working\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "142×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Finish for now\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "142×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Close\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "32×32"
+            },
+            {
+              "key": "Tab",
+              "name": "textarea \"Reading source 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "472×96"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Keep working\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "142×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Keep working\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "142×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Finish for now\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "142×44"
+            }
+          ],
+          "notes": [
+            "dialog opens with focus on: textarea \"For example: thesis drafted, still need the third \"",
+            "Escape closes the dialog; focus returns to: button \"Pause for later\"",
+            "reopened with Enter; draft kept: true"
+          ]
+        },
+        "home after pause": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Resume step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "144×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View full plan\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "140×44"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Resume step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "144×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Resume step 1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "144×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"Pick up where you left off\"; horizontal overflow: false",
+            "Shift+Tab from the h1: a \"Momentum, home\" (focus visible: ring)"
+          ]
+        },
+        "step complete": {
+          "stops": [
+            {
+              "key": "Tab",
+              "name": "button \"Hide note\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "64×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Shift+Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Finish for now\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Undo\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "36×32"
+            },
+            {
+              "key": "Tab",
+              "name": "(body)"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Finish for now\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Undo\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "36×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Hide note\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "64×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Pause for later\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "147×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"From your brief1,500 words · 5+ peer-reviewed sour\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "568×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Start a 30 min timer\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "132×32"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Done: 1. Restate the prompt\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "568×30"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 4\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 5\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Continue to step 6\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "241×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Mark complete\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "148×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"Step 1 done.\"; horizontal overflow: false",
+            "Shift+Tab from the h1: a \"Momentum, home\" (focus visible: ring)",
+            "Undo by Enter returned to /step/1"
+          ]
+        },
+        "done step": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "button \"Original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "87×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Hide note\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "64×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Back to step 3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "145×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"From your brief1,500 words · 5+ peer-reviewed sour\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "568×32"
+            },
+            {
+              "key": "Tab",
+              "name": "(body)"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Done: 1. Restate the prompt\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "568×30"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Done: 2. Find five sources\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "568×30"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"In progress: 3. Draft a thesis and outline\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "568×30"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View full plan\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "90×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Original brief\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "87×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Hide note\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "64×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Hide note\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "64×32"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Back to step 3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "145×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"Restate the prompt\"; horizontal overflow: false",
+            "Shift+Tab from the h1: button \"Original brief\" (focus visible: ring)",
+            "Tab presses from the h1 to \"Back to step 3\": 2",
+            "Enter on Back to step 3 opened /step/3; focus: h1 \"Draft a thesis and outline\""
+          ]
+        },
+        "final check": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r4\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Finish review\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "136×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"View full plan\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "140×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Undo\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "36×32"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r1\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r2\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r3\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button[checkbox] \"check-r4\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "20×20"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Finish review\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "136×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"All 6 steps done.\"; horizontal overflow: false",
+            "Shift+Tab from the h1: a \"Momentum, home\" (focus visible: ring)",
+            "Space ticks the first checkbox: true"
+          ]
+        },
+        "completed home": {
+          "stops": [
+            {
+              "key": "Shift+Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Review assignment\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "179×44"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Start a new assignment\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "205×44"
+            },
+            {
+              "key": "Tab",
+              "name": "(body)"
+            },
+            {
+              "key": "Tab",
+              "name": "a \"Momentum, home\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "104×22"
+            },
+            {
+              "key": "Tab",
+              "name": "button \"Review assignment\"",
+              "visible": "ring",
+              "inViewport": true,
+              "size": "179×44"
+            }
+          ],
+          "notes": [
+            "focus on arrival: h1 \"All steps done\"; horizontal overflow: false",
+            "Shift+Tab from the h1: a \"Momentum, home\" (focus visible: ring)"
+          ]
+        }
+      },
+      "smallTargets": {
+        "brief entry": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "plan review": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "working step": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "pause dialog": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "home after pause": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "step complete": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "done step": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ],
+        "final check": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          },
+          {
+            "name": "check-r1",
+            "w": 20,
+            "h": 20
+          },
+          {
+            "name": "check-r2",
+            "w": 20,
+            "h": 20
+          },
+          {
+            "name": "check-r3",
+            "w": 20,
+            "h": 20
+          },
+          {
+            "name": "check-r4",
+            "w": 20,
+            "h": 20
+          }
+        ],
+        "completed home": [
+          {
+            "name": "Momentum, home",
+            "w": 104,
+            "h": 22
+          }
+        ]
+      }
+    }
+  ]
+}

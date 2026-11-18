@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { type SaveStatus, TopBar } from "@/components/TopBar";
 import { type Action, getActiveAssignment, reducer } from "@/lib/reducer";
-import { load, save } from "@/lib/storage";
+import { load, save, STORAGE_KEY } from "@/lib/storage";
 import { useRedirect } from "@/lib/use-redirect";
 import type { Assignment, MomentumData } from "@/lib/types";
 
@@ -69,6 +69,27 @@ export function MomentumProvider({ children }: { children: React.ReactNode }) {
     // during render: that keeps the server HTML and the first client render identical (no hydration mismatch).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setData(initial);
+  }, []);
+
+  // Another tab wrote (the storage event never fires in the tab that wrote). Take its data, so this
+  // tab's next write doesn't put back an old copy over it. Screens whose route no longer fits the new
+  // data follow their existing redirects.
+  useEffect(() => {
+    function onStorage(event: StorageEvent) {
+      if (event.key !== STORAGE_KEY) return;
+      const result = load();
+      if (!result.ok || (event.newValue !== null && !result.data)) {
+        // Unreadable (load() has backed it up) or storage unusable: keep what's on screen, never write over it.
+        canWrite.current = false;
+        setSaveStatus("failed");
+        return;
+      }
+      const next = result.data ?? EMPTY_DATA;
+      dataRef.current = next;
+      setData(next);
+    }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
 
   const act = useCallback(

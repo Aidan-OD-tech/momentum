@@ -6,10 +6,10 @@ import { BriefEntryScreen } from "@/components/screens/BriefEntryScreen";
 import { BuildingScreen } from "@/components/screens/BuildingScreen";
 import { TopBar } from "@/components/TopBar";
 import { sampleAssignment } from "@/data/sample-assignment";
-import { MAX_BRIEF_CHARS } from "@/lib/brief-limits";
+import { briefLength, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
 import { showSampleBrief } from "@/lib/flags";
 import { useMomentumData } from "@/lib/momentum-store";
-import { simulatedSource, usePlanSource, type BuildResult } from "@/lib/plan-source";
+import { simulatedSource, usePlanSource, type BuildResult, type FailureReason } from "@/lib/plan-source";
 
 // How long typing pauses before the draft is written to storage.
 const DRAFT_SAVE_DELAY_MS = 400;
@@ -17,7 +17,7 @@ const DRAFT_SAVE_DELAY_MS = 400;
 type Phase =
   | { name: "entry"; focus: "heading" | "brief" }
   | { name: "building" }
-  | { name: "error"; reason: "unreadable" | "failed" };
+  | { name: "error"; reason: FailureReason };
 
 // "/" with no open assignment: brief entry, building, and Errors 02 and 03. The brief and deadline are
 // kept as a draft in storage, so they survive a reload, a failed build and Cancel. When a plan is
@@ -65,8 +65,8 @@ export function BriefFlow() {
       backToEntry();
       return;
     }
-    if (text.trim().length > MAX_BRIEF_CHARS) {
-      // Only a draft saved before the limit existed can get here; the text area stops at the limit.
+    if (briefLength(text) > MAX_BRIEF_CHARS) {
+      // The over-limit message is already showing; this moves focus back to the brief.
       setEntryError("tooLong");
       backToEntry();
       return;
@@ -122,7 +122,13 @@ export function BriefFlow() {
           ) : (
             <ErrorCard
               heading="We couldn’t build your plan just now."
-              body="Something went wrong on our side, not with your brief. Try again in a moment."
+              body={
+                phase.reason === "rateLimited"
+                  ? // The route allows 5 plans per IP address in 10 minutes (and 100 an hour in all), so no
+                    // promise of an exact wait. Wording approved by Aidan (decisions.md, M6, item 5).
+                    "Too many plans were built from this network. Try again in about 10 minutes."
+                  : "Something went wrong on our side, not with your brief. Try again in a moment."
+              }
               primary={tryAgain}
               secondary={editBrief}
             />
@@ -139,7 +145,7 @@ export function BriefFlow() {
       onTextChange={(next) => {
         setText(next);
         if (entryError === "empty" && next.trim()) setEntryError(null);
-        if (entryError === "tooLong" && next.trim().length <= MAX_BRIEF_CHARS) setEntryError(null);
+        if (entryError === "tooLong" && briefLength(next) <= MAX_BRIEF_CHARS) setEntryError(null);
       }}
       onDeadlineChange={setDeadline}
       onUseSample={
@@ -151,7 +157,8 @@ export function BriefFlow() {
           : undefined
       }
       onSubmit={submit}
-      error={entryError}
+      // Over the limit shows the message straight away (a paste is no longer cut at the limit).
+      error={entryError ?? (briefLength(text) > MAX_BRIEF_CHARS ? "tooLong" : null)}
       focus={phase.focus}
       focusKey={focusKey}
     />

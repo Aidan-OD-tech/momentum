@@ -13,6 +13,10 @@ export const PlanRequestSchema = z
     brief: z.string(),
     // The student's deadline field. Not sent to the model: the browser applies it over the plan's.
     deadline: z.string().max(32).optional(),
+    // The browser's local date, "YYYY-MM-DD", so relative dates in the brief resolve against the
+    // student's day (H-05). A missing or malformed value becomes undefined, not a 400: the server then
+    // uses its own UTC date, as before M6. The one-day window is checked by resolveToday().
+    today: z.iso.date().optional().catch(undefined),
   })
   .strict();
 

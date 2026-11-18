@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { TopBar } from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
 import { FieldError, TextArea } from "@/components/ui/text-field";
-import { BRIEF_COUNT_FROM, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
+import { BRIEF_COUNT_FROM, briefLength, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
 import { useFocusHeading } from "@/lib/use-focus-heading";
 
 type BriefEntryScreenProps = {
@@ -15,7 +15,7 @@ type BriefEntryScreenProps = {
   // Leave out to hide "Use a sample brief" (see showSampleBrief in src/lib/flags.ts).
   onUseSample?: () => void;
   onSubmit: () => void;
-  // Error 01: nothing pasted. tooLong: a draft saved before the limit existed is over it.
+  // Error 01: nothing pasted. tooLong: the brief is over the limit (shown as soon as it is).
   error: "empty" | "tooLong" | null;
   // "brief" puts focus in the text area (Edit the brief, Cancel, Error 01); "heading" on a fresh visit.
   focus: "heading" | "brief";
@@ -36,7 +36,8 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
     if (focus === "brief") briefRef.current?.focus();
   }, [focus, focusKey]);
 
-  const nearLimit = text.length >= BRIEF_COUNT_FROM;
+  const length = briefLength(text);
+  const nearLimit = length >= BRIEF_COUNT_FROM;
   const describedBy = [error && "brief-error", nearLimit && "brief-count"].filter(Boolean).join(" ") || undefined;
 
   return (
@@ -74,8 +75,9 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
             <TextArea
               id="brief"
               ref={briefRef}
+              // No maxLength: a longer paste is kept whole, so nothing at its end (often the due date) is
+              // dropped unseen. The over-limit message below blocks the build until it's shortened (H-02).
               rows={11}
-              maxLength={MAX_BRIEF_CHARS}
               value={text}
               onChange={(event) => props.onTextChange(event.target.value)}
               placeholder="Paste the full instructions: what to make, length, sources, format and due date."
@@ -92,10 +94,10 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
             {nearLimit && (
               // Development copy. Read with the field (aria-describedby), not announced on every keystroke.
               <p id="brief-count" className="text-caption text-text-tertiary">
-                {count(text.length)} of {count(MAX_BRIEF_CHARS)} characters
+                {count(length)} of {count(MAX_BRIEF_CHARS)} characters
               </p>
             )}
-            <LimitAnnouncement length={text.length} />
+            <LimitAnnouncement length={length} />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -115,7 +117,7 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
 
           <div className="flex flex-wrap items-center justify-between gap-4">
             {/* The AI disclosure (scope item 14), merged with the M3 "No account needed" line. The last
-                sentence covers the M5 usage event; its wording is pending Aidan's approval. */}
+                sentence covers the M5 usage event; its wording was approved by Aidan (decisions.md, M5). */}
             <p className="flex-1 text-caption text-text-tertiary">
               To build your plan, your brief is sent to OpenAI. Your plan and progress stay in this browser. No account needed.
               Momentum counts anonymous usage, such as when a plan’s first step is started.
@@ -130,11 +132,12 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
   );
 }
 
-// A polite live region whose text changes only when the brief crosses into "near the limit" or reaches
-// the limit, so a screen reader hears it once at each point rather than on every keystroke.
+// A polite live region whose text changes only when the brief crosses into "near the limit", reaches
+// the limit or goes over it, so a screen reader hears it once at each point rather than on every keystroke.
 function LimitAnnouncement({ length }: { length: number }) {
   let message = "";
-  if (length >= MAX_BRIEF_CHARS) message = `Your brief has reached the ${count(MAX_BRIEF_CHARS)}-character limit.`;
+  if (length > MAX_BRIEF_CHARS) message = `Your brief is longer than ${count(MAX_BRIEF_CHARS)} characters. Shorten it to build a plan.`;
+  else if (length === MAX_BRIEF_CHARS) message = `Your brief has reached the ${count(MAX_BRIEF_CHARS)}-character limit.`;
   else if (length >= BRIEF_COUNT_FROM) message = `Your brief is close to the ${count(MAX_BRIEF_CHARS)}-character limit.`;
   return (
     <p role="status" className="sr-only">

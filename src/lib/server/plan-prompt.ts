@@ -45,13 +45,26 @@ Write in plain, calm English. No exclamation marks.
 
 // The user message: today's date, then the brief inside the delimiters. Any <brief> or </brief> tags
 // inside the pasted text are removed, so the brief can't close the delimiters early.
-export function buildUserMessage(brief: string, today: Date): string {
+// `today` is a calendar date, "YYYY-MM-DD" (from resolveToday).
+export function buildUserMessage(brief: string, today: string): string {
   const safeBrief = brief.replace(/<\/?brief>/gi, "");
   return `Today's date: ${formatToday(today)}\n\n<brief>\n${safeBrief}\n</brief>`;
 }
 
-// "Wednesday, 2026-11-18", from the server's clock.
-function formatToday(today: Date): string {
-  const weekday = today.toLocaleDateString("en-US", { weekday: "long", timeZone: "UTC" });
-  return `${weekday}, ${today.toISOString().slice(0, 10)}`;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// The date the model is told is today. The browser's date when it sent a valid one within one day of
+// the server's UTC date (every time zone is within a day of UTC); otherwise the server's UTC date.
+export function resolveToday(browserToday: string | undefined, now: Date): string {
+  const serverToday = now.toISOString().slice(0, 10);
+  if (!browserToday) return serverToday;
+  // Both parse as midnight UTC, so this compares calendar dates, not clocks.
+  const daysApart = Math.abs(Date.parse(browserToday) - Date.parse(serverToday)) / DAY_MS;
+  return daysApart <= 1 ? browserToday : serverToday;
+}
+
+// "Wednesday, 2026-11-18": the weekday of that calendar date, with no time zone involved.
+function formatToday(today: string): string {
+  const weekday = new Date(`${today}T00:00:00Z`).toLocaleDateString("en-US", { weekday: "long", timeZone: "UTC" });
+  return `${weekday}, ${today}`;
 }

@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "@/app/api/plan/route";
-import { MAX_BRIEF_CHARS } from "@/lib/brief-limits";
+import { briefLength, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
 import { getOpenAIClient } from "@/lib/server/openai";
 import { resetPlanRateLimit } from "@/lib/server/rate-limit";
 import { modelPlan } from "@/test/model-plan";
@@ -72,6 +72,39 @@ describe("POST /api/plan: success", () => {
     const step = { title: "Step", intro: null, whatToDo: ["Do"], doneWhen: "Done.", estimateMin: 10 };
     useClient(async () => reply(modelPlan({ steps: Array.from({ length: 13 }, () => step) })));
     expect((await post({ brief: "A brief" })).status).toBe(422);
+  });
+});
+
+describe("POST /api/plan: today's date (H-05)", () => {
+  // 8 PM on Nov 18 in New York is already Nov 19 in UTC.
+  let create: ReturnType<typeof useClient>;
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-19T01:00:00Z"));
+    create = useClient(async () => reply(modelPlan()));
+  });
+  afterEach(() => vi.useRealTimers());
+
+  async function toldToday(body: object) {
+    const response = await post({ brief: "Due this Friday.", ...body });
+    expect(response.status).toBe(200);
+    return (create.mock.calls[0][0] as { input: string }).input.split("\n")[0];
+  }
+
+  it("a valid browser date within a day is used", async () => {
+    expect(await toldToday({ today: "2026-11-18" })).toBe("Today's date: Wednesday, 2026-11-18");
+  });
+
+  it("a missing date falls back to the server's UTC date", async () => {
+    expect(await toldToday({})).toBe("Today's date: Thursday, 2026-11-19");
+  });
+
+  it("a far-off date falls back to the server's UTC date", async () => {
+    expect(await toldToday({ today: "2026-10-01" })).toBe("Today's date: Thursday, 2026-11-19");
+  });
+
+  it.each(["18/11/2026", "2026-02-30", "today", 20261118, null])("a malformed date (%s) falls back, and isn't a 400", async (today) => {
+    expect(await toldToday({ today })).toBe("Today's date: Thursday, 2026-11-19");
   });
 });
 
@@ -182,6 +215,12 @@ describe("POST /api/plan: request checks", () => {
 
   it("a brief exactly at the limit is accepted", async () => {
     expect((await post({ brief: "a".repeat(MAX_BRIEF_CHARS) })).status).toBe(200);
+  });
+
+  it("counts length as brief entry does (briefLength): surrounding whitespace doesn't count", async () => {
+    const brief = "a".repeat(MAX_BRIEF_CHARS) + "   \n";
+    expect(briefLength(brief)).toBe(MAX_BRIEF_CHARS);
+    expect((await post({ brief })).status).toBe(200);
   });
 
   it("the 6th request from one IP in 10 minutes is 429; another IP still works", async () => {

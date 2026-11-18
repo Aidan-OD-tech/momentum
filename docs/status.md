@@ -10,8 +10,8 @@ Legend: **planned** (not started), **implemented** (written, not independently c
 | M2 | Core loop on sample data with persistence: home, working step, pause and notes, completion and undo, timer, side panels, final check, completed home, review | verified and merged (PR #2) |
 | M3 | Brief entry, building, plan review and editing, error screens, preview deploy | verified and merged (PR #3) |
 | M4 | AI generation (server-side, structured output) | verified and merged (PR #4) |
-| M5 | Evaluation readiness: sample-brief flag, one tracked event, heuristic and accessibility review, session templates | implemented on branch `feat/m5-evaluation`; **verified** locally on the production build (see M5); Vercel preview check and the sessions pending |
-| M6 | Fixes from evaluation | planned |
+| M5 | Evaluation readiness: sample-brief flag, one tracked event, heuristic and accessibility review, session templates | verified and merged (PR #5); sessions and VoiceOver pending (Aidan) |
+| M6 | Fixes from evaluation | implemented on branch `feat/m6-fixes`; **verified** locally on the production build (see M6); wording approved by Aidan (2026-11-18); not pushed; Vercel preview checks and VoiceOver pending |
 | M7 | Docs and case study | planned |
 
 ## M1 summary
@@ -233,3 +233,69 @@ Screenshots in `docs/evidence/screenshots/`: `m5-<screen>-1280.png` and `m5-<scr
 - Plans created before M5 never send the event (no creation time).
 - Two open tabs overwrite each other's progress (verified; M6 candidate). Two tabs on plan review would send two events.
 - The accessibility failures (1.4.11 field borders, 4.1.3 save status) are unchanged; M6.
+
+## M6
+
+Branch `feat/m6-fixes`, off `main` at `e63ddcf` (PR #5). Pushed by Aidan; Vercel preview of `8410d9f`: https://momentum-git-feat-m6-fixes-aidan-o-driscoll.vercel.app (the branch address, no login needed). Decisions: [decisions.md](decisions.md), section M6. Review: [reviews/2026-11-18-compose-responsive-m6.md](reviews/2026-11-18-compose-responsive-m6.md). Accessibility re-run: [evidence/accessibility.md](evidence/accessibility.md), "M6 re-run".
+
+### Built (one commit per item)
+
+| # | Item | Commit | State |
+| --- | --- | --- | --- |
+| 1 | Tabs stay in step (H-01): the `storage` event reloads another tab's data | `e9c550e` | verified (tests; two Chrome tabs, scripted) |
+| 2 | Field border #949494, 3.03:1 (WCAG 1.4.11, H-08); non-field controls on `border/rule` | `8c7fc6a` | verified (token test; computed style in Chrome) |
+| 3 | Save status in one mounted `role="status"` region; failed state with icon and Ink; one line (WCAG 4.1.3, H-09) | `547f10a` | verified in the DOM; **not heard** (no screen reader) |
+| 4 | No `maxLength`; a long paste is kept and the over-limit message shows at once (H-02) | `f7d0b0b` | verified (tests; 13,000-character paste in Chrome) |
+| 5 | 429 → `rateLimited` → Error 03 with its own line (H-03) | `3423e3a` | verified with a mocked 429, and on the preview with a real 429 (preview check 3) |
+| 6 | The browser's local date sent as `today`, checked on the server (H-05) | `7c46803` | verified (tests; the request body in Chrome; on the preview with the live model, preview check 5) |
+| 7 | Undo described by "Step N is marked done." (signal 5) | `489a3ba` | verified (tests; attribute in Chrome) |
+| 8 | "Progress saved" announcement | none | **planned**: waits for VoiceOver |
+| 9 | Rail keeps the step in progress; "Back to step N" / "Back to home"; wordmark links home (H-17) | `36bdced` | verified (tests; in Chrome) |
+| 10 | Side-panel line once started: "Steps can’t be changed after you start." | `cdb73c5` | verified (tests; in Chrome) |
+| 11 | /craft compose fix: step-complete captions in one footer | `deba3df` | verified (screenshots) |
+| | Test race fix (Error 02/03 focus) | `67533f4` | verified: 0 failures in 25 full runs under load, against about 1 in 8 before |
+
+### Verified (2026-11-18, Node 24.21.0)
+
+| Check | Result |
+| --- | --- |
+| Baseline on the fresh branch before changes | lint, tsc, **221 tests** (not 220: M5's `env=` test added one), build, `check:bundle`: pass |
+| `npm run lint`, `npx tsc --noEmit` | pass |
+| `npm test` | 27 files, **257 tests** pass (36 new). New: <ul><li>another tab's write replaces the data; the next write keeps that tab's note; other keys are ignored; an unreadable value shows failed and is never written over;</li><li>`border/input` ≥ 3:1 on white and `surface/page`; focus border ≥ 3:1 against it;</li><li>the status region is mounted while hidden, is the same element through hidden → saved → failed → saved, and the failed state has its own icon, Ink and no wrap;</li><li>a 13,000-character paste is kept with its end, shows the over-limit message and the count, and sends nothing; trailing whitespace isn't counted, on the client or by the route;</li><li>429 → `rateLimited`; Error 03 shows the rate-limit line, makes one request and retries only on Try again;</li><li>`resolveToday`: valid, missing, far-off; the route uses the browser date, and falls back for a missing, far-off or malformed date (5 kinds) without a 400; `localDate` late in the evening;</li><li>Undo's accessible description on step complete and the final check;</li><li>the done-step rail lists the in-progress step; Back to step N; Back to home; the wordmark link;</li><li>the side-panel line in review, active and completed.</li></ul> The tab-sync tests were checked to fail with the listener removed. |
+| `npm run build`, `npm run check:bundle` | pass; bundle check: no key |
+| Two tabs, H-01 steps (Chrome via Playwright, `m6-scripts/tabs-m6.mjs`) | Tab A paused step 1 with a note; stale tab B pressed Mark complete. The stored step 1 is **done with the note kept** ("Note written in tab A"). In M5 the same steps erased it. **Scripted, not by hand:** Aidan's preview check |
+| Walkthrough on the production build at 1280×800 and 600×800 (`m6-scripts/walk-m6.mjs`) | every M6 check passed at both widths (see axe-m6.json `checks`): <ul><li>status region empty on brief entry;</li><li>field border `rgb(148, 148, 148)`;</li><li>13,000 characters kept, message and count shown, no request;</li><li>the rate-limit line;</li><li>the request body has `today`;</li><li>one event for the whole plan (204);</li><li>Saved on one line;</li><li>Undo described;</li><li>the done view lists "In progress: 3." and Back to step 3 opens step 3;</li><li>the side-panel line;</li><li>the wordmark goes home;</li><li>failed status with icon, Ink, one line, no horizontal scroll, then back to Saved.</li></ul> The only console errors were the 422, 502 and 429 the script returned on purpose |
+| axe, 13 M5 screens + 4 M6 views × 2 widths | **0 violations**. Needs review: only the pause dialog, same items as M5. `evidence/test-results/axe-m6.json` |
+| Keyboard pass, M6 (scripted, `m6-scripts/keyboard-m6.mjs`, both widths) | no traps; focus on the h1 on every screen; the wordmark is the first stop in the page (token ring); Shift+Tab from the h1 reaches it everywhere except the working step and done view, where it reaches the rail first (H-13). Done view: **Back to step 3 is the 2nd Tab from the h1**, after Hide note, and Enter opens step 3. One stop without the token indicator: Chrome's calendar button in the deadline field, which shows Chrome's own blue ring (M7 candidate; M5's "timing artifact" note corrected). `evidence/test-results/keyboard-m6.json` |
+| Top bar below 600 px (`narrow.mjs`) | failed status on one line at 540, 480, 420 and 375; no horizontal scroll; the context shrinks to nothing at 375 (M7 candidate R1) |
+
+### Vercel preview checks (2026-11-18, 18:52–18:53 UTC)
+
+Run by Claude Code with Playwright (Chrome, 1280×800) against the preview of `8410d9f`, using `m6-scripts/preview.mjs`. The preview loaded without a Vercel login. Results: [evidence/test-results/m6-preview.json](evidence/test-results/m6-preview.json). Screenshots: `docs/evidence/screenshots/m6-preview-*.png`. Checks 1, 2 and 4 answered `/api/plan` with the sample plan (no model calls, and none counted toward the rate limit). Checks 5 and 3 made **6 real `/api/plan` requests** from one IP: 5 plans from the model and one 429.
+
+| # | Check | Result | What was observed |
+| --- | --- | --- | --- |
+| 1 | Two tabs (H-01) | **passed** (scripted, not by hand) | One context, two pages. Tab A paused step 1 with "Note written in tab A (preview)". Tab B, open on `/step/1` since before the pause, already showed the note before Mark complete, so the `storage` event had reached it. After tab B's Mark complete, `localStorage` held step 1 as `done` **with the note**. Tab B's top bar read "Saved in this browser". Tab A reloaded on home ("Your next step"); on `/step/1` (the done view) the note was on screen. `m6-preview-two-tabs-tab-a-step-1.png` |
+| 2 | 13,000-character paste | **passed** | 13,000 characters written to the clipboard and pasted with Cmd+V into the brief (not `.fill()`). All **13,000 kept**, ending in "Due Dec 4". "Your brief is longer than 12,000 characters. Shorten it to build a plan." shown, counter "13,000 of 12,000 characters". Break it down sent **no** `/api/plan` request. `m6-preview-paste-13000.png` |
+| 3 | Rate limit (real model calls) | **passed** | Request 1 from this IP was check 5's. Check 3's builds 1–4 were requests 2–5: **200** each, all reaching plan review. Build 5, the **6th request in about 70 seconds**, got **429**, and Error 03 read "Too many plans were built from this network. Try again in about 10 minutes." All six were served from `iad1`. This shows the in-memory limiter worked across these six requests. It doesn't show that every serverless instance shares it: a request landing on a fresh instance would start a new count. `m6-preview-rate-limit-error-03.png` |
+| 4 | Done step (H-17) | **passed** | Steps 1 and 2 done; step 3 opened; step 1 opened from the rail. The rail listed "Done: 1.", "Done: 2." and "**In progress: 3.** Draft a thesis and outline". "Back to step 3" opened `/step/3` with **focus on its h1** ("Draft a thesis and outline"). The wordmark went to `/` (home, "Pick up where you left off"). `m6-preview-done-step.png` |
+| 5 | Local date (H-05; live model) | **passed** | Browser `timezoneId` Pacific/Kiritimati: browser date **2026-11-19**, server UTC date 2026-11-18. The request body's `today` was **"2026-11-19"** (200). Brief: "…Submit it on Canvas by 5 PM tomorrow." Plan review showed **"Due Fri, Nov 20, 5:00 PM"**: the browser's tomorrow, not the server's (Thu, Nov 19). `m6-preview-local-date-plan-review.png` |
+
+Check 5 replaces the by-hand check listed earlier ("after 7 PM local time, a brief due 'this Friday'") with Aidan's scripted version: a browser time zone a day ahead of UTC and a brief due "tomorrow". One model run is one sample; it shows the date reaches the model, not that every relative date resolves right.
+
+Screenshots in `docs/evidence/screenshots/`: `m6-<screen>-1280.png` and `m6-<screen>-600.png` for the 13 M5 screens plus brief-entry-over-limit, error-03-rate-limit, done-step and save-failed.
+
+### Not verified
+
+- **Vercel preview by hand:** the five preview checks above were scripted, not done by a person. That includes the two tabs and the US-evening "this Friday" case, which was covered by the scripted Kiritimati check instead.
+- **The rate limit across serverless instances:** not tested (see preview check 3).
+- **Screen readers:** items 3 and 7 were checked in the DOM only. Item 8 waits for VoiceOver.
+- **Relative dates beyond "tomorrow"** with the live model (for example "this Friday" in a US evening): one model run in preview check 5 only.
+- Safari and Firefox.
+
+### Known limitations
+
+- The `storage` event doesn't fire in the tab that wrote, or between two different browsers. Two browsers on one computer still don't share data (as before).
+- Each screen renders its own top bar, so a save failure that happens as the screen changes may not be announced (M7 candidate).
+- The rate-limit line says "about 10 minutes"; the hourly cap can make the wait longer.
+

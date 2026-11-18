@@ -58,7 +58,8 @@ Light mode only. Neutral grayscale with no accent; emphasis comes from weight an
 | `surface/subtle` | #f5f5f5 | Margin | Step-complete background, "Next up" well, hover on secondary |
 | `surface/sunken` | #fafafa | Underlay | Return note on the working step |
 | `border/default` | #e5e5e5 | Hairline | Dividers, cards, chips |
-| `border/input` | #d4d4d4 | Rule | Inputs and secondary buttons at rest, dashed hidden-note row |
+| `border/input` | #949494 | Field rule | Text fields and text areas at rest (3.03:1 on white, M6) |
+| `border/rule` | #d4d4d4 | Rule | Secondary buttons, the estimate stepper, the upcoming-step badge, the dashed hidden-note row, the review tick |
 | `border/strong` | #111111 | Ink rule | Focused inputs, checkbox outline |
 | `action/primary` | #111111 | Ink | Primary button, checked checkbox |
 | `action/primary-hover` | #000000 | Deep ink | Primary hover |
@@ -68,7 +69,7 @@ Light mode only. Neutral grayscale with no accent; emphasis comes from weight an
 
 Tailwind classes: `bg-surface-subtle`, `text-text-secondary`, `border-border-default`, `bg-action-primary`, and so on. Default Tailwind colors are removed, so only these exist.
 
-Contrast on white: Ink 18.9:1, Pencil 7.8:1, Faint pencil 4.7:1 (4.35:1 on `surface/subtle`, which is below AA for body text). `border/input` is 1.48:1 against white, below the 3:1 non-text minimum where it is a field's only boundary (the text area at rest). Known issue, scheduled for M6.
+Contrast on white: Ink 18.9:1, Pencil 7.8:1, Faint pencil 4.7:1 (4.35:1 on `surface/subtle`, which is below AA for body text). `border/input` (#949494) is 3.03:1 against white and `surface/page`, the lightest neutral that meets the 3:1 non-text minimum for a field's only boundary (WCAG 1.4.11, M6). Focus turns it `border/strong`, 6.22:1 against the resting border. `border/rule` (#d4d4d4, 1.48:1) stays on controls identified by their text or number, and on decoration.
 
 ## Typography
 
@@ -103,7 +104,7 @@ Every control shows the token focus ring on `:focus-visible` (2px white inner, 4
 
 **Buttons** (`ui/button.tsx`). 44px (`h-button`) for primary and secondary, 32px (`h-button-text`) for tertiary, `rounded-sm`.
 - Primary: Ink fill, Paper text. Hover: `action/primary-hover`. Disabled: `surface/subtle` fill, `text/tertiary`, not-allowed cursor.
-- Secondary: Paper fill, `border/input`, Ink text. Hover: `surface/subtle`. Disabled: `text/tertiary`.
+- Secondary: Paper fill, `border/rule`, Ink text. Hover: `surface/subtle`. Disabled: `text/tertiary`.
 - Tertiary: underlined `text-link`. Hover: `text/secondary`. Disabled: `text/tertiary`.
 - Use one primary per view. Undo, Hide note and Show note are tertiary.
 
@@ -127,7 +128,7 @@ Every control shows the token focus ring on `:focus-visible` (2px white inner, 4
 
 **Return note.**
 - Shown: `surface/sunken` well with the label "Where you left off · <saved time>" and a Hide note button.
-- Hidden: a dashed `border/input` row reading "Your note is hidden for this step." with Show note.
+- Hidden: a dashed `border/rule` row reading "Your note is hidden for this step." with Show note.
 - Static (home, review): Paper with a "Your note" label.
 - Hiding never deletes the note.
 

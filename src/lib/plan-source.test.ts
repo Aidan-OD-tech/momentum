@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createSamplePlan } from "@/data/sample-assignment";
-import { apiPlanSource, simulatedSource } from "@/lib/plan-source";
+import { apiPlanSource, localDate, simulatedSource } from "@/lib/plan-source";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -18,14 +18,14 @@ function mockFetch(answer: { status: number; body?: unknown } | Error) {
 const build = (signal = new AbortController().signal) => apiPlanSource.build({ brief: "A brief", deadline: "2026-12-04T17:00" }, signal);
 
 describe("apiPlanSource", () => {
-  it("posts the brief and deadline to /api/plan with the build signal", async () => {
+  it("posts the brief, the deadline and the local date to /api/plan with the build signal", async () => {
     const fetchMock = mockFetch({ status: 200, body: { ok: true, plan: createSamplePlan() } });
     const controller = new AbortController();
     await build(controller.signal);
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe("/api/plan");
     expect(init.method).toBe("POST");
-    expect(JSON.parse(init.body as string)).toEqual({ brief: "A brief", deadline: "2026-12-04T17:00" });
+    expect(JSON.parse(init.body as string)).toEqual({ brief: "A brief", deadline: "2026-12-04T17:00", today: localDate(new Date()) });
     expect(init.signal).toBe(controller.signal);
   });
 
@@ -39,7 +39,12 @@ describe("apiPlanSource", () => {
     expect(await build()).toEqual({ ok: false, reason: "unreadable" });
   });
 
-  it.each([400, 413, 429, 500, 502, 504])("%i is failed (Error 03)", async (status) => {
+  it("429 is rateLimited (Error 03 with its own line)", async () => {
+    mockFetch({ status: 429, body: { reason: "rateLimited" } });
+    expect(await build()).toEqual({ ok: false, reason: "rateLimited" });
+  });
+
+  it.each([400, 413, 500, 502, 504])("%i is failed (Error 03)", async (status) => {
     mockFetch({ status, body: { reason: "failed" } });
     expect(await build()).toEqual({ ok: false, reason: "failed" });
   });
@@ -77,5 +82,13 @@ describe("simulatedSource (?simulate=)", () => {
   it("is ignored without the parameter or with an unknown value", () => {
     expect(simulatedSource("", "development")).toBeNull();
     expect(simulatedSource("?simulate=boom", "development")).toBeNull();
+  });
+});
+
+describe("localDate", () => {
+  it("is the browser's own calendar date, late in the evening too", () => {
+    // Built from local parts, so this holds in any time zone the tests run in.
+    expect(localDate(new Date(2026, 10, 18, 23, 30))).toBe("2026-11-18");
+    expect(localDate(new Date(2026, 0, 5, 0, 5))).toBe("2026-01-05");
   });
 });

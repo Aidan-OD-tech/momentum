@@ -20,10 +20,13 @@ type WorkingStepProps = {
   onPauseDraftChange: (text: string) => void;
   onFinishForNow: (text: string) => void;
   onNoteHiddenChange: (hidden: boolean) => void;
+  // On a done step: the step in progress to go back to, or null for home.
+  backToStep: number | null;
+  onBack: () => void;
 };
 
-// The main column of the working-step screen. A done step (opened from a URL) shows without
-// Mark complete, Pause for later or the timer.
+// The main column of the working-step screen. A done step (opened from the rail or a URL) shows without
+// Mark complete, Pause for later or the timer, and with one way back: to the step in progress, or home.
 export function WorkingStep({
   step,
   stepNumber,
@@ -33,6 +36,8 @@ export function WorkingStep({
   onPauseDraftChange,
   onFinishForNow,
   onNoteHiddenChange,
+  backToStep,
+  onBack,
 }: WorkingStepProps) {
   const headingRef = useFocusHeading<HTMLHeadingElement>(stepNumber);
   const done = step.status === "done";
@@ -71,7 +76,12 @@ export function WorkingStep({
       <DoneWhen criterion={step.doneWhen} />
 
       {done ? (
-        <p className="text-body text-text-secondary">You marked this step done.</p>
+        <div className="flex flex-col items-start gap-3">
+          <p className="text-body text-text-secondary">You marked this step done.</p>
+          <Button variant="secondary" onClick={onBack}>
+            {backToStep ? `Back to step ${backToStep}` : "Back to home"}
+          </Button>
+        </div>
       ) : (
         <div className="flex flex-wrap gap-3">
           <Button variant="primary" onClick={onMarkComplete}>

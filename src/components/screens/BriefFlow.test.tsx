@@ -1,9 +1,9 @@
-import { act, fireEvent, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { HomeRoute } from "@/components/screens/HomeRoute";
 import { sampleAssignment } from "@/data/sample-assignment";
 import { BRIEF_COUNT_FROM, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
-import type { BuildResult, PlanSource } from "@/lib/plan-source";
+import { apiPlanSource, type BuildResult, type PlanSource } from "@/lib/plan-source";
 import { STORAGE_KEY } from "@/lib/storage";
 import { router } from "@/test/navigation-mock";
 import { renderApp } from "@/test/render-app";
@@ -89,27 +89,52 @@ describe("brief entry", () => {
     expect(screen.queryByText(/This preview can only build the sample plan/)).not.toBeInTheDocument();
   });
 
-  it("the text area stops at the limit", () => {
-    renderApp(<HomeRoute />);
-    expect(brief()).toHaveAttribute("maxLength", String(MAX_BRIEF_CHARS));
+  it("a 13,000-character paste is kept whole and shows the over-limit message straight away (H-02)", () => {
+    const { source, calls } = stub("never");
+    renderApp(<HomeRoute />, source);
+    expect(brief()).not.toHaveAttribute("maxLength");
+    const pasted = "a".repeat(12_991) + "Due Dec 4"; // 13,000 characters, the due date at the end
+    type(pasted);
+    expect(brief()).toHaveValue(pasted);
+    expect(screen.getByText("13,000 of 12,000 characters")).toBeInTheDocument();
+    const message = "Your brief is longer than 12,000 characters. Shorten it to build a plan.";
+    expect(screen.getByText(message, { selector: "#brief-error" })).toBeInTheDocument();
+    expect(brief()).toHaveAttribute("aria-invalid", "true");
+    expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent(message);
+    breakItDown();
+    expect(calls).toHaveLength(0);
+    expect(brief()).toHaveValue(pasted);
+
+    type("a".repeat(MAX_BRIEF_CHARS));
+    expect(screen.queryByText(message, { selector: "#brief-error" })).not.toBeInTheDocument();
+  });
+
+  it("counts the brief as the server does, without leading and trailing whitespace", () => {
+    const { source, calls } = stub("never");
+    renderApp(<HomeRoute />, source);
+    type("a".repeat(MAX_BRIEF_CHARS) + "   \n");
+    expect(screen.getByText("12,000 of 12,000 characters")).toBeInTheDocument();
+    expect(screen.queryByText(/longer than 12,000/)).not.toBeInTheDocument();
+    breakItDown();
+    expect(calls).toHaveLength(1);
   });
 
   it("shows a quiet character count only within 10% of the limit, linked to the field", () => {
     renderApp(<HomeRoute />);
     type("a".repeat(BRIEF_COUNT_FROM - 1));
     expect(screen.queryByText(/of 12,000 characters/)).not.toBeInTheDocument();
-    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    expect(within(screen.getByRole("main")).getByRole("status")).toBeEmptyDOMElement();
 
     type("a".repeat(11_200));
     expect(screen.getByText("11,200 of 12,000 characters")).toBeInTheDocument();
     expect(brief()).toHaveAccessibleDescription("11,200 of 12,000 characters");
     // The live region says it once on crossing, and doesn't change with each keystroke.
-    expect(screen.getByRole("status")).toHaveTextContent("Your brief is close to the 12,000-character limit.");
+    expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent("Your brief is close to the 12,000-character limit.");
     type("a".repeat(11_201));
-    expect(screen.getByRole("status")).toHaveTextContent("Your brief is close to the 12,000-character limit.");
+    expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent("Your brief is close to the 12,000-character limit.");
 
     type("a".repeat(MAX_BRIEF_CHARS));
-    expect(screen.getByRole("status")).toHaveTextContent("Your brief has reached the 12,000-character limit.");
+    expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent("Your brief has reached the 12,000-character limit.");
   });
 
   it("a stored draft over the limit isn't sent; it shows an error and keeps the text", () => {
@@ -118,7 +143,7 @@ describe("brief entry", () => {
     const { source, calls } = stub("never");
     renderApp(<HomeRoute />, source);
     breakItDown();
-    expect(screen.getByText("Your brief is longer than 12,000 characters. Shorten it to build a plan.")).toBeInTheDocument();
+    expect(screen.getByText("Your brief is longer than 12,000 characters. Shorten it to build a plan.", { selector: "#brief-error" })).toBeInTheDocument();
     expect(brief()).toHaveValue(long);
     expect(calls).toHaveLength(0);
   });
@@ -141,7 +166,7 @@ describe("building and errors", () => {
     type("Some brief");
     breakItDown();
     expect(await screen.findByRole("heading", { name: "Building your plan" })).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("Working on it");
+    expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent("Working on it");
     expect(screen.getByRole("main").textContent).not.toMatch(/\d/);
   });
 
@@ -161,7 +186,8 @@ describe("building and errors", () => {
     type("Half a brief");
     breakItDown();
     const heading = await screen.findByRole("heading", { name: "We couldn’t find clear requirements in that text." });
-    expect(heading).toHaveFocus();
+    // Focus moves in an effect after the card renders, so wait for it rather than racing it.
+    await waitFor(() => expect(heading).toHaveFocus());
     expect(screen.getByText("Your text is still here.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Edit the brief" }));
     expect(brief()).toHaveValue("Half a brief");
@@ -178,6 +204,23 @@ describe("building and errors", () => {
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Try again" })));
     expect(calls).toHaveLength(2);
     expect(calls[1]).toMatchObject({ brief: "A brief", deadline: "2026-12-04T17:00" });
+  });
+
+  it("a 429 from /api/plan shows Error 03 with the rate-limit line, and doesn't retry on its own", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json({ reason: "rateLimited" }, { status: 429 }));
+    renderApp(<HomeRoute />, apiPlanSource);
+    type("A brief");
+    breakItDown();
+    const heading = await screen.findByRole("heading", { name: "We couldn’t build your plan just now." });
+    await waitFor(() => expect(heading).toHaveFocus());
+    expect(screen.getByText("Too many plans were built from this network. Try again in about 10 minutes.")).toBeInTheDocument();
+    expect(screen.queryByText(/Something went wrong on our side/)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Edit the brief" })).toBeInTheDocument();
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 50)));
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Try again" })));
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    fetchSpy.mockRestore();
   });
 
   it("a source that throws counts as failed", async () => {

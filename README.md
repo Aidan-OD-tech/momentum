@@ -2,7 +2,7 @@
 
 Momentum helps students turn an assignment brief into steps and work through them one at a time. The student does the assignment in their own tools; Momentum only holds the plan and their progress. It is a course project for UX & Front-End Engineering.
 
-Production: https://momentum-five-xi.vercel.app (serves `main`). Current milestone: **M5, evaluation readiness** on branch `feat/m5-evaluation` (M1–M4 merged): the sample-brief flag, one anonymous event, the heuristic and accessibility review, and session templates. See [docs/status.md](docs/status.md).
+Production: https://momentum-five-xi.vercel.app (serves `main`). Current milestone: **M6, fixes from the evaluation** on branch `feat/m6-fixes` (M1–M5 merged): tab sync, field contrast, the save status announcement, long pastes, the rate-limit line, the local date, Undo's description, a way back from a done step and the side-panel line. See [docs/status.md](docs/status.md).
 
 ## Requirements
 

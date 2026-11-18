@@ -1,5 +1,6 @@
-import { SavedCheckIcon } from "@/components/icons";
+import { AlertIcon, SavedCheckIcon } from "@/components/icons";
 import { Wordmark } from "@/components/Wordmark";
+import { cn } from "@/lib/utils";
 
 export type SaveStatus = "hidden" | "saved" | "failed";
 
@@ -28,15 +29,30 @@ export function TopBar({ mode, context, saveStatus = "hidden" }: TopBarProps) {
   );
 }
 
+// One status region, always in the DOM (empty while hidden), so a screen reader hears each change
+// of text: to saved, to failed, and back (WCAG 4.1.3). Writes that keep the same status change nothing,
+// so nothing is announced again on every keystroke.
 function SaveIndicator({ status }: { status: SaveStatus }) {
-  if (status === "hidden") return null;
-  if (status === "failed") {
-    return <p className="text-caption text-text-secondary">Couldn’t save in this browser</p>;
-  }
   return (
-    <p className="flex items-center gap-1 text-caption text-text-tertiary">
-      <SavedCheckIcon />
-      Saved in this browser
+    <p
+      role="status"
+      className={cn(
+        "flex items-center gap-1 whitespace-nowrap text-caption",
+        status === "failed" ? "text-text-primary" : "text-text-tertiary",
+      )}
+    >
+      {status === "saved" && (
+        <>
+          <SavedCheckIcon />
+          Saved in this browser
+        </>
+      )}
+      {status === "failed" && (
+        <>
+          <AlertIcon />
+          Couldn’t save in this browser
+        </>
+      )}
     </p>
   );
 }

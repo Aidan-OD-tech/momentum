@@ -98,8 +98,10 @@ export function FinalCheckScreen() {
 
         {undoN > 0 && (
           <div className="flex items-center justify-between gap-4">
-            <p className="text-caption text-text-tertiary">Step {undoN} is marked done.</p>
-            <Button variant="tertiary" onClick={undo}>
+            <p id="undo-description" className="text-caption text-text-tertiary">
+              Step {undoN} is marked done.
+            </p>
+            <Button variant="tertiary" onClick={undo} aria-describedby="undo-description">
               Undo
             </Button>
           </div>

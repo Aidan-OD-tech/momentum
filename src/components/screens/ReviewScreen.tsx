@@ -70,7 +70,7 @@ export function ReviewScreen() {
                     <span
                       aria-hidden="true"
                       className={cn(
-                        "flex size-checkbox items-center justify-center rounded-sm border border-border-input",
+                        "flex size-checkbox items-center justify-center rounded-sm border border-border-rule",
                         ticked && "border-border-strong bg-action-primary text-text-on-primary",
                       )}
                     >

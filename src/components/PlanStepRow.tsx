@@ -62,7 +62,7 @@ function StepBadge({ number, status }: { number: number; status: Step["status"] 
     );
   }
   return (
-    <span aria-hidden="true" className={cn(base, "border border-border-input text-text-secondary")}>
+    <span aria-hidden="true" className={cn(base, "border border-border-rule text-text-secondary")}>
       {number}
     </span>
   );

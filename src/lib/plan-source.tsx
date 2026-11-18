@@ -10,22 +10,26 @@ export type BuildInput = { brief: string; deadline?: string };
 
 export type BuildResult =
   | { ok: true; plan: PlanDraft }
-  // unreadable: Error 02. failed: Error 03.
-  | { ok: false; reason: "unreadable" | "failed" };
+  // unreadable: Error 02. failed: Error 03. rateLimited: Error 03 with its own line (429).
+  | { ok: false; reason: FailureReason };
+
+export type FailureReason = "unreadable" | "failed" | "rateLimited";
 
 export interface PlanSource {
   build(input: BuildInput, signal: AbortSignal): Promise<BuildResult>;
 }
 
-// Sends the brief to the server route. 200 is a plan, 422 is Error 02, and anything else, including
-// a network error or Cancel (the signal aborts the request), is Error 03. No retries.
+// Sends the brief to the server route. 200 is a plan, 422 is Error 02, 429 is the rate limit, and
+// anything else, including a network error or Cancel (the signal aborts the request), is Error 03.
+// No retries.
 export const apiPlanSource: PlanSource = {
   async build(input, signal) {
     try {
       const response = await fetch("/api/plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
+        // The local date goes too, so "due this Friday" counts from the student's day, not UTC's (H-05).
+        body: JSON.stringify({ ...input, today: localDate(new Date()) }),
         signal,
       });
       if (response.status === 200) {
@@ -33,12 +37,19 @@ export const apiPlanSource: PlanSource = {
         return { ok: true, plan: body.plan };
       }
       if (response.status === 422) return { ok: false, reason: "unreadable" };
+      if (response.status === 429) return { ok: false, reason: "rateLimited" };
       return { ok: false, reason: "failed" };
     } catch {
       return { ok: false, reason: "failed" };
     }
   },
 };
+
+// "YYYY-MM-DD" in the browser's time zone.
+export function localDate(now: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
 
 // Never resolves on its own; it settles as "failed" only when the signal aborts (Cancel).
 function waitForAbort(signal: AbortSignal): Promise<BuildResult> {

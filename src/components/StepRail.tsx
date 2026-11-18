@@ -14,13 +14,14 @@ type StepRailProps = {
   currentNumber: number;
 };
 
-// The left rail on the working step: progress, the done steps and the one on screen, two panel links, the due line.
+// The left rail on the working step: progress, the done steps, the one on screen and the one in progress
+// (so a done step opened from the rail still shows the way back, H-17), two panel links, the due line.
 export function StepRail({ assignment, currentNumber }: StepRailProps) {
   const { openPanel } = usePanel();
   const due = assignment.deadline ? formatDeadline(assignment.deadline) : null;
   const rows = assignment.steps
     .map((step, index) => ({ step, number: index + 1 }))
-    .filter(({ step, number }) => step.status === "done" || number === currentNumber);
+    .filter(({ step, number }) => step.status !== "upcoming" || number === currentNumber);
 
   return (
     <nav aria-label="Your steps" className="flex w-full flex-col gap-6 wide:w-rail wide:shrink-0">
@@ -31,7 +32,8 @@ export function StepRail({ assignment, currentNumber }: StepRailProps) {
             key={step.id}
             number={number}
             label={step.title}
-            state={number === currentNumber && step.status !== "done" ? "current" : "done"}
+            state={step.status === "done" ? "done" : "current"}
+            onScreen={number === currentNumber}
           />
         ))}
       </ol>

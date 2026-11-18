@@ -1,0 +1,148 @@
+{
+  "base": "https://momentum-git-feat-m6-fixes-aidan-o-driscoll.vercel.app",
+  "startedAt": "2026-11-18T18:52:04.116Z",
+  "checks": {
+    "1-two-tabs": {
+      "result": "passed",
+      "storedStep1AfterTabBMarkComplete": {
+        "status": "done",
+        "note": "Note written in tab A (preview)"
+      },
+      "tabBShowedTheNoteBeforeMarkComplete": true,
+      "tabBTopBar": "Saved in this browser",
+      "tabAAfterReloadH1": "Your next step",
+      "tabANoteOnScreenAtStep1AfterReload": true
+    },
+    "2-paste-13000": {
+      "result": "passed",
+      "clipboardLength": 13000,
+      "keptLength": 13000,
+      "endsWithDueDate": true,
+      "overLimitMessage": "Your brief is longer than 12,000 characters. Shorten it to build a plan.",
+      "counter": "13,000 of 12,000 characters",
+      "planRequestsAfterBreakItDown": 0
+    },
+    "4-done-step": {
+      "result": "passed",
+      "railLinksOnDoneStep1": [
+        "Done: 1. Restate the prompt",
+        "Done: 2. Find five sources",
+        "In progress: 3. Draft a thesis and outline"
+      ],
+      "focusAfterBackToStep3": {
+        "tag": "H1",
+        "text": "Draft a thesis and outline"
+      },
+      "wordmarkWentTo": "https://momentum-git-feat-m6-fixes-aidan-o-driscoll.vercel.app/",
+      "homeH1": "Pick up where you left off"
+    },
+    "5-local-date": {
+      "result": "passed",
+      "timezoneId": "Pacific/Kiritimati",
+      "browserDate": "2026-11-19",
+      "serverUtcDate": "2026-11-18",
+      "requestToday": "2026-11-19",
+      "requestStatus": 200,
+      "outcome": "plan review",
+      "planReviewShows": "Due Fri, Nov 20, 5:00 PM",
+      "expectedBrowserTomorrow": "Fri, Nov 20",
+      "serverTomorrowWouldBe": "Thu, Nov 19"
+    },
+    "3-rate-limit": {
+      "result": "passed",
+      "note": "Request numbers count check 5's real request first.",
+      "attempts": [
+        {
+          "label": "check 3, build 1",
+          "requestNumberFromThisIp": 2,
+          "at": "2026-11-18T18:52:23.410Z",
+          "status": 200,
+          "vercelId": "iad1::iad1::rj9nt-1795027943423-55cfd6a278f2",
+          "outcome": "plan review",
+          "errorBody": null
+        },
+        {
+          "label": "check 3, build 2",
+          "requestNumberFromThisIp": 3,
+          "at": "2026-11-18T18:52:40.120Z",
+          "status": 200,
+          "vercelId": "iad1::iad1::fr986-1795027960136-ebff0dfe9404",
+          "outcome": "plan review",
+          "errorBody": null
+        },
+        {
+          "label": "check 3, build 3",
+          "requestNumberFromThisIp": 4,
+          "at": "2026-11-18T18:52:54.420Z",
+          "status": 200,
+          "vercelId": "iad1::iad1::cp2cp-1795027974429-63d5ac6cf289",
+          "outcome": "plan review",
+          "errorBody": null
+        },
+        {
+          "label": "check 3, build 4",
+          "requestNumberFromThisIp": 5,
+          "at": "2026-11-18T18:53:08.632Z",
+          "status": 200,
+          "vercelId": "iad1::iad1::7hvnq-1795027988641-cf524726e5e8",
+          "outcome": "plan review",
+          "errorBody": null
+        },
+        {
+          "label": "check 3, build 5",
+          "requestNumberFromThisIp": 6,
+          "at": "2026-11-18T18:53:23.368Z",
+          "status": 429,
+          "vercelId": "iad1::iad1::6crc9-1795028003378-2de7c0aa6134",
+          "outcome": "error",
+          "errorBody": "Too many plans were built from this network. Try again in about 10 minutes."
+        }
+      ]
+    }
+  },
+  "planRequests": [
+    {
+      "label": "check 5",
+      "at": "2026-11-18T18:52:12.461Z",
+      "status": 200,
+      "vercelId": "iad1::iad1::7zdgk-1795027932913-8adf0d3c4668",
+      "today": "2026-11-19"
+    },
+    {
+      "label": "check 3, build 1",
+      "at": "2026-11-18T18:52:23.410Z",
+      "status": 200,
+      "vercelId": "iad1::iad1::rj9nt-1795027943423-55cfd6a278f2",
+      "today": "2026-11-18"
+    },
+    {
+      "label": "check 3, build 2",
+      "at": "2026-11-18T18:52:40.120Z",
+      "status": 200,
+      "vercelId": "iad1::iad1::fr986-1795027960136-ebff0dfe9404",
+      "today": "2026-11-18"
+    },
+    {
+      "label": "check 3, build 3",
+      "at": "2026-11-18T18:52:54.420Z",
+      "status": 200,
+      "vercelId": "iad1::iad1::cp2cp-1795027974429-63d5ac6cf289",
+      "today": "2026-11-18"
+    },
+    {
+      "label": "check 3, build 4",
+      "at": "2026-11-18T18:53:08.632Z",
+      "status": 200,
+      "vercelId": "iad1::iad1::7hvnq-1795027988641-cf524726e5e8",
+      "today": "2026-11-18"
+    },
+    {
+      "label": "check 3, build 5",
+      "at": "2026-11-18T18:53:23.368Z",
+      "status": 429,
+      "vercelId": "iad1::iad1::6crc9-1795028003378-2de7c0aa6134",
+      "today": "2026-11-18"
+    }
+  ],
+  "finishedAt": "2026-11-18T18:53:23.918Z"
+}
