@@ -47,12 +47,16 @@ export function formatSavedAt(savedAt: string, now: Date = new Date()): string {
   return `saved ${MONTHS[saved.getMonth()]} ${saved.getDate()}`;
 }
 
-// "You have a thesis." -> "Done when you have a thesis."
-// The first letter is lowercased unless the first word looks like an acronym ("APA 7th ...").
+// "you have a thesis." -> "Done when you have a thesis."
+// The criterion is used as written, so a proper noun keeps its capital ("Turnitin confirms ...").
+// Criteria start lowercase unless they begin with a proper noun (the prompt asks for this; M4 decision).
 export function doneWhenSentence(criterion: string): string {
-  const isAcronym = /^[A-Z]{2}/.test(criterion);
-  const first = isAcronym ? criterion : criterion.charAt(0).toLowerCase() + criterion.slice(1);
-  return `Done when ${first}`;
+  return `Done when ${criterion}`;
+}
+
+// "you have a thesis." -> "You have a thesis." For a criterion shown on its own, as a sentence.
+export function capitalizeFirst(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 // 1122000 ms -> "18:42". Rounds up, so the display reaches 0:00 only when time is up.

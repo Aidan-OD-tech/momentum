@@ -66,13 +66,24 @@ export function cleanDeadline(value: string | null): string | undefined {
 
 const ORDER: Record<Requirement["kind"], number> = { substantive: 0, format: 1, submission: 2 };
 
+// "Use APA 7th edition. " -> "Use APA 7th edition", so requirement chips don't end in a full stop.
+export function withoutFullStop(text: string): string {
+  return text.trim().replace(/\.+$/, "").trim();
+}
+
+// "Submit the essay", "submit your PDF": a step for handing the work in. Submission is a reminder,
+// never a step; the prompt says so, and toPlanDraft drops these as a backstop.
+export function isSubmitStep(title: string): boolean {
+  return /^submit/i.test(title.trim());
+}
+
 // Turns the model's answer into the app's PlanDraft, adding IDs and applying the product rules.
 // Returns null when the plan can't be used, which the route answers as Error 02 (unreadable).
 export function toPlanDraft(model: ModelPlan): PlanDraft | null {
   if (!model.readable) return null;
 
   const requirements = model.requirements
-    .map((r) => ({ label: r.label.trim(), shortLabel: r.shortLabel?.trim() || undefined, kind: r.kind }))
+    .map((r) => ({ label: withoutFullStop(r.label), shortLabel: withoutFullStop(r.shortLabel ?? "") || undefined, kind: r.kind }))
     .filter((r) => r.label !== "")
     // Substantive first, then format, then the submission reminder. sort() keeps the model's order within a kind.
     .sort((a, b) => ORDER[a.kind] - ORDER[b.kind])
@@ -81,16 +92,17 @@ export function toPlanDraft(model: ModelPlan): PlanDraft | null {
   // A plan needs at least one thing to check in the final check.
   if (!requirements.some((r) => r.kind !== "submission")) return null;
 
-  const steps = model.steps.map(
-    (s, index): PlanStep => ({
+  // Dropped before IDs and the step count, so the plan still needs 1 to 12 steps without them.
+  const steps = model.steps
+    .filter((s) => !isSubmitStep(s.title))
+    .map((s, index): PlanStep => ({
       id: `s${index + 1}`,
       title: s.title.trim(),
       intro: s.intro?.trim() || undefined,
       whatToDo: s.whatToDo.map((item) => item.trim()).filter((item) => item !== ""),
       doneWhen: s.doneWhen.trim(),
       estimateMin: roundEstimate(s.estimateMin),
-    }),
-  );
+    }));
   if (steps.length < MIN_STEPS || steps.length > MAX_STEPS) return null;
   // Title and Done when are required, as in the step edit card.
   if (steps.some((s) => s.title === "" || s.doneWhen === "")) return null;

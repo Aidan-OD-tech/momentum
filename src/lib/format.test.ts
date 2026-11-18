@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  capitalizeFirst,
   doneWhenSentence,
   formatCountdown,
   formatDeadline,
@@ -57,9 +58,16 @@ describe("other formatters", () => {
     expect(formatTotalMinutes(45)).toBe("45 min");
   });
 
-  it("doneWhenSentence lowercases the first letter unless it starts an acronym", () => {
-    expect(doneWhenSentence("You have a one-sentence thesis.")).toBe("Done when you have a one-sentence thesis.");
+  it("doneWhenSentence uses the criterion as written, so proper nouns keep their capital", () => {
+    expect(doneWhenSentence("you have a one-sentence thesis.")).toBe("Done when you have a one-sentence thesis.");
+    expect(doneWhenSentence("Turnitin confirms your submission.")).toBe("Done when Turnitin confirms your submission.");
     expect(doneWhenSentence("APA 7th is used throughout.")).toBe("Done when APA 7th is used throughout.");
+  });
+
+  it("capitalizeFirst capitalizes only the first letter", () => {
+    expect(capitalizeFirst("you have a thesis.")).toBe("You have a thesis.");
+    expect(capitalizeFirst("Turnitin confirms it.")).toBe("Turnitin confirms it.");
+    expect(capitalizeFirst("")).toBe("");
   });
 
   it("formatCountdown rounds up to whole seconds", () => {

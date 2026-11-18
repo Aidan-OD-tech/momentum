@@ -32,7 +32,8 @@ Steps
 - title: a short action, for example "Draft a thesis and outline".
 - intro: one sentence of context for the step, or null.
 - whatToDo: two to four short actions the student takes.
-- doneWhen: one concrete criterion the student can check themselves, for example "You have a one-sentence thesis and a three-point outline."
+- doneWhen: one concrete criterion the student can check themselves. It follows the words "Done when", so start it lowercase unless it begins with a proper noun, for example "you have a one-sentence thesis and a three-point outline." or "Turnitin shows your submission."
+- Never create a step for submitting the assignment. Submission is already shown to the student as a reminder.
 - estimateMin: an approximate whole number of minutes for the step.
 
 Readable
