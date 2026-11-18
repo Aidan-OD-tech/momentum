@@ -99,3 +99,8 @@ Records what AI tools produced and where Aidan changed, corrected or decided. Ke
   - A new route test called the fake-client helper inside a named function, which the hooks lint rule rejects; moved into `beforeEach`.
   - The first M6 walkthrough tried to show the failed save status on brief entry, which has no save indicator; moved to the final check.
 
+### Aidan's corrections and decisions (M6)
+
+- Approved the wording for items 3, 5, 9 and 10, kept `border/rule` at #d4d4d4 for label-identified controls, added the estimate stepper's +/− boundary as an M7 candidate, and corrected his item 8 line to VoiceOver step 7 (2026-11-18).
+- Asked for the keyboard script to be re-run with the wordmark as a Tab stop. The re-run (scripted, both widths) also corrected an M5 note: the deadline stop the script flagged is Chrome's calendar button, which shows Chrome's own ring, not a timing artifact (2026-11-18).
+- Added a preview check for item 6: after 7 PM local time, a brief due "this Friday" (2026-11-18).

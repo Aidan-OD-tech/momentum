@@ -11,7 +11,7 @@ Legend: **planned** (not started), **implemented** (written, not independently c
 | M3 | Brief entry, building, plan review and editing, error screens, preview deploy | verified and merged (PR #3) |
 | M4 | AI generation (server-side, structured output) | verified and merged (PR #4) |
 | M5 | Evaluation readiness: sample-brief flag, one tracked event, heuristic and accessibility review, session templates | verified and merged (PR #5); sessions and VoiceOver pending (Aidan) |
-| M6 | Fixes from evaluation | implemented on branch `feat/m6-fixes`; **verified** locally on the production build (see M6); not pushed; Vercel preview checks, wording approvals and VoiceOver pending |
+| M6 | Fixes from evaluation | implemented on branch `feat/m6-fixes`; **verified** locally on the production build (see M6); wording approved by Aidan (2026-11-18); not pushed; Vercel preview checks and VoiceOver pending |
 | M7 | Docs and case study | planned |
 
 ## M1 summary
@@ -266,6 +266,7 @@ Branch `feat/m6-fixes`, off `main` at `e63ddcf` (PR #5). Not pushed (Aidan pushe
 | Two tabs, H-01 steps (Chrome via Playwright, `m6-scripts/tabs-m6.mjs`) | Tab A paused step 1 with a note; stale tab B pressed Mark complete. The stored step 1 is **done with the note kept** ("Note written in tab A"). In M5 the same steps erased it. **Scripted, not by hand:** Aidan's preview check |
 | Walkthrough on the production build at 1280×800 and 600×800 (`m6-scripts/walk-m6.mjs`) | every M6 check passed at both widths (see axe-m6.json `checks`): <ul><li>status region empty on brief entry;</li><li>field border `rgb(148, 148, 148)`;</li><li>13,000 characters kept, message and count shown, no request;</li><li>the rate-limit line;</li><li>the request body has `today`;</li><li>one event for the whole plan (204);</li><li>Saved on one line;</li><li>Undo described;</li><li>the done view lists "In progress: 3." and Back to step 3 opens step 3;</li><li>the side-panel line;</li><li>the wordmark goes home;</li><li>failed status with icon, Ink, one line, no horizontal scroll, then back to Saved.</li></ul> The only console errors were the 422, 502 and 429 the script returned on purpose |
 | axe, 13 M5 screens + 4 M6 views × 2 widths | **0 violations**. Needs review: only the pause dialog, same items as M5. `evidence/test-results/axe-m6.json` |
+| Keyboard pass, M6 (scripted, `m6-scripts/keyboard-m6.mjs`, both widths) | no traps; focus on the h1 on every screen; the wordmark is the first stop in the page (token ring); Shift+Tab from the h1 reaches it everywhere except the working step and done view, where it reaches the rail first (H-13). Done view: **Back to step 3 is the 2nd Tab from the h1**, after Hide note, and Enter opens step 3. One stop without the token indicator: Chrome's calendar button in the deadline field, which shows Chrome's own blue ring (M7 candidate; M5's "timing artifact" note corrected). `evidence/test-results/keyboard-m6.json` |
 | Top bar below 600 px (`narrow.mjs`) | failed status on one line at 540, 480, 420 and 375; no horizontal scroll; the context shrinks to nothing at 375 (M7 candidate R1) |
 
 Screenshots in `docs/evidence/screenshots/`: `m6-<screen>-1280.png` and `m6-<screen>-600.png` for the 13 M5 screens plus brief-entry-over-limit, error-03-rate-limit, done-step and save-failed.
@@ -276,11 +277,11 @@ Screenshots in `docs/evidence/screenshots/`: `m6-<screen>-1280.png` and `m6-<scr
   - two tabs by hand;
   - a 13,000-character paste;
   - the sixth build in 10 minutes (a real 429);
-  - done step → Back to step N.
+  - done step → Back to step N;
+  - **after 7 PM local time, build from a brief due "this Friday" and confirm plan review shows the correct Friday** (item 6, local date).
   Pending Aidan's push.
 - **Screen readers:** items 3 and 7 were checked in the DOM only. Item 8 waits for VoiceOver.
 - **The live model with the browser's date:** no OpenAI requests were made in M6, so whether "due this Friday" now resolves right in a US evening is untested against the model.
-- **The keyboard script** wasn't re-run (the wordmark adds a Tab stop); M7 candidate.
 - Safari and Firefox.
 
 ### Known limitations
@@ -288,5 +289,4 @@ Screenshots in `docs/evidence/screenshots/`: `m6-<screen>-1280.png` and `m6-<scr
 - The `storage` event doesn't fire in the tab that wrote, or between two different browsers. Two browsers on one computer still don't share data (as before).
 - Each screen renders its own top bar, so a save failure that happens as the screen changes may not be announced (M7 candidate).
 - The rate-limit line says "about 10 minutes"; the hourly cap can make the wait longer.
-- Wording for items 3, 5, 9 and 10 is pending Aidan's approval.
 

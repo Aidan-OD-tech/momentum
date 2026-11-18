@@ -14,5 +14,7 @@ Playwright scripts Claude Code used for the M6 checks on 2026-11-18, on the prod
   Results: [axe-m6.json](../axe-m6.json). Screenshots: `docs/evidence/screenshots/m6-<screen>-<width>.png`.
 - `tabs-m6.mjs`: the M5 two-tab check (H-01) run again on the M6 build.
 - `narrow.mjs`: the top bar with the failed save status at 600, 540, 480, 420 and 375 px.
+- `keyboard-m6.mjs <out.json> <width>`: the M5 keyboard pass, plus Shift+Tab from each h1 and the done-step view reached from step 3's rail. Results: [keyboard-m6.json](../keyboard-m6.json).
+- `deadline-focus.mjs` and `deadline-shot.mjs`: the deadline field's border and ring at each of its Tab stops, 60 ms and 600 ms after the key, and a screenshot of the calendar button's focus.
 
 To run them, follow the M5 README (same packages, `sample.json` one folder above, `PORT=3100 npm start`).

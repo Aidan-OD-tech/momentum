@@ -29,11 +29,37 @@ What changed, by criterion:
   - It stays on one line (20 px tall, line height 20 px) at 1280, 600, 540, 480, 420 and 375 px, with no horizontal scroll.
   - **Not heard:** no screen reader was used. VoiceOver script step 8 checks it.
 - **2.4.6 (advisory): Undo now has an accessible description**, "Step N is marked done.", on step complete and the final check.
-- **Keyboard:** the wordmark is now a link home and the first Tab stop on every screen. The M5 keyboard script wasn't re-run; see the [compose and responsive review](../reviews/2026-11-18-compose-responsive-m6.md), R7.
+- **Keyboard:** re-run below ("Keyboard pass, M6").
+
+### Keyboard pass, M6 (scripted, 1280×800 and 600×800)
+
+Script: [m6-scripts/keyboard-m6.mjs](test-results/m6-scripts/keyboard-m6.mjs). It runs the M5 flow, plus Shift+Tab from each h1 and the done-step view (step 1 opened from step 3's rail by keyboard). Results: [test-results/keyboard-m6.json](test-results/keyboard-m6.json). Both widths gave the same order.
+
+- **No traps.** Focus lands on the h1 on every screen (unchanged). There was no horizontal overflow, and no focused element was outside the viewport.
+- **The wordmark ("Momentum, home") is first in the page's Tab order** and shows the token ring. When Tab wraps past the last control, it's the first stop again.
+  - **Shift+Tab from the h1** reaches the wordmark on brief entry, plan review, home, step complete, the final check and completed home.
+  - **On the working step and the done view**, Shift+Tab from the h1 reaches the rail's "Original brief" instead, because the rail comes before the main column in the page (H-13).
+- **Tab order after the h1, where it changed:**
+
+| Screen | M6 order (Tab from the h1, then wrapping) |
+| --- | --- |
+| Working step | Mark complete → Pause for later → From your brief → Start a N min timer → (end of page) → **Momentum, home** → rail step link(s) → View full plan → Original brief |
+| Done step (new) | Hide note (when the step has a note) → **Back to step 3** → From your brief → (end of page) → **Momentum, home** → Done: 1 → Done: 2 → In progress: 3 → View full plan → Original brief. **Back to step 3 is the 2nd Tab from the h1** (the 1st when there's no note). It follows the visual order of the main column. Enter opens step 3 with focus on its h1 |
+| Step complete | Continue to step N → Finish for now → Undo → **Momentum, home** |
+| Final check | four checkboxes → Finish review → View full plan → Undo → **Momentum, home** |
+| Other screens | as in M5, with **Momentum, home** after the last control |
+
+- **Target size:** the wordmark link is 104×22 px. Under 24 px tall, it meets 2.5.8 through the spacing exception: no other target within 24 px. axe `target-size` passed. The four 20×20 final-check checkboxes are as in M5.
+- **The deadline field's calendar button (correction to M5):**
+  - The one stop the script flags without an indicator is the 7th Tab stop in the deadline field: Chrome's own calendar button, inside the date field.
+  - Re-checked 600 ms after the Tab (`m6-scripts/deadline-focus.mjs`): the field keeps its resting border (#949494) and has no token ring, but Chrome draws its default blue focus ring around the calendar icon (`screenshots/m6-deadline-picker-focus-1280.png`). Focus is visible, so 2.4.7 passes, but the indicator isn't Momentum's.
+  - M5 called this a timing artifact. That was right for the date parts, which turn `border/strong`, but not for this stop.
+  - Not fixed (M7 candidate).
+
 
 Still open: "Progress saved" (VoiceOver step 7; M6 item 8 waits for it).
 
-The M5 record follows, unchanged except for the criteria table and one corrected step number (step 7, not 4, for "Progress saved").
+The M5 record follows, unchanged except for the criteria table, one corrected step number (step 7, not 4, for "Progress saved") and a correction to the deadline focus note.
 
 
 Run by Claude Code on 2026-11-18 on the production build of `feat/m5-evaluation` (`npm run build && npm start`), Chrome via Playwright, at **1280×800** and **600×800**. `/api/plan` was answered by the test script with the sample plan.
@@ -94,7 +120,7 @@ Flow: brief entry → plan review (edit step 1, Cancel) → Start step 1 → sid
 
 **Visible focus:**
 - Every stop showed the token ring, or for text fields the dark `border/strong`.
-- The script first flagged the deadline field as having no indicator. It read the style 60 ms after the Tab, before the border's transition finished. A second check after 600 ms showed `border/strong` (#111111). Pass.
+- The script first flagged the deadline field as having no indicator. It read the style 60 ms after the Tab, before the border's transition finished. A second check after 600 ms showed `border/strong` (#111111). Pass. **Corrected in M6:** the flagged stop is Chrome's calendar button inside the field, which shows Chrome's own blue ring and not `border/strong` (see "Keyboard pass, M6").
 - At 600 px nothing scrolled sideways (`scrollWidth` ≤ window width on every screen), and every focused control was inside the viewport.
 
 ## Criteria

@@ -59,5 +59,5 @@ None found at 1280×800 or 600×800.
   - "Back to step N" is 44 px tall.
   - The wordmark link is 20 px tall, but no other target is within 24 px, so it meets 2.5.8 through the spacing exception. axe's `target-size` rule passed on every screen.
 - **R7. Keyboard:**
-  - The wordmark is now the first Tab stop on every screen. Focus still lands on the h1 when a screen opens (unchanged), so the wordmark is reached with Shift+Tab, not on the way to the main action.
-  - **Not re-run:** the M5 keyboard script (`keyboard.mjs`). The new tab stop changes its expected order. Aidan's VoiceOver script covers the rest.
+  - The wordmark is now the first Tab stop in the page. Focus still lands on the h1 when a screen opens (unchanged), so the wordmark is reached with Shift+Tab, or when Tab wraps, not on the way to the main action. On the working step and done view, Shift+Tab reaches the rail first (H-13).
+  - **Re-run on Aidan's request** (`keyboard-m6.mjs`, both widths): no traps. On the done view, "Back to step 3" is the 2nd Tab from the h1. Details in [accessibility.md](../evidence/accessibility.md), "Keyboard pass, M6".
