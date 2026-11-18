@@ -195,7 +195,7 @@ Browser, sample brief, fresh storage: review → Edit step 2, change its title, 
 ### Variation and small issues seen
 
 - **Output varies between runs.** The sample brief gave 6, 5 and 6 steps in three runs, with different titles and estimates (6 h 50 min and 6 h 25 min shown). One browser run title-cased the plan title ("Urban Green Spaces and Wellbeing"); one wrote "Analyse" where the script run wrote "Analyze".
-- **"Done when turnitin confirms…"**: `doneWhenSentence` lowercases the first letter of Done when, so a criterion that starts with a proper noun loses its capital. The hand-written sample never started with one. See `m4-plan-review-sample.png`.
+- **"Done when turnitin confirms…"**: `doneWhenSentence` lowercases the first letter of Done when, so a criterion that starts with a proper noun loses its capital. The hand-written sample never started with one. (Fixed later the same day; the screenshot that showed it was replaced by the preview one below.)
 - **Full stops in chips.** Generated labels are sentences ending in "."; chips without a short label show them as written (substantive and submission chips).
 
 ### Screenshots
@@ -213,6 +213,22 @@ Aidan's fixes from the issues above: criteria start lowercase unless they begin 
 
 No criterion started with a proper noun in either run, so "Turnitin confirms…" keeping its capital is checked by unit test only.
 
-## Still to run
+## 2026-11-18: Vercel preview
 
-The Vercel preview, once Aidan pushes: checks 1, 3 and 7, plus the curl checks (400 and 413).
+https://momentum-git-feat-m4-ai-generation-aidan-o-driscoll.vercel.app, commit `a7f673c` (with the narrowed Submit rule), Chrome via Playwright from Aidan's laptop. Times from the calling script; network to Vercel included. 6 model requests and 3 curl checks.
+
+| Check | Result | Time |
+| --- | --- | --- |
+| curl, POST with no body | 400 | — |
+| curl, 13,000-character brief | 413 `{"reason":"tooLong"}` | — |
+| curl, GET | 405 | — |
+| 1. Sample brief (browser) | 200, plan review; Fri, Dec 4, 5:00 PM | **14.9 s** |
+| Portfolio brief rerun (script) | 200 | **18.1 s** |
+| 3. Recipe (browser) | 422, Error 02; Edit the brief keeps the recipe | **3.3 s** |
+| 7. Requests 4–6 from the same IP (recipe, then Try again ×2) | 422, 422, then **429** → Error 03 (the 6th request in 10 minutes) | — |
+
+**Sample brief** (5 steps, about 7 h 15 min): substantive "Write an argumentative essay taking a clear position on whether access to urban green space improves psychological wellbeing"; format "Support your position with at least five peer-reviewed sources", "Write 1,500 words, plus or minus 10%; the reference list does not count toward the word limit", "Use APA 7th edition, including in-text citations and a reference list"; submission "Upload the essay to Turnitin by Friday, December 4 at 5:00 PM". All criteria start lowercase, no label ends in a full stop, no Submit step. Screenshot: `m4-plan-review-sample.png` (retaken here; replaces the pre-fix one).
+
+**Portfolio brief** (6 steps): all requirements from the local run are present (split slightly differently: Gibbs and APA are listed on their own lines); both dates kept as submission reminders, deadline `2026-12-15T12:00`. The interim step is back: step 5 "Send the draft for feedback" (15 min, "you have handed in the first draft for peer feedback."), then "Revise and check the portfolio", whose first action is "Review the peer feedback and revise where useful." The step isn't titled "Submit…", so it came from the reworded instructions, not from the narrower backstop.
+
+Preview plans took 14.9 and 18.1 s, a little slower than the local 10.0–14.9 s.

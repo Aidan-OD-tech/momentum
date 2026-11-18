@@ -236,7 +236,7 @@ From [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.
 
 ### Open for Aidan
 
-- **Building copy:** revisit after the preview timings (above).
+- **Building copy:** preview timings were 14.9 s (sample) and 18.1 s (portfolio), and 3.3 s for the recipe; local plans took 10.0–14.9 s. "About 15 seconds" would undersell the 18 s run; "under a minute" held for every run. Aidan's call.
 - **How to hide "Use a sample brief"** for M5: at the start of M5.
 - (Claude Code) **Seen in one live run before the filter was narrowed:** the reflective portfolio plan had no step for reading peer feedback between the first draft and the final revision. The narrower rule allows that step again; not yet re-run live.
 

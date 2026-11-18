@@ -9,7 +9,7 @@ Legend: **planned** (not started), **implemented** (written, not independently c
 | M1 | Foundation and working-step screen | verified and merged (PR #1) |
 | M2 | Core loop on sample data with persistence: home, working step, pause and notes, completion and undo, timer, side panels, final check, completed home, review | verified and merged (PR #2) |
 | M3 | Brief entry, building, plan review and editing, error screens, preview deploy | verified and merged (PR #3) |
-| M4 | AI generation (server-side, structured output) | implemented on branch `feat/m4-ai-generation`; **verified locally** with mocked tests and live checks 1–9 against `gpt-6.1-terra`; Vercel preview not yet checked |
+| M4 | AI generation (server-side, structured output) | implemented on branch `feat/m4-ai-generation`; **verified** locally (mocked tests, live checks 1–9 against `gpt-6.1-terra`) and on the Vercel preview (checks 1, 3, 7 and curl); PR not yet opened |
 | M5 | Evaluation (heuristic evaluation, task-based feedback) | planned |
 | M6 | Fixes from evaluation | planned |
 | M7 | Docs and case study | planned |
@@ -127,7 +127,7 @@ Screenshots in `docs/evidence/screenshots/`: `m3-brief-entry-empty`, `m3-error01
 
 ## M4
 
-Branch `feat/m4-ai-generation`, off `main` after PR #3. Not pushed, not deployed. Decisions: [decisions.md](decisions.md), section M4. Risk review: [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.md).
+Branch `feat/m4-ai-generation`, off `main` after PR #3. Pushed by Aidan; preview at https://momentum-git-feat-m4-ai-generation-aidan-o-driscoll.vercel.app (the branch alias, which follows the latest push; the checks below ran on commit `a7f673c`). Not merged; production still serves `main`. Decisions: [decisions.md](decisions.md), section M4. Risk review: [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.md).
 
 ### Built
 
@@ -157,12 +157,14 @@ Branch `feat/m4-ai-generation`, off `main` after PR #3. Not pushed, not deployed
 | Live checks 1–5 and 9 (after credit, `gpt-6.1-terra`) | **all pass**; details, briefs and actual output in [evidence/generation-checks.md](evidence/generation-checks.md). 1: sample brief → every requirement, none invented, Fri, Dec 4, 5:00 PM, substantive first. 2: lab report and reflective portfolio (development briefs) checked requirement by requirement, none missing or invented; the portfolio's final date chosen over the draft date. 3: recipe → 422, Error 02, brief kept. 4: injection → normal plan, no essay text or sources. 5: no date → no deadline; the field's date wins. 9: edit a step, complete every step (count from the plan), final check lists the plan's non-submission requirements, home "All steps done" |
 | Timings | 9 plans in **10.0–13.9 s**; recipe refused in 3.0–3.3 s |
 | After the three fixes | `npm test` 20 files, **183 tests** pass (new: full stops removed from labels and short labels; a mid-plan "Submit the draft…" step kept and a final "Submit the essay" step dropped, before IDs; 13 steps with a final Submit → 12, valid; only a Submit step → unreadable; `doneWhenSentence` keeps a proper noun's capital; `capitalizeFirst`; the two new instruction lines). Lint, tsc, build and `check:bundle` pass. Live, 2 requests (sample and portfolio briefs, 14.9 s and 13.7 s): every criterion starts lowercase, no label ends in a full stop, no Submit step. No criterion started with a proper noun in these runs, so that case is checked by unit test only |
+| Vercel preview (2026-11-18, `a7f673c`, Chrome via Playwright) | curl: no body → **400**; 13,000 characters → **413** `{"reason":"tooLong"}`; GET → 405. The page shows the disclosure line. **Check 1**: sample brief → plan in **14.9 s**, every requirement, none invented, Fri, Dec 4, 5:00 PM, criteria lowercase, no final full stops, no Submit step. **Portfolio brief rerun**: 200 in **18.1 s**; the draft-for-feedback step is back ("Send the draft for feedback", step 5 of 6), and the revision step starts with reviewing the feedback. **Check 3**: recipe → Error 02 in 3.3 s, brief kept. **Check 7**: requests 3–6 from one IP in 10 minutes answered 422, 422, 422, then **429** → Error 03. No page errors |
 
-Screenshots in `docs/evidence/screenshots/`: `m4-brief-entry` (full page, with the disclosure line), `m4-near-limit-count`, `m4-building`, `m4-plan-review-sample`, `m4-plan-review-second`, `m4-error02-recipe`.
+Screenshots in `docs/evidence/screenshots/`: `m4-brief-entry` (full page, with the disclosure line), `m4-near-limit-count`, `m4-building`, `m4-plan-review-sample` (retaken on the preview after the fixes), `m4-plan-review-second`, `m4-error02-recipe`.
 
 ### Not verified
 
-- **The Vercel preview:** checks 1, 3 and 7 and the curl checks, after Aidan pushes.
+- Live check 9 (end to end) and checks 2, 4 and 5 were run locally, not on the preview.
+- The narrowed Submit backstop has not been triggered by real output: no plan since the fix had a last step titled "Submit…". It is covered by unit tests.
 - Safari, Firefox and screen readers (live regions checked in the DOM only).
 
 ### Known limitations
