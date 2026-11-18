@@ -80,3 +80,22 @@ Records what AI tools produced and where Aidan changed, corrected or decided. Ke
 - Closed the M4 building-copy item (keep "under a minute") and added "Today" in UTC to the M6 candidates (2026-11-18).
 - Approved the disclosure line; confirmed H-01 as severity 3 and marked the heuristic evaluation reviewed; accepted the M6 candidates in order (tab sync, then WCAG 1.4.11 and 4.1.3), with H-04, H-07 and the severity-1 items as "watch in sessions" (2026-11-18).
 - Asked for an `env=` tag (`VERCEL_ENV`) on the event log line, so preview and test traffic can be filtered out (2026-11-18).
+
+## M6: fixes from the evaluation (2026-11-18)
+
+- Implemented by Claude Code from Aidan's written M6 prompt: items 1–7, 9 and 10, one commit each, with tests. Then a `/craft compose` and `/craft responsive` pass, and the axe walkthrough again. Item 8 waits for VoiceOver, as the prompt said.
+- **What Claude Code did not do:**
+  - It wrote no session findings, quotes or counts.
+  - It moved no "Watch in sessions" item into M6.
+  - It used no screen reader.
+  - It made no OpenAI requests (`/api/plan` was answered by the scripts).
+  - It didn't push, merge or deploy.
+  - The H-01 two-tab check was scripted in Chrome, not done by hand.
+- **Flagged rather than decided:**
+  - "Change only fields" vs "darken `--border-input`" (the non-field controls moved to a new `border/rule` token at the old colour);
+  - "VoiceOver step 4" for "Progress saved", which is step 7 in the script.
+- **Claude Code's own corrections during M6:**
+  - A commit (item 10) went in while one test was failing: the check grepped the output instead of failing on it. The failure was a timing race in two Error 02/03 tests, made more likely by the new 429 test and by a server running alongside. Bisecting showed no product commit caused it. Fixed in the tests (`67533f4`), and later commits ran the suite with a strict pass check.
+  - A new route test called the fake-client helper inside a named function, which the hooks lint rule rejects; moved into `beforeEach`.
+  - The first M6 walkthrough tried to show the failed save status on brief entry, which has no save indicator; moved to the final check.
+

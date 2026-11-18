@@ -296,3 +296,65 @@ From the heuristic evaluation (H-), the accessibility pass (WCAG numbers) and th
 - H-04 estimates about twice the sample's;
 - H-07 Start step 1 below the fold;
 - severity 1: H-06 "Done when You…" (moved here from M4's M6 candidates), H-10 Undo cleared after moving on, H-11 clearing the note deletes it, H-12 Escape in edit cards, H-13 rail Tab order, H-14 visible "Finish editing to start." (signal 7), H-15 "this browser on this computer" copy (risk 2), H-16 silent fresh start.
+
+## M6 (2026-11-18)
+
+Fixes from the evaluation, in the order Aidan accepted (M5, "M6 candidates"), plus items 9 and 10 from Aidan's walkthrough. Each item is one commit on `feat/m6-fixes`. No "Watch in sessions" item was moved in.
+
+### From Aidan's M6 prompt
+
+1. **Tabs stay in step** (H-01). (Aidan) `MomentumProvider` listens for the `storage` event on `momentum:v1` and replaces its data with what another tab wrote, through the same `load()`. Screens whose route no longer fits follow their existing redirects; no new message.
+   - (Claude Code) If the other tab's value is unreadable, `load()` backs it up as on first load. This tab keeps what's on screen, stops writing and shows "Couldn’t save in this browser". If the key was removed, the data becomes empty, as on a first visit.
+   - (Claude Code) "Progress saved" isn't cleared by another tab's write.
+2. **Field border 3:1** (WCAG 1.4.11, H-08). (Aidan) `border/input` is now **#949494**, the lightest neutral that reaches 3:1: **3.03:1** on white and on `surface/page` (#ffffff); #959595 is 2.995:1. `border/default` is unchanged.
+   - (Claude Code, **flag for Aidan**) `border/input` was also used by secondary buttons, the estimate stepper, the upcoming-step badge, the dashed hidden-note row and the review tick. "Change only fields" and "darken `--border-input`" conflicted for those. So they moved to a new token, `border/rule`, at the old #d4d4d4 (DESIGN.md already called it "Rule"), and their look is unchanged. If Aidan would rather darken everything that used the old token, delete `border/rule` and point those classes back at `border-input`.
+3. **Save status in one mounted live region** (WCAG 4.1.3, H-09). (Aidan) An empty `role="status"` paragraph is always in the top bar, and only its text changes, so writes that keep the same status announce nothing.
+   - (Claude Code) The failed state uses the alert icon (`AlertIcon`, already used by the error cards) and Ink text. Saved keeps the check icon and Faint pencil.
+   - **Wording unchanged:** "Saved in this browser" and "Couldn’t save in this browser". Both fit on one line at every width checked, from 1280 down to 375 px (`whitespace-nowrap`), so no shorter wording was needed. **Aidan to confirm keeping it.**
+4. **A long paste is kept** (H-02). (Aidan) `maxLength` is removed, and the existing over-limit message blocks the build.
+   - (Claude Code) The message now shows as soon as the brief is over 12,000 characters, not only after Break it down. The live region says it once, in the same words.
+   - (Claude Code) The counter, the over-limit check and the server's 413 now share one rule, `briefLength()`: the trimmed length. Before, the counter counted surrounding whitespace and the other two didn't.
+5. **Rate-limit line on Error 03** (H-03). (Aidan) A 429 becomes `rateLimited` in `plan-source`, and Error 03 keeps its heading and Try again (no automatic retry). Body: **"Too many plans were built from this network. Try again in about 10 minutes."** (Aidan's suggested wording; **pending his approval**.) The hourly cap of 100 can make the wait longer than 10 minutes, which "about" doesn't fully cover. A safer alternative is "Try again later."
+6. **The browser's local date** (H-05). (Aidan) `POST /api/plan` carries `today: "YYYY-MM-DD"`. zod accepts only a real ISO date; a missing or malformed value becomes undefined, not a 400. `resolveToday()` uses the browser's date when it's within one day of the server's UTC date, and the server's UTC date otherwise. `buildUserMessage` takes the date as a string.
+   - **Disclosure:** this adds one field to what's sent with the brief: the student's calendar date. It doesn't reveal the brief or identify anyone. Nothing is logged or stored. No copy change (Aidan's prompt).
+7. **Undo is described** (signal 5). (Aidan) Undo keeps its label and gets `aria-describedby` pointing to a visible line, "Step N is marked done.", on step complete (new) and the final check (the existing line, now linked).
+   - (Claude Code) On step complete, "Step N will be here when you come back." stays, and both captions share one footer block (/craft compose C1).
+8. **"Progress saved" announced:** not changed (see Open for Aidan).
+9. **A way back from a done step** (H-17, severity 3, confirmed by Aidan; found in his walkthrough). (Aidan)
+   - The rail lists done steps, the step on screen and the step in progress.
+   - The done view gets one Secondary action, **"Back to step N"**, or **"Back to home"** when no step is in progress.
+   - The wordmark links to `/`, named **"Momentum, home"**.
+   - (Claude Code) `aria-current="step"` is now on the step on screen even when it's done; before, a done step on screen had none. The in-progress row looks current (dot, medium weight), and when it isn't the step on screen a screen reader hears "In progress:" before it, matching "Done:". Wording **pending Aidan's approval**.
+10. **Side-panel line once a plan has started.** (Aidan) In review: "To change steps, edit the plan from the plan review." (unchanged). Active or completed: **"Steps can’t be changed after you start."** (**pending Aidan's approval**). Editing after start is still not built.
+
+### Claude Code's other changes
+
+- **A test race fixed:** the Error 02 and 03 tests checked heading focus straight after `findByRole`, before the effect that moves focus. It failed about 1 run in 8 with a server running alongside. The tests now wait for focus (`67533f4`). No product change.
+- The M5 baseline was 221 tests, not 220: M5's `env=` test added one after the count was written down.
+
+### Open for Aidan
+
+- **Approve the wording:**
+  - item 3: keep the full save status wording;
+  - item 5: the rate-limit line;
+  - item 9: "Back to step N", "Back to home", and "Momentum, home";
+  - item 10: "Steps can’t be changed after you start.".
+- **Item 2's token split** (`border/rule` for non-field controls): keep it, or darken those too.
+- **Item 8 waits for VoiceOver script step 4. If 'Progress saved' isn't heard, mount its status region before the text appears, as in item 3.** (Aidan's line.) Note: the script's "Progress saved" check is **step 7**. M5's accessibility table said "step 4" in error, and that's where this line comes from. The table is corrected in M6; the line above is kept as Aidan wrote it.
+- **Preview checks after the push:**
+  - two tabs (item 1);
+  - a 13,000-character paste (item 4);
+  - the sixth build in 10 minutes from one network (item 5);
+  - on step 3, open done step 1 from the rail, then "Back to step 3" (item 9).
+- Running the sessions and the VoiceOver script (unchanged from M5).
+
+### M7 candidates
+
+From the [compose and responsive review](reviews/2026-11-18-compose-responsive-m6.md) and M6 work. None is built.
+- **C6:** on a done step, the rail doesn't visually mark which done step is on screen; only "Step N of M" and `aria-current` do.
+- **C7:** Error 03 for the rate limit keeps Try again as the primary action, though it will fail for a while.
+- **C8:** over the limit, the brief doesn't show where character 12,000 falls.
+- **R1:** below about 420 px, the top bar's assignment context shrinks to nothing; hide it below a set width instead.
+- **R2 (watch in sessions):** at 600×800, "Back to step N" is below the fold (the rail's step link is visible).
+- **Save status across a route change:** each screen renders its own top bar. A failure that happens as the student moves screens (for example Mark complete → step complete) arrives already filled on the new screen, and screen readers often skip that, as with "Progress saved". Moving the top bar into the layout would fix both. Check with VoiceOver first.
+- **Keyboard script:** re-run `keyboard.mjs` with the wordmark as the first Tab stop, and update its expected order.

@@ -31,7 +31,7 @@ Marketing rows are written for the portfolio case study; Momentum has no product
 | One-liner | Paste your assignment brief and an optional deadline. |
 | Short | The student pastes the brief text and can add a deadline. PDF import is out of scope. |
 | Marketing | Paste the brief as you got it. Add a deadline if you have one. |
-| Technical | `/` with no open assignment. Pasted text and a native `datetime-local` deadline that overrides the plan's. The only checks are "not empty" (Error 01, no request) and the 12,000-character limit (`maxLength`, with a quiet count within 10% of it). The draft is saved in `briefDraft` as the student types and survives reload, failure and Cancel. One caption line discloses that the brief is sent to OpenAI. "Use a sample brief" fills the sample text only, and shows only when `NEXT_PUBLIC_SHOW_SAMPLE_BRIEF` is `"true"` (hidden for the M5 sessions). |
+| Technical | `/` with no open assignment. Pasted text and a native `datetime-local` deadline that overrides the plan's. The only checks are "not empty" (Error 01, no request) and the 12,000-character limit (since M6 a longer paste is kept whole; the over-limit message shows at once and blocks the build; a quiet count within 10% of the limit; all three, and the server's 413, count the trimmed length). The draft is saved in `briefDraft` as the student types and survives reload, failure and Cancel. One caption line discloses that the brief is sent to OpenAI. "Use a sample brief" fills the sample text only, and shows only when `NEXT_PUBLIC_SHOW_SAMPLE_BRIEF` is `"true"` (hidden for the M5 sessions). |
 
 ### Plan building
 
@@ -42,7 +42,7 @@ Marketing rows are written for the portfolio case study; Momentum has no product
 | One-liner | Turns the brief into a summary, requirements and steps. |
 | Short | One server-side model request returns structured plan data, which is validated before use. After that, navigating and editing never call the model again. |
 | Marketing | Momentum reads your brief and suggests steps, each with what “done” looks like. |
-| Technical | `apiPlanSource` (`src/lib/plan-source.tsx`) posts to `POST /api/plan` (`src/app/api/plan/route.ts`), which makes one OpenAI Responses API call with a strict zod schema (`src/lib/plan-schema.ts`) and the instructions in `src/lib/server/plan-prompt.ts`. The key is read only in `src/lib/server/openai.ts` (`server-only`). Server checks: zod request, 12,000 characters (413), in-memory rate limit (429), 45 s timeout (504), abort on Cancel. Post-processing: estimates to 5 min, 1–12 steps, substantive first, date-only deadlines kept, malformed ones dropped. 422 → Error 02; anything else → Error 03; the brief is always kept. One indeterminate building state with Cancel. |
+| Technical | `apiPlanSource` (`src/lib/plan-source.tsx`) posts to `POST /api/plan` (`src/app/api/plan/route.ts`), which makes one OpenAI Responses API call with a strict zod schema (`src/lib/plan-schema.ts`) and the instructions in `src/lib/server/plan-prompt.ts`. The key is read only in `src/lib/server/openai.ts` (`server-only`). Server checks: zod request, 12,000 characters (413), in-memory rate limit (429), 45 s timeout (504), abort on Cancel. Post-processing: estimates to 5 min, 1–12 steps, substantive first, date-only deadlines kept, malformed ones dropped. 422 → Error 02; 429 → Error 03 with its own rate-limit line (M6); anything else → Error 03; the brief is always kept. The browser sends its local date (`today`), which the server uses within a day of its UTC date (M6). One indeterminate building state with Cancel. |
 
 ### Plan review and editing
 
@@ -68,7 +68,7 @@ Marketing rows are written for the portfolio case study; Momentum has no product
 | One-liner | One step in focus: what to do and when it’s done. |
 | Short | Shows the current step's title, intro, what to do, "Done when", an approximate estimate and the relevant brief requirements, with a rail of all steps alongside. Mark complete stays within 700px of the top at 1280×800. |
 | Marketing | Just the step in front of you: what to do, and how you’ll know it’s done. |
-| Technical | Route `/step/n`; malformed numbers return 404 from the server, while a number past the end of the stored plan shows Not found on the client with HTTP 200 (known limit). The rail stacks above the column below 960px. The "From your brief" line is collapsible. Focus moves to the h1 on route change. |
+| Technical | Route `/step/n`; malformed numbers return 404 from the server, while a number past the end of the stored plan shows Not found on the client with HTTP 200 (known limit). The rail stacks above the column below 960px. It lists done steps, the step on screen and the step in progress; a done step offers "Back to step N" (or "Back to home") (M6). The wordmark links home. The "From your brief" line is collapsible. Focus moves to the h1 on route change. |
 
 ### Pause and return notes
 
@@ -90,7 +90,7 @@ Marketing rows are written for the portfolio case study; Momentum has no product
 | One-liner | Mark a step done, see what’s next, undo if needed. |
 | Short | Mark complete leads to a "Step N done." screen with progress, the next step and an Undo. Undo restores the step's previous state, including its note. |
 | Marketing | Finish a step and see what’s next. Undo if you clicked too soon. |
-| Technical | Route `/step/n/done`. `lastUndo` stores the previous step fields; one level of undo. Progress counts come from the plan. |
+| Technical | Route `/step/n/done`. `lastUndo` stores the previous step fields; one level of undo. Undo is described by the visible line "Step N is marked done." (M6). Progress counts come from the plan. |
 
 ### Optional timer
 
@@ -151,7 +151,7 @@ Marketing rows are written for the portfolio case study; Momentum has no product
 | Scale | major |
 | Status | built |
 | One-liner | Progress is saved in your browser, and Momentum tells you if it isn't. |
-| Short | Every change is written to local storage. "Saved in this browser" appears only after a confirmed write; if writing fails, the app keeps working in memory and says "Couldn’t save in this browser". No accounts or cloud sync. |
+| Short | Every change is written to local storage. "Saved in this browser" appears only after a confirmed write; if writing fails, the app keeps working in memory and says "Couldn’t save in this browser". No accounts or cloud sync. Since M6 the status sits in one mounted live region (the failed state with its own icon), and an open tab takes another tab's writes instead of overwriting them. |
 | Marketing | No account needed. Your progress stays in this browser, and if saving ever fails, Momentum tells you. |
 | Technical | One versioned key, `momentum:v1`. Unreadable data is copied to `momentum:v1:unreadable` before starting fresh. If storage can't be read or backed up, the app stops writing for the session so nothing is overwritten. Writes happen after each reducer change in `momentum-store.tsx`. |
 

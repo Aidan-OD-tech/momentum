@@ -1,4 +1,40 @@
-# Accessibility pass (M5, target WCAG 2.2 AA)
+# Accessibility pass (M5, re-run in M6; target WCAG 2.2 AA)
+
+## M6 re-run (2026-11-18)
+
+Claude Code ran the M5 axe walkthrough again on the production build of `feat/m6-fixes`. It used the same tool, tags and widths (1280×800 and 600×800), on the same 13 screens plus four M6 views:
+- brief entry over the limit;
+- Error 03 for the rate limit;
+- the done-step view;
+- the failed save status (on the final check).
+
+Files:
+- results: [test-results/axe-m6.json](test-results/axe-m6.json);
+- scripts: [test-results/m6-scripts/](test-results/m6-scripts/);
+- screenshots: `docs/evidence/screenshots/m6-<screen>-<1280|600>.png`.
+
+| Result | 1280×800 | 600×800 |
+| --- | --- | --- |
+| axe violations, 17 views | 0 | 0 |
+| Needs review | pause dialog only: `aria-hidden-focus` and `color-contrast`, as in M5 (checked by hand below) | pause dialog only: `aria-hidden-focus`, as in M5 |
+
+What changed, by criterion:
+- **1.4.11 Non-text Contrast: now passes.**
+  - The brief and deadline fields' computed resting border is `rgb(148, 148, 148)` (#949494), measured in Chrome: **3.03:1** on white and on `surface/page` (#ffffff).
+  - Focus turns it `border/strong`, **6.22:1** against the resting border.
+  - The token test (`src/tokens.test.ts`) fails if `border/input` drops below 3:1.
+- **4.1.3 Status Messages (save status): now passes in the DOM.**
+  - The top bar keeps one `role="status"` region mounted, empty while hidden; only its text changes.
+  - In Chrome it read: empty on brief entry; "Saved in this browser" on the working step; "Couldn’t save in this browser" with the alert icon in Ink (`rgb(17, 17, 17)`) when storage refused a write; then "Saved in this browser" again after a good write.
+  - It stays on one line (20 px tall, line height 20 px) at 1280, 600, 540, 480, 420 and 375 px, with no horizontal scroll.
+  - **Not heard:** no screen reader was used. VoiceOver script step 8 checks it.
+- **2.4.6 (advisory): Undo now has an accessible description**, "Step N is marked done.", on step complete and the final check.
+- **Keyboard:** the wordmark is now a link home and the first Tab stop on every screen. The M5 keyboard script wasn't re-run; see the [compose and responsive review](../reviews/2026-11-18-compose-responsive-m6.md), R7.
+
+Still open: "Progress saved" (VoiceOver step 7; M6 item 8 waits for it).
+
+The M5 record follows, unchanged except for the criteria table and one corrected step number (step 7, not 4, for "Progress saved").
+
 
 Run by Claude Code on 2026-11-18 on the production build of `feat/m5-evaluation` (`npm run build && npm start`), Chrome via Playwright, at **1280×800** and **600×800**. `/api/plan` was answered by the test script with the sample plan.
 
@@ -72,17 +108,17 @@ Flow: brief entry → plan review (edit step 1, Cancel) → Start step 1 → sid
 | 2.5.8 Target Size (Minimum) | **Pass** | Every control is at least 24×24 px except the four final-check checkboxes (20×20). They meet the spacing exception: rows are 16 px apart with 26 px lines, so 24 px circles don't overlap. Each label is also linked (`htmlFor`), so clicking the text ticks the box. |
 | 3.3.1 Error Identification | **Pass** | Error 01: text message, `aria-invalid`, linked by `aria-describedby`, focus in the field (also tested). Errors 02 and 03: full-screen messages with the heading focused. The over-limit draft error uses the same pattern. Not checked in M5: the step edit card's required fields. |
 | 3.3.3 Error Suggestion | **Pass, with a note** | Each error says what to do. Error 03's "Try again in a moment" is also shown for the rate limit (up to 10 minutes), so the suggestion can be wrong (heuristic H-03). Related, outside 3.3: a paste over 12,000 characters is cut without a message (H-02). |
-| 4.1.3 Status Messages | **Fail (save status)** | See below. |
+| 4.1.3 Status Messages | **Fail (save status) in M5; save status fixed in M6** | See below and the M6 re-run above. |
 
 **4.1.3, by status message:**
 
 | Message | In the DOM | Result |
 | --- | --- | --- |
-| "Saved in this browser" / "Couldn’t save in this browser" (top bar) | a plain `<p>`, no live region | **Fail**: a save failure is never announced → M6 |
+| "Saved in this browser" / "Couldn’t save in this browser" (top bar) | M5: a plain `<p>`, no live region. M6: one mounted `role="status"` region | M5 **Fail**: a save failure is never announced. **M6: pass in the DOM; not heard** |
 | Building ("Working on it") | `role="status"`, and the h1 "Building your plan" is focused | Pass in the DOM; not heard |
 | "Requirements updated…" (R3 03) | a `role="status"` container that stays mounted and fills on change | Pass in the DOM; not heard |
 | Character count near the limit | linked to the field; a separate polite region changes once near and once at the limit | Pass in the DOM (tested); not heard |
-| "Progress saved" (home) | `role="status"`, but it arrives already filled with the new screen, which screen readers often skip | **Not checked**: VoiceOver step 4 |
+| "Progress saved" (home) | `role="status"`, but it arrives already filled with the new screen, which screen readers often skip | **Not checked**: VoiceOver step 7 (M5 said "step 4" here in error; corrected in M6) |
 
 ## M6 candidates from this pass
 
