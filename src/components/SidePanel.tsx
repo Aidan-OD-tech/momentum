@@ -81,7 +81,7 @@ function PanelBody({ tab, onTabChange }: { tab: PanelTab; onTabChange: (tab: Pan
           ))}
         </ol>
         {/* Plan review is the only place steps can be edited, and it can't be reached once the plan has
-            started (decisions.md, M3 "Don't build"). Started-plan wording pending Aidan's approval (M6). */}
+            started (decisions.md, M3 "Don't build"). Started-plan wording approved by Aidan (decisions.md, M6, item 10). */}
         <p className="text-caption text-text-tertiary">
           {assignment.status === "review"
             ? "To change steps, edit the plan from the plan review."

@@ -117,7 +117,7 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
 
           <div className="flex flex-wrap items-center justify-between gap-4">
             {/* The AI disclosure (scope item 14), merged with the M3 "No account needed" line. The last
-                sentence covers the M5 usage event; its wording is pending Aidan's approval. */}
+                sentence covers the M5 usage event; its wording was approved by Aidan (decisions.md, M5). */}
             <p className="flex-1 text-caption text-text-tertiary">
               To build your plan, your brief is sent to OpenAI. Your plan and progress stay in this browser. No account needed.
               Momentum counts anonymous usage, such as when a plan’s first step is started.
