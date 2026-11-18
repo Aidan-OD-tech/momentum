@@ -20,7 +20,7 @@ From M4 the app needs one secret, `OPENAI_API_KEY`, used only by the server rout
 
 1. **Sample-brief flag.** Leave `NEXT_PUBLIC_SHOW_SAMPLE_BRIEF` **unset** in Vercel for Production and Preview during the sessions: "Use a sample brief" is then hidden. For the case-study demo, add it with the value `true` and redeploy. The value is built into the page, so a change needs a new deployment. It isn't a secret.
 2. **Analytics.** Nothing to enable. The project is on Hobby, where Web Analytics custom events aren't included, so the event goes to Momentum's own `POST /api/event` and shows in **Logs** (filter Environment: production, search `event=first_step_started`). Hobby keeps logs for **1 hour**: see [evidence/measurement.md](evidence/measurement.md).
-3. **After pushing `feat/m5-evaluation`:** on the preview, confirm the button is hidden, build one plan, press Start step 1, and check that one `[api/event] event=first_step_started …` line appears in Logs (Environment: preview). Then reload and reopen step 1: no second line.
+3. **After pushing `feat/m5-evaluation`:** on the preview, confirm the button is hidden, build one plan, press Start step 1, and check that one `[api/event] event=first_step_started … env=preview` line appears in Logs (Environment: preview). Then reload and reopen step 1: no second line.
 
 ## Checks after a deploy (Claude Code, once the URL exists)
 

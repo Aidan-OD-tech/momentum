@@ -44,19 +44,27 @@ Nothing else is sent: no brief, plan or note text, no ids, no timestamps. The ro
 - writes one line, and stores nothing:
 
 ```
-[api/event] event=first_step_started stepCount=6 bucket=2–5
+[api/event] event=first_step_started stepCount=6 bucket=2–5 env=production
 ```
+
+`env` is Vercel's `VERCEL_ENV`: `production`, `preview` or `development`, and `unknown` outside Vercel (`npm start` on a laptop). Only `env=production` lines count toward the measure.
 
 ## How Aidan reads the numbers
 
 1. Vercel → the Momentum project → **Logs**.
 2. Filter **Environment: production** (previews are separate), and set the time range.
-3. Search `event=first_step_started` for the starts, and `[api/plan] 200 ok` for the plans created.
+3. Search `event=first_step_started env=production` for the starts, and `[api/plan] 200 ok` for the plans created (that line has no `env=` tag, so rely on the Environment filter for it).
 4. Count the start lines by `bucket=`. Primary measure = (starts with `<2`, `2–5` or `5–15`) ÷ plans created.
 
 **Retention: Hobby keeps runtime logs for 1 hour** ([Vercel docs](https://vercel.com/docs/logs/runtime), "Limits"). Lines older than an hour are gone. In practice:
 - **During a session:** keep Logs open in **Live** mode and copy the participant's lines into their session file (`docs/evidence/feedback/`) straight away.
-- **After launch:** numbers exist only for the hours when someone copied them. Keeping them longer needs a paid plan, a log drain or a store. That's a scope and cost decision for Aidan, not part of M5.
+- **After launch (on Hobby):** numbers exist only for the hours when someone copied them.
+
+**Sessions vs a real launch.** The 1-hour window suits the sessions: Aidan is watching, and he copies each participant's lines within the hour. A real post-launch deployment would need durable collection instead, without adding a database to Momentum:
+- **Vercel Web Analytics custom events** (Pro plan): `track("first_step_started", { … })` with the same two properties, counted in the Analytics dashboard;
+- or a **Vercel log drain**, which forwards the existing `[api/event]` lines to a log service that keeps them.
+
+Either way, observed session results and post-launch telemetry stay in separate tables (below) and are never added together. Neither is built for M5.
 
 Before counting, leave out:
 - Aidan's own test runs on production (note their times);

@@ -260,36 +260,37 @@ From [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.
 - (Claude Code) Buckets are half-open: under 2, 2 to under 5, 5 to under 15, 15 or more. The primary measure ("within 15 minutes") is the first three.
 - (Claude Code) The event is built from the assignment as it was **before** `startPlan`, in the Start step 1 handler (`PlanReviewScreen`). Plan review is the only way to open step 1 for the first time; started-plan routes redirect a plan in review home.
 
-**Where it goes: `POST /api/event`, not Vercel Web Analytics.** (Aidan: the project is on Hobby; Claude Code checked the docs on 2026-11-18: "Custom Events are available on Enterprise and Pro plans".) The route accepts only this event name and the two fields (strict zod schema, extra fields → 400), at most 256 characters (413), rate limited to 10 per IP per 10 minutes and 300 per hour (429). It logs one line (`[api/event] event=first_step_started stepCount=6 bucket=2–5`) and stores nothing. No `@vercel/analytics`, no page-view tracking, no third-party tracker.
+**Where it goes: `POST /api/event`, not Vercel Web Analytics.** (Aidan: the project is on Hobby; Claude Code checked the docs on 2026-11-18: "Custom Events are available on Enterprise and Pro plans".) The route accepts only this event name and the two fields (strict zod schema, extra fields → 400), at most 256 characters (413), rate limited to 10 per IP per 10 minutes and 300 per hour (429). It logs one line (`[api/event] event=first_step_started stepCount=6 bucket=2–5 env=production`) and stores nothing. No `@vercel/analytics`, no page-view tracking, no third-party tracker.
 - (Claude Code) The rate limiter became a small factory in `rate-limit.ts` so plans and events keep separate counts; the plan limits are unchanged.
 - (Claude Code) The browser sends with `fetch(..., { keepalive: true })` and ignores failures; no retry.
-- Known limit: **Hobby keeps runtime logs for 1 hour**, so the numbers must be copied within the hour (measurement.md). Keeping them longer is a scope and cost decision for Aidan.
+- **`env=` tag on the log line.** (Aidan, 2026-11-18, before the push) The line ends with `env=${process.env.VERCEL_ENV ?? "unknown"}`: `production`, `preview` or `development` on Vercel, `unknown` locally. So preview and test traffic can be filtered out of the production numbers.
+- Known limit: **Hobby keeps runtime logs for 1 hour**, so the numbers must be copied within the hour (measurement.md, "Retention"). A real post-launch deployment would use durable collection (Web Analytics custom events on Pro, or a log drain), still without a database. That is not built for M5.
 
-**Disclosure line.** (Claude Code, wording from Aidan's prompt; **pending Aidan's approval**) Brief entry's caption now ends with "Momentum counts anonymous usage, such as when a plan’s first step is started." The rest of the line is unchanged.
+**Disclosure line approved.** (Aidan, 2026-11-18) Brief entry's caption ends with "Momentum counts anonymous usage, such as when a plan’s first step is started." The rest of the line is unchanged.
 
 **Measure definition.** (Aidan's measures, written up by Claude Code in [evidence/measurement.md](evidence/measurement.md)) Primary: the share of created plans whose step 1 is opened in the same browser within 15 minutes ("starts within the first visit"); denominator from `[api/plan] 200 ok` log lines. Complementary: paused steps later resumed (observed in sessions only; not instrumented). "Observed in sessions" and "gathered after launch" are kept apart.
 
 **No fixes in M5.** (Aidan) Heuristic and accessibility findings become M6 candidates; product behavior changes only with Aidan's approval.
 
+**Heuristic evaluation reviewed.** (Aidan, 2026-11-18) H-01 confirmed as severity 3. H-04, H-07 and the severity-1 items are "watch in sessions", not committed M6 work.
+
 ### Open for Aidan
 
-- **Approve the disclosure wording** (above).
-- **Review the heuristic evaluation** ([evidence/heuristic-evaluation.md](evidence/heuristic-evaluation.md)): set severities, edit, mark reviewed.
-- **Accept or reject the /craft risk and /craft signal items** ([reviews/2026-11-18-risk-pause-saving.md](reviews/2026-11-18-risk-pause-saving.md), [reviews/2026-11-18-signal.md](reviews/2026-11-18-signal.md)). The proposed M6 candidates are listed below.
-- **After-launch numbers:** with 1-hour log retention, decide whether "gathered after launch" means only what was copied within the hour, or whether a paid plan, a log drain or a store is worth it (scope and cost).
-- **Session template vs the session guide:** the template follows MOMENTUM_CONTEXT's three tasks; align it with the guide's observation sheet.
+- **Session template vs the session guide:** the guide (`handoffs/m5-session-guide.md`) isn't on disk. Once it is pasted, copy it to `evidence/feedback/session-guide.md` and align `session-template.md` with its observation sheet headings.
 
-### M6 candidates (proposed in M5, pending Aidan)
+### M6 candidates (accepted by Aidan, 2026-11-18, in this order)
 
-From the heuristic evaluation (H-), the accessibility pass (WCAG numbers) and the two reviews:
-- **Keep tabs in step** (H-01, risk 1 and 13): listen for the `storage` event and replace in-memory data with what another tab wrote. Verified: a second tab erased a saved note and showed "Saved in this browser".
-- **Save indicator** (WCAG 4.1.3, H-09, signal 3 and 9): a mounted live region; the failed state with an icon; one line at 600 px.
-- **Text field border** (WCAG 1.4.11, H-08): a darker resting border for fields (the existing 1.48:1 item).
-- **Paste over 12,000 characters** (H-02, signal 4): say that text was cut.
-- **Rate-limit message** (H-03, signal 2): its own Error 03 line with an honest wait.
-- **Undo names what it undoes** (signal 5).
-- **"Progress saved" announced** (WCAG 4.1.3, signal 6): only if the VoiceOver check shows it isn't.
-- **Visible "Finish editing to start."** (H-14, signal 7).
-- **Escape cancels an edit card** (H-12).
-- Depends on the sessions: Start step 1 below the fold (H-07), estimates about twice the sample's (H-04), "this browser on this computer" copy (H-15, risk 2).
-- Already listed under M4: "Done when" prefix (H-06), "Today" in UTC (H-05).
+From the heuristic evaluation (H-), the accessibility pass (WCAG numbers) and the two reviews ([risk](reviews/2026-11-18-risk-pause-saving.md), [signal](reviews/2026-11-18-signal.md)):
+1. **Keep tabs in step** (H-01, severity 3; risk 1 and 13). Listen for the `storage` event and replace in-memory data with what another tab wrote. Verified: a second tab erased a saved note and showed "Saved in this browser".
+2. **Text field border contrast** (WCAG 1.4.11; H-08). A darker resting border for fields (the existing 1.48:1 item).
+3. **Save status announcement** (WCAG 4.1.3; H-09, signal 3 and 9). A mounted live region; the failed state with an icon; one line at 600 px.
+4. **Paste over 12,000 characters** (H-02; signal 4). Say that text was cut.
+5. **Rate-limit message** (H-03; signal 2). Its own Error 03 line with an honest wait.
+6. **"Today" in UTC** (H-05; listed under M4).
+7. **Undo names what it undoes** (signal 5).
+8. **"Progress saved" announced** (WCAG 4.1.3; signal 6): only if the VoiceOver check shows it isn't.
+
+**Watch in sessions** (not committed M6 work; promoted only if participants run into them):
+- H-04 estimates about twice the sample's;
+- H-07 Start step 1 below the fold;
+- severity 1: H-06 "Done when You…" (also listed under M4's M6 candidates), H-10 Undo cleared after moving on, H-11 clearing the note deletes it, H-12 Escape in edit cards, H-13 rail Tab order, H-14 visible "Finish editing to start." (signal 7), H-15 "this browser on this computer" copy (risk 2), H-16 silent fresh start.

@@ -180,7 +180,7 @@ Screenshots in `docs/evidence/screenshots/`: `m4-brief-entry` (full page, with t
 
 ## M5
 
-Branch `feat/m5-evaluation`, off `main` after PR #4. Not pushed (Aidan pushes). Decisions: [decisions.md](decisions.md), section M5. Evidence: [evidence/measurement.md](evidence/measurement.md), [evidence/heuristic-evaluation.md](evidence/heuristic-evaluation.md) (draft, not yet reviewed by Aidan), [evidence/accessibility.md](evidence/accessibility.md), [evidence/feedback/](evidence/feedback/). Reviews: [reviews/2026-11-18-risk-pause-saving.md](reviews/2026-11-18-risk-pause-saving.md), [reviews/2026-11-18-signal.md](reviews/2026-11-18-signal.md).
+Branch `feat/m5-evaluation`, off `main` after PR #4. Not pushed (Aidan pushes). Decisions: [decisions.md](decisions.md), section M5. Evidence: [evidence/measurement.md](evidence/measurement.md), [evidence/heuristic-evaluation.md](evidence/heuristic-evaluation.md) (reviewed by Aidan, 2026-11-18), [evidence/accessibility.md](evidence/accessibility.md), [evidence/feedback/](evidence/feedback/). Reviews: [reviews/2026-11-18-risk-pause-saving.md](reviews/2026-11-18-risk-pause-saving.md), [reviews/2026-11-18-signal.md](reviews/2026-11-18-signal.md).
 
 ### Built
 
@@ -189,8 +189,8 @@ Branch `feat/m5-evaluation`, off `main` after PR #4. Not pushed (Aidan pushes). 
   - `src/lib/first-step-event.ts`: the bucket, the payload and a send that runs only in a production build;
   - `createPlan` records `planCreatedAt`; `startPlan` records `firstStepStartedAt`. Both are optional, still storage version 1;
   - Start step 1 sends the event when `firstStepStartedAt` was unset.
-- **`POST /api/event`** (`src/app/api/event/route.ts`): a strict zod schema, at most 256 characters, its own rate limit (the limiter is now a factory shared with `/api/plan`), one log line, nothing stored.
-- **Disclosure:** one added sentence, pending Aidan's approval.
+- **`POST /api/event`** (`src/app/api/event/route.ts`): a strict zod schema, at most 256 characters, its own rate limit (the limiter is now a factory shared with `/api/plan`), one log line ending in `env=` (Vercel's `VERCEL_ENV`, or `unknown`), nothing stored.
+- **Disclosure:** one added sentence, approved by Aidan (2026-11-18).
 - **Docs:**
   - the measure definition;
   - the heuristic evaluation draft;

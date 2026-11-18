@@ -78,3 +78,5 @@ Records what AI tools produced and where Aidan changed, corrected or decided. Ke
 
 - The project is on Vercel Hobby, so the event uses `POST /api/event` (2026-11-18).
 - Closed the M4 building-copy item (keep "under a minute") and added "Today" in UTC to the M6 candidates (2026-11-18).
+- Approved the disclosure line; confirmed H-01 as severity 3 and marked the heuristic evaluation reviewed; accepted the M6 candidates in order (tab sync, then WCAG 1.4.11 and 4.1.3), with H-04, H-07 and the severity-1 items as "watch in sessions" (2026-11-18).
+- Asked for an `env=` tag (`VERCEL_ENV`) on the event log line, so preview and test traffic can be filtered out (2026-11-18).
