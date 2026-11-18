@@ -1,36 +1,42 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { createSamplePlan, sampleAssignment } from "@/data/sample-assignment";
 import type { PlanDraft } from "@/lib/types";
 
-// Where plans come from. M3 has one source that can only build the sample plan; M4 adds a
-// server-side model source behind the same interface. Screens get the source from context,
-// so tests can inject a stub.
+// Where plans come from. The app uses apiPlanSource, which asks the server route POST /api/plan.
+// Screens get the source from context, so tests can inject a stub.
 
 export type BuildInput = { brief: string; deadline?: string };
 
 export type BuildResult =
   | { ok: true; plan: PlanDraft }
-  // unreadable: Error 02. failed: Error 03. sampleOnly: the M3-only notice on brief entry.
-  | { ok: false; reason: "unreadable" | "failed" | "sampleOnly" };
+  // unreadable: Error 02. failed: Error 03.
+  | { ok: false; reason: "unreadable" | "failed" };
 
 export interface PlanSource {
   build(input: BuildInput, signal: AbortSignal): Promise<BuildResult>;
 }
 
-// Straight quotes and one space everywhere, so a sample brief pasted with different line breaks
-// or quote styles still counts as the sample.
-export function normalizeBrief(text: string): string {
-  return text.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, " ").trim();
-}
-
-// TEMPORARY (M3 only; remove in M4). Builds the sample plan from the sample brief and nothing else.
-// No fake delay: the building state shows for as long as this takes, which is a moment.
-export const samplePlanSource: PlanSource = {
-  async build({ brief }) {
-    if (normalizeBrief(brief) === normalizeBrief(sampleAssignment.brief)) return { ok: true, plan: createSamplePlan() };
-    return { ok: false, reason: "sampleOnly" };
+// Sends the brief to the server route. 200 is a plan, 422 is Error 02, and anything else, including
+// a network error or Cancel (the signal aborts the request), is Error 03. No retries.
+export const apiPlanSource: PlanSource = {
+  async build(input, signal) {
+    try {
+      const response = await fetch("/api/plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+        signal,
+      });
+      if (response.status === 200) {
+        const body = (await response.json()) as { plan: PlanDraft };
+        return { ok: true, plan: body.plan };
+      }
+      if (response.status === 422) return { ok: false, reason: "unreadable" };
+      return { ok: false, reason: "failed" };
+    } catch {
+      return { ok: false, reason: "failed" };
+    }
   },
 };
 
@@ -49,7 +55,7 @@ export function simulatedSource(search: string, nodeEnv: string | undefined = pr
   return null;
 }
 
-const PlanSourceContext = createContext<PlanSource>(samplePlanSource);
+const PlanSourceContext = createContext<PlanSource>(apiPlanSource);
 
 export function PlanSourceProvider({ source, children }: { source: PlanSource; children: React.ReactNode }) {
   return <PlanSourceContext.Provider value={source}>{children}</PlanSourceContext.Provider>;

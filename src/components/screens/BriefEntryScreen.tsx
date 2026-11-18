@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { TopBar } from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
 import { FieldError, TextArea } from "@/components/ui/text-field";
+import { BRIEF_COUNT_FROM, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
 import { useFocusHeading } from "@/lib/use-focus-heading";
 
 type BriefEntryScreenProps = {
@@ -13,20 +14,20 @@ type BriefEntryScreenProps = {
   onDeadlineChange: (deadline: string) => void;
   onUseSample: () => void;
   onSubmit: () => void;
-  // Error 01: the student pressed Break it down with nothing pasted.
-  emptyError: boolean;
-  // The M3-only notice when the sample source can't build from this text.
-  sampleOnly: boolean;
+  // Error 01: nothing pasted. tooLong: a draft saved before the limit existed is over it.
+  error: "empty" | "tooLong" | null;
   // "brief" puts focus in the text area (Edit the brief, Cancel, Error 01); "heading" on a fresh visit.
   focus: "heading" | "brief";
   // Changes whenever focus should move again (e.g. a second empty submit).
   focusKey: number;
 };
 
+const count = (n: number) => n.toLocaleString("en-US");
+
 // "/" with no open assignment: brief entry (R3 05, Error 01). No save indicator before a plan exists
 // (handoff decision 4).
 export function BriefEntryScreen(props: BriefEntryScreenProps) {
-  const { text, deadline, emptyError, sampleOnly, focus, focusKey } = props;
+  const { text, deadline, error, focus, focusKey } = props;
   const headingRef = useFocusHeading<HTMLHeadingElement>();
   const briefRef = useRef<HTMLTextAreaElement>(null);
 
@@ -34,7 +35,8 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
     if (focus === "brief") briefRef.current?.focus();
   }, [focus, focusKey]);
 
-  const describedBy = [emptyError && "brief-error", sampleOnly && "brief-sample-only"].filter(Boolean).join(" ") || undefined;
+  const nearLimit = text.length >= BRIEF_COUNT_FROM;
+  const describedBy = [error && "brief-error", nearLimit && "brief-count"].filter(Boolean).join(" ") || undefined;
 
   return (
     <>
@@ -70,19 +72,27 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
               id="brief"
               ref={briefRef}
               rows={11}
+              maxLength={MAX_BRIEF_CHARS}
               value={text}
               onChange={(event) => props.onTextChange(event.target.value)}
               placeholder="Paste the full instructions: what to make, length, sources, format and due date."
-              aria-invalid={emptyError || undefined}
+              aria-invalid={error ? true : undefined}
               aria-describedby={describedBy}
             />
-            {emptyError && <FieldError id="brief-error">Paste your brief first, so there’s something to break down.</FieldError>}
-            {sampleOnly && (
-              // TEMPORARY development copy (M3 only; remove in M4 with the sample source).
-              <p id="brief-sample-only" role="status" className="text-body text-text-secondary">
-                This preview can only build the sample plan. Plans from your own brief come in the next version.
+            {error === "empty" && <FieldError id="brief-error">Paste your brief first, so there’s something to break down.</FieldError>}
+            {error === "tooLong" && (
+              // Development copy.
+              <FieldError id="brief-error">
+                Your brief is longer than {count(MAX_BRIEF_CHARS)} characters. Shorten it to build a plan.
+              </FieldError>
+            )}
+            {nearLimit && (
+              // Development copy. Read with the field (aria-describedby), not announced on every keystroke.
+              <p id="brief-count" className="text-caption text-text-tertiary">
+                {count(text.length)} of {count(MAX_BRIEF_CHARS)} characters
               </p>
             )}
+            <LimitAnnouncement length={text.length} />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -101,7 +111,10 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <p className="text-caption text-text-tertiary">No account needed. Your plan stays in this browser.</p>
+            {/* The AI disclosure (scope item 14), merged with the M3 "No account needed" line. Development copy. */}
+            <p className="flex-1 text-caption text-text-tertiary">
+              To build your plan, your brief is sent to OpenAI. Your plan and progress stay in this browser. No account needed.
+            </p>
             <Button variant="primary" type="submit">
               Break it down
             </Button>
@@ -109,5 +122,18 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
         </form>
       </main>
     </>
+  );
+}
+
+// A polite live region whose text changes only when the brief crosses into "near the limit" or reaches
+// the limit, so a screen reader hears it once at each point rather than on every keystroke.
+function LimitAnnouncement({ length }: { length: number }) {
+  let message = "";
+  if (length >= MAX_BRIEF_CHARS) message = `Your brief has reached the ${count(MAX_BRIEF_CHARS)}-character limit.`;
+  else if (length >= BRIEF_COUNT_FROM) message = `Your brief is close to the ${count(MAX_BRIEF_CHARS)}-character limit.`;
+  return (
+    <p role="status" className="sr-only">
+      {message}
+    </p>
   );
 }

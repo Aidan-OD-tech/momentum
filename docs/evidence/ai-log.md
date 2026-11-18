@@ -42,3 +42,18 @@ Records what AI tools produced and where Aidan changed, corrected or decided. Ke
 - Accepted the `/craft scope` recommendations, with "Use a sample brief" kept for M3 against scope item 8, and the cost guard, `/craft risk` and the disclosure line deferred to M4.
 - Delete step without a dialog; new requirements are substantive.
 
+
+## M4: real plan generation (2026-11-18)
+
+- Implemented by Claude Code from Aidan's written M4 prompt (sent in two parts). Before building, Claude Code ran `/craft risk` on the route ([../reviews/2026-11-18-risk-generation.md](../reviews/2026-11-18-risk-generation.md)) and stopped for Aidan on three items that changed the prompt's sections 1–2. Aidan accepted all three: date-only deadlines, a cut-off reply shown as Error 03, and "use the final submission date".
+- Claude Code wrote the model instructions in `src/lib/server/plan-prompt.ts` from the rules in Aidan's prompt; Aidan has not yet edited them.
+- Claude Code read the installed `openai` SDK (7.59) and Vercel's current docs instead of relying on memory. That's where two design points came from: `responses.parse` throws on a schema mismatch (so the route parses itself), and Vercel overwrites `X-Forwarded-For`.
+- Claude Code's own corrections during M4:
+  - The bundle check as specified (a bare `sk-`) failed on the first build: React's `mask-type` attribute contains it. It now matches the shape of a key and was checked to fail on a planted one.
+  - A lint warning in a new test (an unused destructured variable) was fixed.
+  - The first full-page screenshot of brief entry was cut at 800 px and hid the disclosure line; it was retaken as a full page.
+- The API key was never read, printed or logged by Claude Code. Checks only tested whether it was set, and check 8 overrode it with an empty value in the shell.
+
+### Aidan's corrections and decisions (M4)
+
+- Accepted risk items A, B and C (2026-11-18).

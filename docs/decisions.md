@@ -169,3 +169,77 @@ All accepted by Aidan on 2026-11-18. The four defaults first (Add a step draft, 
 **Chip copy gap: leave `shortLabel ?? label` for M3.** (Aidan) Figma R3 03's short forms ("Clear position on the assigned question", "Submit via Turnitin") are not copied in. M4's prompt will generate matching `label` and `shortLabel` values.
 
 **"Use a sample brief" stays for M3.** (Aidan) Revisit right after M4's live AI route is verified: keep it as an optional helper, or hide it during the M5 evaluation sessions.
+
+## M4 (2026-11-18)
+
+### From Aidan's M4 prompt
+
+**OpenAI Structured Outputs through `OPENAI_API_KEY`.** (Aidan) The key is read only in `src/lib/server/openai.ts` (`import "server-only"`); no `NEXT_PUBLIC_` variable holds it. The model comes from `OPENAI_MODEL` (set to `gpt-6.1-terra` in `.env.local` and Vercel), with a default in code.
+
+**Model: `gpt-6.1-terra`, also the code default.** (Aidan, 2026-11-18, after adding credit and a $5 monthly budget cap on the OpenAI project) `DEFAULT_MODEL` in `src/lib/server/openai.ts` matches `OPENAI_MODEL`, so a missing variable doesn't fall back to a model the project can't use. Live checks with it: [evidence/generation-checks.md](evidence/generation-checks.md).
+
+**Limits.** (Aidan) Brief: 1 to 12,000 characters after trimming, from one constant (`src/lib/brief-limits.ts`); over it, 413 `tooLong`. Rate limit: 5 requests per 10 minutes per IP (first `x-forwarded-for` entry), plus 100 per hour overall; over it, 429 `rateLimited`. Model call stopped after 45 s (504) or when the browser cancels. `maxDuration` 60 (Vercel Hobby and Pro both allow up to 300 s with Fluid compute, checked 2026-11-18). No retries (scope item 7), no repair pass (scope item 15).
+- Limitation: the rate limiter lives in memory, so on Vercel it is per instance and resets on a cold start. Best effort, not a guarantee. The hard cost guard is the monthly budget limit on the OpenAI project, which Aidan sets (docs/deploy.md). Vercel overwrites `X-Forwarded-For`, so callers can't spoof it there.
+
+**Status mapping.** (Aidan, with risk item B) 200 plan; 422 `unreadable` → Error 02 (refusal, `readable: false`, no substantive or format requirement, 0 or more than 12 steps, output that fails the schema); everything else → Error 03: 400, 413, 429, 502 (missing key, API or network error, reply cut off at the token limit), 504. The client also treats network errors and Cancel as `failed`.
+
+**`samplePlanSource`, `sampleOnly` and its notice are removed.** (Aidan) "Use a sample brief" only fills the text area. `?simulate=` stays, development only. It is hidden during the M5 sessions (below).
+
+### /craft risk items accepted (Aidan, 2026-11-18)
+
+From [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.md):
+- **A. Date-only deadlines.** The model returns `YYYY-MM-DD` when the brief gives a date but no time, and the app shows "Due Fri, Dec 4" with no time. A deadline in neither shape is dropped (no deadline), not used to reject the plan.
+- **B. A reply cut off at the token limit is Error 03** (502 `failed`), not Error 02, because the brief wasn't the problem. Output limit 4,000 tokens.
+- **C. Several dates:** the instructions say to use the final submission date as the deadline.
+
+### Claude Code's choices
+
+**Disclosure merged with the M3 line.** (Claude Code; wording approved by Aidan, below) "No account needed. Your plan stays in this browser." repeated "stays in this browser", so brief entry now has one caption line: "To build your plan, your brief is sent to OpenAI. Your plan and progress stay in this browser. No account needed." The first two sentences are Aidan's development copy. Nothing is said about OpenAI's retention or training.
+
+**`responses.create` with `zodTextFormat`, then one `JSON.parse` and one `safeParse`.** (Claude Code) The SDK's `responses.parse` throws on a schema mismatch, which would look like an API failure; parsing in the route keeps "unreadable" and "failed" apart and shows the single parse attempt.
+
+**The model schema has no length, pattern or range rules;** (Claude Code) `toPlanDraft` applies them, so a rule can't be lost to what strict mode supports.
+
+**A plan needs at least one substantive or format requirement;** (Claude Code) a submission reminder alone is unreadable. Steps also need a title and Done when, as in the edit card.
+
+**IDs are `r1…` and `s1…` in order,** (Claude Code) like the sample.
+
+**"Today" is the server's UTC date, with its weekday** ("Wednesday, 2026-11-18"). (Claude Code)
+
+**`<brief>` tags inside the pasted text are removed** (Claude Code) so the brief can't close the delimiters early.
+
+**The student's deadline is accepted by the route but not sent to the model;** (Claude Code) the browser applies it over the plan's, as in M3.
+
+**A stored draft over the limit isn't sent.** (Claude Code) It can only come from M3, which had no limit. Brief entry shows "Your brief is longer than 12,000 characters. Shorten it to build a plan." (development copy) and makes no request, so the server's 413 never shows as Error 03's "not with your brief".
+
+**Character count announcements.** (Claude Code) The visible count is linked to the field with `aria-describedby` (read on focus). A separate polite live region changes only when the brief crosses 10,800 and when it reaches 12,000 (development copy: "Your brief is close to the 12,000-character limit." / "Your brief has reached the 12,000-character limit.").
+
+**Bundle check matches the shape of a key** (Claude Code) (`sk-` followed by 20 or more key characters), not a bare `sk-`, which React's `mask-type` attribute contains. It also fails on `OPENAI_API_KEY` and `api.openai.com`, and prints which rule matched, never the text.
+
+### Settled by Aidan (2026-11-18, after the live checks)
+
+**Model.** Keep `gpt-6.1-terra` as both `OPENAI_MODEL` and the code default (above).
+
+**Disclosure wording.** Keep the merged single line: "To build your plan, your brief is sent to OpenAI. Your plan and progress stay in this browser. No account needed."
+
+**Estimates and step count: no prompt tuning.** Generated estimates for the sample brief (about 6.5 h) are about twice the hand-written plan's 3 h 20 min, and the same brief gives 5 or 6 steps between runs. Logged as expected run-to-run variation, and a point to observe in the M5 sessions.
+
+**"Use a sample brief" is hidden during the M5 evaluation sessions.** Participants get the brief text and paste it, so pasting is tested directly. This deviates from Figma R3 05, which draws the button; it is backed by [/craft scope](reviews/2026-11-17-scope-m3-m4.md) item 8. How (removal or a flag) is decided when M5 starts; nothing changes in M4.
+
+**Building copy.** Keep "This usually takes under a minute." for now. If the Vercel preview runs also stay around 10–15 s, it may change to "This usually takes about 15 seconds."
+
+**Three fixes from the live output.**
+- **"Done when" uses the criterion as written.** `doneWhenSentence` no longer lowercases the first letter, and the instructions ask the model to start each criterion lowercase unless it begins with a proper noun (such as Turnitin). The sample plan's criteria are stored lowercase to match, so they read as before.
+  - (Claude Code, follows from the fix) The working step's "Done when" well shows the criterion on its own as a sentence, so it capitalizes the first letter (`capitalizeFirst`); capitalizing never breaks a proper noun.
+- **No full stops at the end of requirement labels.** `toPlanDraft` removes them from labels and short labels, so chips don't end in punctuation. Full stops inside a label stay ("Dec. 4").
+- **No step for the final submission.** The instructions say never to create one, because the final submission is already a reminder; a step for an interim submission (a draft for peer feedback) is fine. As a backstop, `toPlanDraft` drops the **last** step only if its title starts with "Submit" (any case), before giving IDs and counting steps, so a plan still needs 1 to 12 steps after the drop; a plan whose only step is a Submit step is unreadable (Error 02). (Aidan, narrowed the same day from "any Submit step" so interim milestones aren't dropped.)
+
+### Open for Aidan
+
+- **Building copy:** preview timings were 14.9 s (sample) and 18.1 s (portfolio), and 3.3 s for the recipe; local plans took 10.0–14.9 s. "About 15 seconds" would undersell the 18 s run; "under a minute" held for every run. Aidan's call.
+- **How to hide "Use a sample brief"** for M5: at the start of M5.
+- (Claude Code) **Seen in one live run before the filter was narrowed:** the reflective portfolio plan had no step for reading peer feedback between the first draft and the final revision. The narrower rule allows that step again; not yet re-run live.
+
+### M6 candidates
+
+- **"Done when" prefix in the step editor.** A criterion the student types with a capital in the edit card ("You have…") reads "Done when You have…" on plan review, step complete and home. Idea: show "Done when" as a fixed prefix before the field, so the student writes the rest of the sentence. No UI change in M4.
