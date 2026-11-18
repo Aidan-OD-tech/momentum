@@ -75,18 +75,21 @@ export function StepCompleteScreen({ n }: { n: number }) {
             </Button>
           </div>
 
-          <p className="text-caption text-text-tertiary">Step {nextN} will be here when you come back.</p>
-          {assignment.lastUndo?.stepId === step.id && (
-            // As on the final check: the visible line tells a screen reader what Undo undoes.
-            <div className="flex items-center justify-between gap-4">
-              <p id="undo-description" className="text-caption text-text-tertiary">
-                Step {n} is marked done.
-              </p>
-              <Button variant="tertiary" onClick={undo} aria-describedby="undo-description">
-                Undo
-              </Button>
-            </div>
-          )}
+          {/* One footer: the two captions sit closer to each other than to the buttons above. */}
+          <div className="flex flex-col gap-1">
+            <p className="text-caption text-text-tertiary">Step {nextN} will be here when you come back.</p>
+            {assignment.lastUndo?.stepId === step.id && (
+              // As on the final check: the visible line tells a screen reader what Undo undoes.
+              <div className="flex items-center justify-between gap-4">
+                <p id="undo-description" className="text-caption text-text-tertiary">
+                  Step {n} is marked done.
+                </p>
+                <Button variant="tertiary" onClick={undo} aria-describedby="undo-description">
+                  Undo
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>
