@@ -7,6 +7,7 @@ import { TopBar } from "@/components/TopBar";
 import { WorkingStep } from "@/components/WorkingStep";
 import { assignmentContext } from "@/lib/format";
 import { useMomentum } from "@/lib/momentum-store";
+import { inProgressStepNumber } from "@/lib/step-state";
 
 // /step/n: the working step (Core 01, 06, 07, 08, 11, 12; Setup 06).
 export function StepScreen({ n }: { n: number }) {
@@ -22,6 +23,9 @@ export function StepScreen({ n }: { n: number }) {
   // The URL is well formed (the server checked) but past the end of this plan. Only the browser
   // knows the plan's length, so this is a client-side Not found with HTTP 200 (see docs/decisions.md).
   if (!step) notFound();
+
+  // Where "Back to …" goes from a done step: the step in progress, or home when none is.
+  const backToStep = inProgressStepNumber(assignment);
 
   function markComplete() {
     const othersDone = assignment.steps.every((other, index) => index === n - 1 || other.status === "done");
@@ -49,6 +53,8 @@ export function StepScreen({ n }: { n: number }) {
           onPauseDraftChange={(text) => act({ type: "setPauseDraft", n, text })}
           onFinishForNow={finishForNow}
           onNoteHiddenChange={(hidden) => act({ type: "setNoteHidden", n, hidden })}
+          backToStep={backToStep}
+          onBack={() => router.push(backToStep ? `/step/${backToStep}` : "/")}
         />
       </div>
     </>

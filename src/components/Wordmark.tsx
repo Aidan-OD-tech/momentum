@@ -1,9 +1,12 @@
-// The Momentum wordmark: a small dark square and the name (top bar in Figma).
+import Link from "next/link";
+
+// The Momentum wordmark: a small dark square and the name (top bar in Figma). A link home, so every
+// screen has a way back (H-17). It looks the same; focus shows the token ring (globals.css).
 export function Wordmark() {
   return (
-    <span className="flex items-center gap-2 text-body-strong text-text-primary">
+    <Link href="/" aria-label="Momentum, home" className="flex items-center gap-2 rounded-sm text-body-strong text-text-primary">
       <span aria-hidden="true" className="size-logo rounded-sm bg-action-primary" />
       Momentum
-    </span>
+    </Link>
   );
 }
