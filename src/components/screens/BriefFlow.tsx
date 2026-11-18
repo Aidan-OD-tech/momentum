@@ -7,6 +7,7 @@ import { BuildingScreen } from "@/components/screens/BuildingScreen";
 import { TopBar } from "@/components/TopBar";
 import { sampleAssignment } from "@/data/sample-assignment";
 import { MAX_BRIEF_CHARS } from "@/lib/brief-limits";
+import { showSampleBrief } from "@/lib/flags";
 import { useMomentumData } from "@/lib/momentum-store";
 import { simulatedSource, usePlanSource, type BuildResult } from "@/lib/plan-source";
 
@@ -87,7 +88,7 @@ export function BriefFlow() {
     if (controller.signal.aborted) return;
 
     if (result.ok) {
-      act({ type: "createPlan", id: crypto.randomUUID(), plan: result.plan, brief: text, deadlineOverride: deadline });
+      act({ type: "createPlan", id: crypto.randomUUID(), plan: result.plan, brief: text, deadlineOverride: deadline, at: new Date().toISOString() });
     } else {
       setPhase({ name: "error", reason: result.reason });
     }
@@ -141,10 +142,14 @@ export function BriefFlow() {
         if (entryError === "tooLong" && next.trim().length <= MAX_BRIEF_CHARS) setEntryError(null);
       }}
       onDeadlineChange={setDeadline}
-      onUseSample={() => {
-        setText(sampleAssignment.brief);
-        setEntryError(null);
-      }}
+      onUseSample={
+        showSampleBrief()
+          ? () => {
+              setText(sampleAssignment.brief);
+              setEntryError(null);
+            }
+          : undefined
+      }
       onSubmit={submit}
       error={entryError}
       focus={phase.focus}

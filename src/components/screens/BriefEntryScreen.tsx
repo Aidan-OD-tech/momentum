@@ -12,7 +12,8 @@ type BriefEntryScreenProps = {
   deadline: string;
   onTextChange: (text: string) => void;
   onDeadlineChange: (deadline: string) => void;
-  onUseSample: () => void;
+  // Leave out to hide "Use a sample brief" (see showSampleBrief in src/lib/flags.ts).
+  onUseSample?: () => void;
   onSubmit: () => void;
   // Error 01: nothing pasted. tooLong: a draft saved before the limit existed is over it.
   error: "empty" | "tooLong" | null;
@@ -64,9 +65,11 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
               <label htmlFor="brief" className="text-body-strong text-text-primary">
                 Assignment brief
               </label>
-              <Button variant="tertiary" onClick={props.onUseSample}>
-                Use a sample brief
-              </Button>
+              {props.onUseSample && (
+                <Button variant="tertiary" onClick={props.onUseSample}>
+                  Use a sample brief
+                </Button>
+              )}
             </div>
             <TextArea
               id="brief"
@@ -111,9 +114,11 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-4">
-            {/* The AI disclosure (scope item 14), merged with the M3 "No account needed" line. Development copy. */}
+            {/* The AI disclosure (scope item 14), merged with the M3 "No account needed" line. The last
+                sentence covers the M5 usage event; its wording is pending Aidan's approval. */}
             <p className="flex-1 text-caption text-text-tertiary">
               To build your plan, your brief is sent to OpenAI. Your plan and progress stay in this browser. No account needed.
+              Momentum counts anonymous usage, such as when a plan’s first step is started.
             </p>
             <Button variant="primary" type="submit">
               Break it down

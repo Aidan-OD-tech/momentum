@@ -11,7 +11,7 @@ const active = (data: MomentumData) => getActiveAssignment(data)!;
 
 function inReview(deadlineOverride = ""): MomentumData {
   const withDraft = reducer(EMPTY, { type: "setBriefDraft", draft: { text: "the brief", deadline: deadlineOverride } });
-  return reducer(withDraft, { type: "createPlan", id: "p1", plan: createSamplePlan(), brief: "the brief", deadlineOverride });
+  return reducer(withDraft, { type: "createPlan", id: "p1", plan: createSamplePlan(), brief: "the brief", deadlineOverride, at: "2026-11-17T09:00:00.000Z" });
 }
 
 const extraStep = (id: string): PlanStep => ({ id, title: `Extra ${id}`, whatToDo: [], doneWhen: "It exists.", estimateMin: 15 });
@@ -42,10 +42,10 @@ describe("createPlan", () => {
   });
 
   it("keeps earlier assignments", () => {
-    const earlier = reducer(inReview(), { type: "startPlan" });
+    const earlier = reducer(inReview(), { type: "startPlan", at: "2026-11-17T09:05:00.000Z" });
     const data = run(
       { ...earlier, activeAssignmentId: null },
-      { type: "createPlan", id: "p2", plan: createSamplePlan(), brief: "b", deadlineOverride: "" },
+      { type: "createPlan", id: "p2", plan: createSamplePlan(), brief: "b", deadlineOverride: "", at: "2026-11-17T09:00:00.000Z" },
     );
     expect(data.assignments.map((a) => a.id)).toEqual(["p1", "p2"]);
   });
@@ -102,13 +102,13 @@ describe("plan edits in review", () => {
   });
 
   it("rejects every edit once the plan has started", () => {
-    const started = reducer(inReview(), { type: "startPlan" });
+    const started = reducer(inReview(), { type: "startPlan", at: "2026-11-17T09:05:00.000Z" });
     const edits: Action[] = [
       { type: "updateStep", n: 1, step: extraStep("x") },
       { type: "addStep", step: extraStep("x") },
       { type: "deleteStep", n: 1 },
       { type: "updateRequirements", requirements: [] },
-      { type: "startPlan" },
+      { type: "startPlan", at: "2026-11-17T09:05:00.000Z" },
     ];
     for (const edit of edits) expect(reducer(started, edit)).toBe(started);
   });
@@ -116,7 +116,7 @@ describe("plan edits in review", () => {
 
 describe("startPlan", () => {
   it("makes the plan active and opens step 1", () => {
-    const data = reducer(inReview(), { type: "startPlan" });
+    const data = reducer(inReview(), { type: "startPlan", at: "2026-11-17T09:05:00.000Z" });
     expect(active(data).status).toBe("active");
     expect(active(data).steps.map((s) => s.status)).toEqual(["inProgress", "upcoming", "upcoming", "upcoming", "upcoming", "upcoming"]);
   });
@@ -130,7 +130,7 @@ describe("plans that don't have six steps", () => {
     while (active(data).steps.length > 1) data = reducer(data, { type: "deleteStep", n: active(data).steps.length });
     expect(active(data).steps).toHaveLength(1);
 
-    data = run(data, { type: "startPlan" }, { type: "completeStep", n: 1 }, { type: "finishReview", at: "2026-11-17T10:00:00.000Z" });
+    data = run(data, { type: "startPlan", at: "2026-11-17T09:05:00.000Z" }, { type: "completeStep", n: 1 }, { type: "finishReview", at: "2026-11-17T10:00:00.000Z" });
     expect(active(data)).toMatchObject({ status: "completed" });
     expect(active(data).steps[0].status).toBe("done");
   });

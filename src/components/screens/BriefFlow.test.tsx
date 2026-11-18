@@ -12,6 +12,7 @@ vi.mock("next/navigation", () => import("@/test/navigation-mock"));
 
 afterEach(() => {
   vi.clearAllMocks();
+  vi.unstubAllEnvs();
   localStorage.clear();
 });
 
@@ -60,7 +61,17 @@ describe("brief entry", () => {
     expect(screen.getByLabelText(/Deadline/)).toHaveValue("2026-12-01T09:00");
   });
 
-  it("Use a sample brief fills the text area without submitting", () => {
+  it("hides Use a sample brief unless NEXT_PUBLIC_SHOW_SAMPLE_BRIEF is \"true\"", () => {
+    for (const value of [undefined, "", "false", "1", "TRUE"]) {
+      vi.stubEnv("NEXT_PUBLIC_SHOW_SAMPLE_BRIEF", value);
+      const { unmount } = renderApp(<HomeRoute />);
+      expect(screen.queryByRole("button", { name: "Use a sample brief" })).not.toBeInTheDocument();
+      unmount();
+    }
+  });
+
+  it("with the flag on, Use a sample brief fills the text area without submitting", () => {
+    vi.stubEnv("NEXT_PUBLIC_SHOW_SAMPLE_BRIEF", "true");
     const { source, calls } = stub("never");
     renderApp(<HomeRoute />, source);
     fireEvent.click(screen.getByRole("button", { name: "Use a sample brief" }));
@@ -71,7 +82,9 @@ describe("brief entry", () => {
   it("shows the disclosure line as plain text near Break it down, and no sample-only notice", () => {
     renderApp(<HomeRoute />);
     expect(
-      screen.getByText("To build your plan, your brief is sent to OpenAI. Your plan and progress stay in this browser. No account needed."),
+      screen.getByText(
+        "To build your plan, your brief is sent to OpenAI. Your plan and progress stay in this browser. No account needed. Momentum counts anonymous usage, such as when a plan’s first step is started.",
+      ),
     ).toBeVisible();
     expect(screen.queryByText(/This preview can only build the sample plan/)).not.toBeInTheDocument();
   });

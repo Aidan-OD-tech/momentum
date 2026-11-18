@@ -226,7 +226,7 @@ From [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.
 
 **"Use a sample brief" is hidden during the M5 evaluation sessions.** Participants get the brief text and paste it, so pasting is tested directly. This deviates from Figma R3 05, which draws the button; it is backed by [/craft scope](reviews/2026-11-17-scope-m3-m4.md) item 8. How (removal or a flag) is decided when M5 starts; nothing changes in M4.
 
-**Building copy.** Keep "This usually takes under a minute." for now. If the Vercel preview runs also stay around 10–15 s, it may change to "This usually takes about 15 seconds."
+**Building copy.** Keep "This usually takes under a minute." for now. If the Vercel preview runs also stay around 10–15 s, it may change to "This usually takes about 15 seconds." *Closed at the M4 merge (Aidan): keep "This usually takes under a minute."; see M5 below.*
 
 **Three fixes from the live output.**
 - **"Done when" uses the criterion as written.** `doneWhenSentence` no longer lowercases the first letter, and the instructions ask the model to start each criterion lowercase unless it begins with a proper noun (such as Turnitin). The sample plan's criteria are stored lowercase to match, so they read as before.
@@ -236,10 +236,63 @@ From [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.
 
 ### Open for Aidan
 
-- **Building copy:** preview timings were 14.9 s (sample) and 18.1 s (portfolio), and 3.3 s for the recipe; local plans took 10.0–14.9 s. "About 15 seconds" would undersell the 18 s run; "under a minute" held for every run. Aidan's call.
-- **How to hide "Use a sample brief"** for M5: at the start of M5.
+- ~~**Building copy**~~: closed at the M4 merge; kept "This usually takes under a minute." (M5 section).
+- ~~**How to hide "Use a sample brief"**~~: decided in M5 (an environment flag).
 - (Claude Code) **Seen in one live run before the filter was narrowed:** the reflective portfolio plan had no step for reading peer feedback between the first draft and the final revision. The narrower rule allows that step again; not yet re-run live.
 
 ### M6 candidates
 
-- **"Done when" prefix in the step editor.** A criterion the student types with a capital in the edit card ("You have…") reads "Done when You have…" on plan review, step complete and home. Idea: show "Done when" as a fixed prefix before the field, so the student writes the rest of the sentence. No UI change in M4.
+- ~~**"Done when" prefix in the step editor.**~~ *Moved to "watch in sessions" (H-06) by Aidan, 2026-11-18; not committed M6 work.* A criterion the student types with a capital in the edit card ("You have…") reads "Done when You have…" on plan review, step complete and home. Idea: show "Done when" as a fixed prefix before the field, so the student writes the rest of the sentence. No UI change in M4.
+- **"Today" in UTC.** (Aidan, at the M4 merge) Send the browser's local date with `POST /api/plan`, so a relative due date ("this Friday") resolves correctly for a US evening request, when the server's UTC date is already tomorrow.
+
+## M5 (2026-11-18)
+
+### Closed from M4 (Aidan, at the M4 merge)
+
+**Building copy stays "This usually takes under a minute."** Vercel preview builds took 14.9–18.1 s, so "under a minute" holds reliably; "about 15 seconds" would undersell the slower runs.
+
+### From Aidan's M5 prompt
+
+**"Use a sample brief" is behind `NEXT_PUBLIC_SHOW_SAMPLE_BRIEF`.** (Aidan) The button shows only when the variable is exactly `"true"`; unset or anything else hides it, so it is hidden on Vercel by default during the sessions and Aidan sets it for the case-study demo. Not a secret, so `NEXT_PUBLIC_` is fine. Next.js writes the value into the browser code at build time, so changing it needs a redeploy. The sample brief text stays in the code for tests. Read in `src/lib/flags.ts`. This implements the M4 decision "hidden during the M5 evaluation sessions" (deviates from Figma R3 05, backed by /craft scope item 8).
+
+**One event, `first_step_started`.** (Aidan) Sent when step 1 of a plan is opened for the first time, with `minutesSincePlanCreated` (`<2`, `2–5`, `5–15`, `>15`) and `stepCount`. Nothing else: no text, no ids, no IP stored. Once per plan: `firstStepStartedAt` on the assignment. Never sent from development or tests.
+- (Claude Code) `createPlan` and `startPlan` now carry `at`, and `createPlan` records `planCreatedAt`, because the bucket needs the plan's creation time. Both fields are optional on `Assignment`, so data saved before M5 still loads as version 1. Those plans never send the event.
+- (Claude Code) Buckets are half-open: under 2, 2 to under 5, 5 to under 15, 15 or more. The primary measure ("within 15 minutes") is the first three.
+- (Claude Code) The event is built from the assignment as it was **before** `startPlan`, in the Start step 1 handler (`PlanReviewScreen`). Plan review is the only way to open step 1 for the first time; started-plan routes redirect a plan in review home.
+
+**Where it goes: `POST /api/event`, not Vercel Web Analytics.** (Aidan: the project is on Hobby; Claude Code checked the docs on 2026-11-18: "Custom Events are available on Enterprise and Pro plans".) The route accepts only this event name and the two fields (strict zod schema, extra fields → 400), at most 256 characters (413), rate limited to 10 per IP per 10 minutes and 300 per hour (429). It logs one line (`[api/event] event=first_step_started stepCount=6 bucket=2–5 env=production`) and stores nothing. No `@vercel/analytics`, no page-view tracking, no third-party tracker.
+- (Claude Code) The rate limiter became a small factory in `rate-limit.ts` so plans and events keep separate counts; the plan limits are unchanged.
+- (Claude Code) The browser sends with `fetch(..., { keepalive: true })` and ignores failures; no retry.
+- **`env=` tag on the log line.** (Aidan, 2026-11-18, before the push) The line ends with `env=${process.env.VERCEL_ENV ?? "unknown"}`: `production`, `preview` or `development` on Vercel, `unknown` locally. So preview and test traffic can be filtered out of the production numbers.
+- Known limit: **Hobby keeps runtime logs for 1 hour**, so the numbers must be copied within the hour (measurement.md, "Retention"). A real post-launch deployment would use durable collection (Web Analytics custom events on Pro, or a log drain), still without a database. That is not built for M5.
+
+**Disclosure line approved.** (Aidan, 2026-11-18) Brief entry's caption ends with "Momentum counts anonymous usage, such as when a plan’s first step is started." The rest of the line is unchanged.
+
+**Measure definition.** (Aidan's measures, written up by Claude Code in [evidence/measurement.md](evidence/measurement.md)) Primary: the share of created plans whose step 1 is opened in the same browser within 15 minutes ("starts within the first visit"); denominator from `[api/plan] 200 ok` log lines. Complementary: paused steps later resumed (observed in sessions only; not instrumented). "Observed in sessions" and "gathered after launch" are kept apart.
+
+**No fixes in M5.** (Aidan) Heuristic and accessibility findings become M6 candidates; product behavior changes only with Aidan's approval.
+
+**Heuristic evaluation reviewed.** (Aidan, 2026-11-18) H-01 confirmed as severity 3. H-04, H-07 and the severity-1 items are "watch in sessions", not committed M6 work.
+
+**Session guide and template.** (Aidan, 2026-11-18) The guide is in the repo as [evidence/feedback/session-guide.md](evidence/feedback/session-guide.md). `session-template.md` uses its observation sheet's fields exactly, plus a separate section for the Vercel log lines (README step 4).
+
+### Open for Aidan
+
+- None for M5 beyond running the sessions, the VoiceOver script and the preview check. Severities other than H-01 stay "(proposed)" until after the sessions.
+
+### M6 candidates (accepted by Aidan, 2026-11-18, in this order)
+
+From the heuristic evaluation (H-), the accessibility pass (WCAG numbers) and the two reviews ([risk](reviews/2026-11-18-risk-pause-saving.md), [signal](reviews/2026-11-18-signal.md)):
+1. **Keep tabs in step** (H-01, severity 3; risk 1 and 13). Listen for the `storage` event and replace in-memory data with what another tab wrote. Verified: a second tab erased a saved note and showed "Saved in this browser".
+2. **Text field border contrast** (WCAG 1.4.11; H-08). A darker resting border for fields (the existing 1.48:1 item).
+3. **Save status announcement** (WCAG 4.1.3; H-09, signal 3 and 9). A mounted live region; the failed state with an icon; one line at 600 px.
+4. **Paste over 12,000 characters** (H-02; signal 4). Say that text was cut.
+5. **Rate-limit message** (H-03; signal 2). Its own Error 03 line with an honest wait.
+6. **"Today" in UTC** (H-05; listed under M4).
+7. **Undo names what it undoes** (signal 5).
+8. **"Progress saved" announced** (WCAG 4.1.3; signal 6): only if the VoiceOver check shows it isn't.
+
+**Watch in sessions** (not committed M6 work; promoted only if participants run into them):
+- H-04 estimates about twice the sample's;
+- H-07 Start step 1 below the fold;
+- severity 1: H-06 "Done when You…" (moved here from M4's M6 candidates), H-10 Undo cleared after moving on, H-11 clearing the note deletes it, H-12 Escape in edit cards, H-13 rail Tab order, H-14 visible "Finish editing to start." (signal 7), H-15 "this browser on this computer" copy (risk 2), H-16 silent fresh start.

@@ -9,8 +9,8 @@ Legend: **planned** (not started), **implemented** (written, not independently c
 | M1 | Foundation and working-step screen | verified and merged (PR #1) |
 | M2 | Core loop on sample data with persistence: home, working step, pause and notes, completion and undo, timer, side panels, final check, completed home, review | verified and merged (PR #2) |
 | M3 | Brief entry, building, plan review and editing, error screens, preview deploy | verified and merged (PR #3) |
-| M4 | AI generation (server-side, structured output) | implemented on branch `feat/m4-ai-generation`; **verified** locally (mocked tests, live checks 1–9 against `gpt-6.1-terra`) and on the Vercel preview (checks 1, 3, 7 and curl); PR not yet opened |
-| M5 | Evaluation (heuristic evaluation, task-based feedback) | planned |
+| M4 | AI generation (server-side, structured output) | verified and merged (PR #4) |
+| M5 | Evaluation readiness: sample-brief flag, one tracked event, heuristic and accessibility review, session templates | implemented on branch `feat/m5-evaluation`; **verified** locally on the production build (see M5); Vercel preview check and the sessions pending |
 | M6 | Fixes from evaluation | planned |
 | M7 | Docs and case study | planned |
 
@@ -127,7 +127,7 @@ Screenshots in `docs/evidence/screenshots/`: `m3-brief-entry-empty`, `m3-error01
 
 ## M4
 
-Branch `feat/m4-ai-generation`, off `main` after PR #3. Pushed by Aidan; preview at https://momentum-git-feat-m4-ai-generation-aidan-o-driscoll.vercel.app (the branch alias, which follows the latest push; the checks below ran on commit `a7f673c`). Not merged; production still serves `main`. Decisions: [decisions.md](decisions.md), section M4. Risk review: [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.md).
+Merged in PR #4; production serves it. The record below is as verified at merge. Branch `feat/m4-ai-generation`, off `main` after PR #3. Preview at https://momentum-git-feat-m4-ai-generation-aidan-o-driscoll.vercel.app (the branch alias, which follows the latest push; the checks below ran on commit `a7f673c`). Decisions: [decisions.md](decisions.md), section M4. Risk review: [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.md).
 
 ### Built
 
@@ -177,3 +177,59 @@ Screenshots in `docs/evidence/screenshots/`: `m4-brief-entry` (full page, with t
 - **Pasting more than 12,000 characters keeps the first 12,000** (browser `maxLength`). The count shows "12,000 of 12,000 characters" and the live region says the limit was reached, but nothing says text was cut.
 - "Try again in a moment" on Error 03 can be up to 10 minutes when the cause is the rate limit.
 - "Today" in the model message is the server's UTC date.
+
+## M5
+
+Branch `feat/m5-evaluation`, off `main` after PR #4. Not pushed (Aidan pushes). Decisions: [decisions.md](decisions.md), section M5. Evidence: [evidence/measurement.md](evidence/measurement.md), [evidence/heuristic-evaluation.md](evidence/heuristic-evaluation.md) (reviewed by Aidan, 2026-11-18), [evidence/accessibility.md](evidence/accessibility.md), [evidence/feedback/](evidence/feedback/). Reviews: [reviews/2026-11-18-risk-pause-saving.md](reviews/2026-11-18-risk-pause-saving.md), [reviews/2026-11-18-signal.md](reviews/2026-11-18-signal.md).
+
+### Built
+
+- **Sample-brief flag:** "Use a sample brief" shows only when `NEXT_PUBLIC_SHOW_SAMPLE_BRIEF` is `"true"` (`src/lib/flags.ts`). The sample text stays for tests.
+- **One event, `first_step_started`:**
+  - `src/lib/first-step-event.ts`: the bucket, the payload and a send that runs only in a production build;
+  - `createPlan` records `planCreatedAt`; `startPlan` records `firstStepStartedAt`. Both are optional, still storage version 1;
+  - Start step 1 sends the event when `firstStepStartedAt` was unset.
+- **`POST /api/event`** (`src/app/api/event/route.ts`): a strict zod schema, at most 256 characters, its own rate limit (the limiter is now a factory shared with `/api/plan`), one log line ending in `env=` (Vercel's `VERCEL_ENV`, or `unknown`), nothing stored.
+- **Disclosure:** one added sentence, approved by Aidan (2026-11-18).
+- **Docs:**
+  - the measure definition;
+  - the heuristic evaluation draft;
+  - the accessibility pass with a VoiceOver script for Aidan;
+  - `/craft risk` and `/craft signal`;
+  - the session README (with the browser reset) and the session template;
+  - the axe and keyboard results, and the scripts that made them.
+
+### Verified (2026-11-18, Node 24.21.0)
+
+| Check | Result |
+| --- | --- |
+| Baseline on the fresh branch before changes | lint, tsc, 183 tests, build, `check:bundle`: pass |
+| `npm run lint`, `npx tsc --noEmit` | pass |
+| `npm test` | 22 files, **220 tests** pass. New: <ul><li>the flag: hidden for unset, `""`, `false`, `1`, `TRUE`; shown and working for `true`;</li><li>the bucket boundaries;</li><li>the payload is exactly the three keys and holds no brief or plan text or ids;</li><li>the step count comes from the plan (3 after deleting steps);</li><li>no event once `firstStepStartedAt` is set, through complete → undo → reopen and a JSON round trip;</li><li>no event for pre-M5 plans;</li><li>`sendEvent` sends nothing for `development`, `test`, unset or the test run's own `NODE_ENV`, and in production posts exactly the event and swallows a failed request;</li><li>Start step 1 with `NODE_ENV` stubbed to production sends one event with bucket `2–5` (plan at 09:00, start at 09:03), and nothing more after a re-render of plan review or reopening step 1;</li><li>Start step 1 in tests sends nothing;</li><li>`/api/event`: 204 and the exact log line; the other buckets; 400 for another event name, an extra text field, an extra id, an unknown bucket, a non-integer, a string count, zero, a missing field, an array and non-JSON, each logging only status and reason; 413 for an oversized body; 429 after 10 from one IP while another IP passes; the IP is never logged.</li></ul> The once-per-plan test was checked to fail when the `firstStepStartedAt` guard is removed. |
+| `npm run build`, `npm run check:bundle` | pass; `/api/event` is a dynamic route; bundle check: 27 files, no key |
+| Production build, flag unset (Chrome via Playwright, 1280×800 and 600×800) | <ul><li>"Use a sample brief" absent; the disclosure line shown;</li><li>the brief is kept through Error 01, building and Cancel, and Errors 02 and 03;</li><li>no event before Start step 1, then **exactly one** (`{"event":"first_step_started","minutesSincePlanCreated":"<2","stepCount":6}`, answered 204);</li><li>still one after a pause, a reload, Resume, Mark complete, Undo, reopening `/step/1` by URL and completing all six steps through Finish review;</li><li>server log: one `[api/event] event=first_step_started stepCount=6 bucket=<2` line per run (two runs, two lines);</li><li>the only console errors were the browser's own reports of the 422 and 502 the script returned on purpose.</li></ul> |
+| Production build, `NEXT_PUBLIC_SHOW_SAMPLE_BRIEF=true` | button shown; it fills the sample brief (`m5-brief-entry-flag-on-1280.png`) |
+| `/api/event` with curl on the production build | valid → **204**; other event name → 400; extra `brief` field → 400; 400+ characters → **413**; GET → 405. Log lines: the event line, then `400 invalid-body` ×2, `413 too-long` |
+| axe on 13 screens × 2 widths | **0 violations**; needs-review items checked by hand ([accessibility.md](evidence/accessibility.md)). Raw: `evidence/test-results/axe-m5.json` |
+| Keyboard pass (scripted, whole flow, both widths) | no traps; Escape closes the dialog and panel and returns focus; visible focus at every stop; no focused element outside the viewport; no horizontal overflow at 600 px. `evidence/test-results/keyboard-m5.json` |
+| Two tabs (for the risk review) | a note saved in tab A was erased by Mark complete in a stale tab B, which showed "Saved in this browser" (known issue, M6 candidate) |
+
+Screenshots in `docs/evidence/screenshots/`: `m5-<screen>-1280.png` and `m5-<screen>-600.png` for brief-entry, error-01, building, error-02, error-03, plan-review, plan-review-edit, working-step, pause-dialog, home-after-pause, step-complete, final-check, completed-home; plus `m5-brief-entry-flag-on-1280.png`.
+
+### Not verified
+
+- **Vercel preview:** the event arriving in the Vercel logs, and the button hidden with the variable unset. Pending Aidan's push.
+- **A real model plan** in the M5 browser runs: `/api/plan` was answered by the script with the sample plan (no OpenAI requests in M5).
+- **Screen readers:** VoiceOver script written for Aidan; not run. Live regions were checked in the DOM only.
+- **A manual keyboard pass by a person:** the pass was scripted key presses.
+- **Sessions:** not run yet; nothing in `evidence/feedback/` is filled in.
+- Safari and Firefox.
+- The step edit card's required-field errors (3.3.1) weren't exercised in M5.
+
+### Known limitations
+
+- **Hobby keeps runtime logs for 1 hour**, so event counts exist only if copied within the hour.
+- Counts are per browser, include Aidan's and preview traffic unless filtered, and are a lower bound (no retry). See measurement.md.
+- Plans created before M5 never send the event (no creation time).
+- Two open tabs overwrite each other's progress (verified; M6 candidate). Two tabs on plan review would send two events.
+- The accessibility failures (1.4.11 field borders, 4.1.3 save status) are unchanged; M6.

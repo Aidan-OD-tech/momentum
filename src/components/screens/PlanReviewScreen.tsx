@@ -10,6 +10,7 @@ import { usePanel } from "@/components/SidePanel";
 import { StepEditCard } from "@/components/StepEditCard";
 import { TopBar } from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
+import { firstStepStartedEvent, sendEvent } from "@/lib/first-step-event";
 import { assignmentMeta, formatDeadline, formatTotalMinutes } from "@/lib/format";
 import { useMomentumData } from "@/lib/momentum-store";
 import { applyRequirementRows, NEW_STEP_DRAFT, type RequirementRow, sameRequirements, type StepDraft, stepFromDraft } from "@/lib/plan-edits";
@@ -93,7 +94,11 @@ export function PlanReviewScreen() {
   function startStep1() {
     if (editing) return; // aria-disabled: the reason is described on the button.
     setLeaving(true);
-    act({ type: "startPlan" });
+    const at = new Date().toISOString();
+    // Worked out before startPlan sets firstStepStartedAt; null if step 1 was started before.
+    const event = firstStepStartedEvent(assignment!, at);
+    act({ type: "startPlan", at });
+    if (event) sendEvent(event);
     router.push("/step/1");
   }
 
