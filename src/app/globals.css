@@ -24,6 +24,7 @@
   --color-surface-sunken: var(--surface-sunken);
   --color-border-default: var(--border-default);
   --color-border-input: var(--border-input);
+  --color-border-rule: var(--border-rule);
   --color-border-strong: var(--border-strong);
   --color-action-primary: var(--action-primary);
   --color-action-primary-hover: var(--action-primary-hover);

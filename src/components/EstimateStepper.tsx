@@ -17,7 +17,7 @@ export function EstimateStepper({ labelledBy, minutes, onChange }: EstimateStepp
     <div
       role="group"
       aria-labelledby={labelledBy}
-      className="flex h-button items-center gap-2 self-start rounded-sm border border-border-input px-1"
+      className="flex h-button items-center gap-2 self-start rounded-sm border border-border-rule px-1"
     >
       <button
         type="button"

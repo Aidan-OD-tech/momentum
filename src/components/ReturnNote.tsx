@@ -16,7 +16,7 @@ type ReturnNoteProps = {
 export function ReturnNote({ note, savedAt, variant, onHide, onShow }: ReturnNoteProps) {
   if (variant === "hidden") {
     return (
-      <div className="flex items-center justify-between gap-4 rounded-md border border-dashed border-border-input px-4 py-1">
+      <div className="flex items-center justify-between gap-4 rounded-md border border-dashed border-border-rule px-4 py-1">
         <p className="flex items-center gap-3 text-body text-text-tertiary">
           <NoteIcon />
           Your note is hidden for this step.
