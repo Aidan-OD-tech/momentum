@@ -16,12 +16,12 @@ export type Action =
   | { type: "startNewAssignment" }
   // Brief entry and plan review (M3).
   | { type: "setBriefDraft"; draft: BriefDraft }
-  | { type: "createPlan"; id: string; plan: PlanDraft; brief: string; deadlineOverride: string }
+  | { type: "createPlan"; id: string; plan: PlanDraft; brief: string; deadlineOverride: string; at: string }
   | { type: "updateStep"; n: number; step: PlanStep }
   | { type: "addStep"; step: PlanStep }
   | { type: "deleteStep"; n: number }
   | { type: "updateRequirements"; requirements: Requirement[] }
-  | { type: "startPlan" };
+  | { type: "startPlan"; at: string };
 
 // Estimates are whole minutes in steps of 5, at least 5 (handoff "By screen" 3).
 export function clampEstimate(minutes: number): number {
@@ -75,6 +75,7 @@ export function reducer(data: MomentumData, action: Action): MomentumData {
       lastUndo: null,
       completedAt: null,
       finalReviewedAt: null,
+      planCreatedAt: action.at,
     };
     // The draft has become a plan, so it is cleared.
     return { ...data, activeAssignmentId: created.id, assignments: [...data.assignments, created], briefDraft: undefined };
@@ -113,7 +114,13 @@ export function reducer(data: MomentumData, action: Action): MomentumData {
     case "startPlan": {
       if (!inReview || assignment.steps.length === 0) return data;
       const [first, ...rest] = assignment.steps;
-      return replaceActive(data, { ...assignment, status: "active", steps: [{ ...first, status: "inProgress" }, ...rest] });
+      return replaceActive(data, {
+        ...assignment,
+        status: "active",
+        steps: [{ ...first, status: "inProgress" }, ...rest],
+        // Kept if already set, so it always records the first start.
+        firstStepStartedAt: assignment.firstStepStartedAt ?? action.at,
+      });
     }
 
     case "openStep": {

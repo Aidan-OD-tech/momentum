@@ -1,6 +1,7 @@
-import { fireEvent, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PlanReviewScreen } from "@/components/screens/PlanReviewScreen";
+import { StepScreen } from "@/components/screens/StepScreen";
 import { createSamplePlan } from "@/data/sample-assignment";
 import { reducer } from "@/lib/reducer";
 import { STORAGE_KEY } from "@/lib/storage";
@@ -20,7 +21,7 @@ function renderReview(stepCount?: number) {
   const plan = createSamplePlan();
   if (stepCount) plan.steps = plan.steps.slice(0, stepCount);
   const empty: MomentumData = { version: 1, activeAssignmentId: null, assignments: [] };
-  const data = reducer(empty, { type: "createPlan", id: "p1", plan, brief: "The brief", deadlineOverride: "" });
+  const data = reducer(empty, { type: "createPlan", id: "p1", plan, brief: "The brief", deadlineOverride: "", at: "2026-11-17T09:00:00.000Z" });
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   renderApp(<PlanReviewScreen />);
 }
@@ -158,11 +159,58 @@ describe("plan review", () => {
     expect(router.replace).not.toHaveBeenCalled();
   });
 
+  it("Start step 1 sends first_step_started once (production build), and a reload or reopening step 1 sends nothing more", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const fetchSpy = vi.fn<typeof fetch>(() => Promise.resolve(new Response(null, { status: 204 })));
+    vi.stubGlobal("fetch", fetchSpy);
+    // The plan was created at 09:00 (renderReview); Start step 1 is pressed at 09:03.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-17T09:03:00.000Z"));
+    try {
+      renderReview();
+      fireEvent.click(start());
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(fetchSpy.mock.calls[0][0]).toBe("/api/event");
+      expect(JSON.parse(fetchSpy.mock.calls[0][1]!.body as string)).toEqual({
+        event: "first_step_started",
+        minutesSincePlanCreated: "2–5",
+        stepCount: 6,
+      });
+      expect(stored().firstStepStartedAt).toBe("2026-11-17T09:03:00.000Z");
+
+      // Reload: plan review for a started plan only redirects home.
+      cleanup();
+      renderApp(<PlanReviewScreen />);
+      // Reopen step 1.
+      cleanup();
+      renderApp(<StepScreen n={1} />);
+      expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+      vi.unstubAllEnvs();
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("Start step 1 sends nothing in tests or development", () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal("fetch", fetchSpy);
+    try {
+      renderReview();
+      fireEvent.click(start());
+      expect(stored().status).toBe("active");
+      expect(fetchSpy).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("sends a started plan home: no editing after starting", () => {
     const empty: MomentumData = { version: 1, activeAssignmentId: null, assignments: [] };
     const started = [
-      { type: "createPlan" as const, id: "p1", plan: createSamplePlan(), brief: "b", deadlineOverride: "" },
-      { type: "startPlan" as const },
+      { type: "createPlan" as const, id: "p1", plan: createSamplePlan(), brief: "b", deadlineOverride: "", at: "2026-11-17T09:00:00.000Z" },
+      { type: "startPlan" as const, at: "2026-11-17T09:05:00.000Z" },
     ].reduce(reducer, empty);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(started));
     renderApp(<PlanReviewScreen />);

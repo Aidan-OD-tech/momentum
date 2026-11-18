@@ -88,7 +88,7 @@ export function BriefFlow() {
     if (controller.signal.aborted) return;
 
     if (result.ok) {
-      act({ type: "createPlan", id: crypto.randomUUID(), plan: result.plan, brief: text, deadlineOverride: deadline });
+      act({ type: "createPlan", id: crypto.randomUUID(), plan: result.plan, brief: text, deadlineOverride: deadline, at: new Date().toISOString() });
     } else {
       setPhase({ name: "error", reason: result.reason });
     }

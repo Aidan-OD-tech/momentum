@@ -55,6 +55,10 @@ export type Assignment = {
   lastUndo: { stepId: string; previous: Partial<Step> } | null;
   completedAt: string | null;
   finalReviewedAt: string | null;
+  // When the plan was created (M5). Optional: plans saved before M5 don't have it.
+  planCreatedAt?: string;
+  // When Start step 1 was pressed (M5). Set once, so first_step_started is sent at most once per plan.
+  firstStepStartedAt?: string;
 };
 
 // What the student has typed on brief entry, kept until a plan is created.
