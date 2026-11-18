@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { HomeRoute } from "@/components/screens/HomeRoute";
 import { sampleAssignment } from "@/data/sample-assignment";
 import { BRIEF_COUNT_FROM, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
-import type { BuildResult, PlanSource } from "@/lib/plan-source";
+import { apiPlanSource, type BuildResult, type PlanSource } from "@/lib/plan-source";
 import { STORAGE_KEY } from "@/lib/storage";
 import { router } from "@/test/navigation-mock";
 import { renderApp } from "@/test/render-app";
@@ -203,6 +203,22 @@ describe("building and errors", () => {
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Try again" })));
     expect(calls).toHaveLength(2);
     expect(calls[1]).toMatchObject({ brief: "A brief", deadline: "2026-12-04T17:00" });
+  });
+
+  it("a 429 from /api/plan shows Error 03 with the rate-limit line, and doesn't retry on its own", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json({ reason: "rateLimited" }, { status: 429 }));
+    renderApp(<HomeRoute />, apiPlanSource);
+    type("A brief");
+    breakItDown();
+    expect(await screen.findByRole("heading", { name: "We couldn’t build your plan just now." })).toHaveFocus();
+    expect(screen.getByText("Too many plans were built from this network. Try again in about 10 minutes.")).toBeInTheDocument();
+    expect(screen.queryByText(/Something went wrong on our side/)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Edit the brief" })).toBeInTheDocument();
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 50)));
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Try again" })));
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    fetchSpy.mockRestore();
   });
 
   it("a source that throws counts as failed", async () => {

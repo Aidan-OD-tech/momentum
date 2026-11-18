@@ -9,7 +9,7 @@ import { sampleAssignment } from "@/data/sample-assignment";
 import { briefLength, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
 import { showSampleBrief } from "@/lib/flags";
 import { useMomentumData } from "@/lib/momentum-store";
-import { simulatedSource, usePlanSource, type BuildResult } from "@/lib/plan-source";
+import { simulatedSource, usePlanSource, type BuildResult, type FailureReason } from "@/lib/plan-source";
 
 // How long typing pauses before the draft is written to storage.
 const DRAFT_SAVE_DELAY_MS = 400;
@@ -17,7 +17,7 @@ const DRAFT_SAVE_DELAY_MS = 400;
 type Phase =
   | { name: "entry"; focus: "heading" | "brief" }
   | { name: "building" }
-  | { name: "error"; reason: "unreadable" | "failed" };
+  | { name: "error"; reason: FailureReason };
 
 // "/" with no open assignment: brief entry, building, and Errors 02 and 03. The brief and deadline are
 // kept as a draft in storage, so they survive a reload, a failed build and Cancel. When a plan is
@@ -122,7 +122,13 @@ export function BriefFlow() {
           ) : (
             <ErrorCard
               heading="We couldn’t build your plan just now."
-              body="Something went wrong on our side, not with your brief. Try again in a moment."
+              body={
+                phase.reason === "rateLimited"
+                  ? // The route allows 5 plans per IP address in 10 minutes (and 100 an hour in all), so no
+                    // promise of an exact wait. Wording pending Aidan's approval (decisions.md, M6).
+                    "Too many plans were built from this network. Try again in about 10 minutes."
+                  : "Something went wrong on our side, not with your brief. Try again in a moment."
+              }
               primary={tryAgain}
               secondary={editBrief}
             />

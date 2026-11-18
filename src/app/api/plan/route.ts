@@ -12,7 +12,7 @@ import { allowPlanRequest, clientIp } from "@/lib/server/rate-limit";
 //   200 { ok: true, plan }              plan review
 //   400 { reason: "invalid" }           Error 03 (the UI never sends this)
 //   413 { reason: "tooLong" }           Error 03 (the UI never sends this)
-//   429 { reason: "rateLimited" }       Error 03
+//   429 { reason: "rateLimited" }       Error 03, with its own line about the wait
 //   422 { reason: "unreadable" }        Error 02: refused, not a brief, no requirements, or a reply that fails the schema
 //   502 { reason: "failed" }            Error 03: missing key, network or API error, or a reply cut off at the token limit
 //   504 { reason: "failed" }            Error 03: no answer within 45 seconds

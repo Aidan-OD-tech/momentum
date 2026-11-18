@@ -39,7 +39,12 @@ describe("apiPlanSource", () => {
     expect(await build()).toEqual({ ok: false, reason: "unreadable" });
   });
 
-  it.each([400, 413, 429, 500, 502, 504])("%i is failed (Error 03)", async (status) => {
+  it("429 is rateLimited (Error 03 with its own line)", async () => {
+    mockFetch({ status: 429, body: { reason: "rateLimited" } });
+    expect(await build()).toEqual({ ok: false, reason: "rateLimited" });
+  });
+
+  it.each([400, 413, 500, 502, 504])("%i is failed (Error 03)", async (status) => {
     mockFetch({ status, body: { reason: "failed" } });
     expect(await build()).toEqual({ ok: false, reason: "failed" });
   });
