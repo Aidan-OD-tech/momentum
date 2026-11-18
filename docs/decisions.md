@@ -337,7 +337,7 @@ Fixes from the evaluation, in the order Aidan accepted (M5, "M6 candidates"), pl
 ### Open for Aidan
 
 - **Item 8 waits for VoiceOver script step 7. If 'Progress saved' isn't heard, mount its status region before the text appears, as in item 3.** (Aidan's line, corrected by Aidan on 2026-11-18 from "step 4".)
-- **Preview checks after the push:**
+- **Preview checks after the push:** run by Claude Code with Playwright on 2026-11-18 at Aidan's request, and all five passed (status.md, M6, "Vercel preview checks"). They were scripted, not by hand:
   - two tabs (item 1);
   - a 13,000-character paste (item 4);
   - the sixth build in 10 minutes from one network (item 5);

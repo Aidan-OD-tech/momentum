@@ -236,7 +236,7 @@ Screenshots in `docs/evidence/screenshots/`: `m5-<screen>-1280.png` and `m5-<scr
 
 ## M6
 
-Branch `feat/m6-fixes`, off `main` at `e63ddcf` (PR #5). Not pushed (Aidan pushes). Decisions: [decisions.md](decisions.md), section M6. Review: [reviews/2026-11-18-compose-responsive-m6.md](reviews/2026-11-18-compose-responsive-m6.md). Accessibility re-run: [evidence/accessibility.md](evidence/accessibility.md), "M6 re-run".
+Branch `feat/m6-fixes`, off `main` at `e63ddcf` (PR #5). Pushed by Aidan; Vercel preview of `8410d9f`: https://momentum-git-feat-m6-fixes-aidan-o-driscoll.vercel.app (the branch address, no login needed). Decisions: [decisions.md](decisions.md), section M6. Review: [reviews/2026-11-18-compose-responsive-m6.md](reviews/2026-11-18-compose-responsive-m6.md). Accessibility re-run: [evidence/accessibility.md](evidence/accessibility.md), "M6 re-run".
 
 ### Built (one commit per item)
 
@@ -246,8 +246,8 @@ Branch `feat/m6-fixes`, off `main` at `e63ddcf` (PR #5). Not pushed (Aidan pushe
 | 2 | Field border #949494, 3.03:1 (WCAG 1.4.11, H-08); non-field controls on `border/rule` | `8c7fc6a` | verified (token test; computed style in Chrome) |
 | 3 | Save status in one mounted `role="status"` region; failed state with icon and Ink; one line (WCAG 4.1.3, H-09) | `547f10a` | verified in the DOM; **not heard** (no screen reader) |
 | 4 | No `maxLength`; a long paste is kept and the over-limit message shows at once (H-02) | `f7d0b0b` | verified (tests; 13,000-character paste in Chrome) |
-| 5 | 429 → `rateLimited` → Error 03 with its own line (H-03) | `3423e3a` | verified with a mocked 429; real rate limit on the preview pending |
-| 6 | The browser's local date sent as `today`, checked on the server (H-05) | `7c46803` | verified (tests; the request body in Chrome). Not checked against the live model |
+| 5 | 429 → `rateLimited` → Error 03 with its own line (H-03) | `3423e3a` | verified with a mocked 429, and on the preview with a real 429 (preview check 3) |
+| 6 | The browser's local date sent as `today`, checked on the server (H-05) | `7c46803` | verified (tests; the request body in Chrome; on the preview with the live model, preview check 5) |
 | 7 | Undo described by "Step N is marked done." (signal 5) | `489a3ba` | verified (tests; attribute in Chrome) |
 | 8 | "Progress saved" announcement | none | **planned**: waits for VoiceOver |
 | 9 | Rail keeps the step in progress; "Back to step N" / "Back to home"; wordmark links home (H-17) | `36bdced` | verified (tests; in Chrome) |
@@ -269,19 +269,28 @@ Branch `feat/m6-fixes`, off `main` at `e63ddcf` (PR #5). Not pushed (Aidan pushe
 | Keyboard pass, M6 (scripted, `m6-scripts/keyboard-m6.mjs`, both widths) | no traps; focus on the h1 on every screen; the wordmark is the first stop in the page (token ring); Shift+Tab from the h1 reaches it everywhere except the working step and done view, where it reaches the rail first (H-13). Done view: **Back to step 3 is the 2nd Tab from the h1**, after Hide note, and Enter opens step 3. One stop without the token indicator: Chrome's calendar button in the deadline field, which shows Chrome's own blue ring (M7 candidate; M5's "timing artifact" note corrected). `evidence/test-results/keyboard-m6.json` |
 | Top bar below 600 px (`narrow.mjs`) | failed status on one line at 540, 480, 420 and 375; no horizontal scroll; the context shrinks to nothing at 375 (M7 candidate R1) |
 
+### Vercel preview checks (2026-11-18, 18:52–18:53 UTC)
+
+Run by Claude Code with Playwright (Chrome, 1280×800) against the preview of `8410d9f`, using `m6-scripts/preview.mjs`. The preview loaded without a Vercel login. Results: [evidence/test-results/m6-preview.json](evidence/test-results/m6-preview.json). Screenshots: `docs/evidence/screenshots/m6-preview-*.png`. Checks 1, 2 and 4 answered `/api/plan` with the sample plan (no model calls, and none counted toward the rate limit). Checks 5 and 3 made **6 real `/api/plan` requests** from one IP: 5 plans from the model and one 429.
+
+| # | Check | Result | What was observed |
+| --- | --- | --- | --- |
+| 1 | Two tabs (H-01) | **passed** (scripted, not by hand) | One context, two pages. Tab A paused step 1 with "Note written in tab A (preview)". Tab B, open on `/step/1` since before the pause, already showed the note before Mark complete, so the `storage` event had reached it. After tab B's Mark complete, `localStorage` held step 1 as `done` **with the note**. Tab B's top bar read "Saved in this browser". Tab A reloaded on home ("Your next step"); on `/step/1` (the done view) the note was on screen. `m6-preview-two-tabs-tab-a-step-1.png` |
+| 2 | 13,000-character paste | **passed** | 13,000 characters written to the clipboard and pasted with Cmd+V into the brief (not `.fill()`). All **13,000 kept**, ending in "Due Dec 4". "Your brief is longer than 12,000 characters. Shorten it to build a plan." shown, counter "13,000 of 12,000 characters". Break it down sent **no** `/api/plan` request. `m6-preview-paste-13000.png` |
+| 3 | Rate limit (real model calls) | **passed** | Request 1 from this IP was check 5's. Check 3's builds 1–4 were requests 2–5: **200** each, all reaching plan review. Build 5, the **6th request in about 70 seconds**, got **429**, and Error 03 read "Too many plans were built from this network. Try again in about 10 minutes." All six were served from `iad1`. This shows the in-memory limiter worked across these six requests. It doesn't show that every serverless instance shares it: a request landing on a fresh instance would start a new count. `m6-preview-rate-limit-error-03.png` |
+| 4 | Done step (H-17) | **passed** | Steps 1 and 2 done; step 3 opened; step 1 opened from the rail. The rail listed "Done: 1.", "Done: 2." and "**In progress: 3.** Draft a thesis and outline". "Back to step 3" opened `/step/3` with **focus on its h1** ("Draft a thesis and outline"). The wordmark went to `/` (home, "Pick up where you left off"). `m6-preview-done-step.png` |
+| 5 | Local date (H-05; live model) | **passed** | Browser `timezoneId` Pacific/Kiritimati: browser date **2026-11-19**, server UTC date 2026-11-18. The request body's `today` was **"2026-11-19"** (200). Brief: "…Submit it on Canvas by 5 PM tomorrow." Plan review showed **"Due Fri, Nov 20, 5:00 PM"**: the browser's tomorrow, not the server's (Thu, Nov 19). `m6-preview-local-date-plan-review.png` |
+
+Check 5 replaces the by-hand check listed earlier ("after 7 PM local time, a brief due 'this Friday'") with Aidan's scripted version: a browser time zone a day ahead of UTC and a brief due "tomorrow". One model run is one sample; it shows the date reaches the model, not that every relative date resolves right.
+
 Screenshots in `docs/evidence/screenshots/`: `m6-<screen>-1280.png` and `m6-<screen>-600.png` for the 13 M5 screens plus brief-entry-over-limit, error-03-rate-limit, done-step and save-failed.
 
 ### Not verified
 
-- **Vercel preview:**
-  - two tabs by hand;
-  - a 13,000-character paste;
-  - the sixth build in 10 minutes (a real 429);
-  - done step → Back to step N;
-  - **after 7 PM local time, build from a brief due "this Friday" and confirm plan review shows the correct Friday** (item 6, local date).
-  Pending Aidan's push.
+- **Vercel preview by hand:** the five preview checks above were scripted, not done by a person. That includes the two tabs and the US-evening "this Friday" case, which was covered by the scripted Kiritimati check instead.
+- **The rate limit across serverless instances:** not tested (see preview check 3).
 - **Screen readers:** items 3 and 7 were checked in the DOM only. Item 8 waits for VoiceOver.
-- **The live model with the browser's date:** no OpenAI requests were made in M6, so whether "due this Friday" now resolves right in a US evening is untested against the model.
+- **Relative dates beyond "tomorrow"** with the live model (for example "this Friday" in a US evening): one model run in preview check 5 only.
 - Safari and Firefox.
 
 ### Known limitations
