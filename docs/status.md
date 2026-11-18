@@ -8,7 +8,7 @@ Legend: **planned** (not started), **implemented** (written, not independently c
 | --- | --- | --- |
 | M1 | Foundation and working-step screen | verified and merged (PR #1) |
 | M2 | Core loop on sample data with persistence: home, working step, pause and notes, completion and undo, timer, side panels, final check, completed home, review | verified and merged (PR #2) |
-| M3 | Brief entry, building, plan review and editing, error screens, preview deploy | implemented and verified locally on branch `feat/m3-plan-entry-and-review` (not pushed); preview deploy not done yet (Aidan) |
+| M3 | Brief entry, building, plan review and editing, error screens, preview deploy | implemented and verified on branch `feat/m3-plan-entry-and-review`, locally and on the Vercel preview; awaiting PR #3 |
 | M4 | AI generation (server-side, structured output) | planned |
 | M5 | Evaluation (heuristic evaluation, task-based feedback) | planned |
 | M6 | Fixes from evaluation | planned |
@@ -92,11 +92,24 @@ Branch `feat/m3-plan-entry-and-review`, off `main` after PR #2. Not pushed, not 
 | Narrow width | no horizontal overflow at 375 px on brief entry and on plan review with a step edit card open |
 | Start step 1, 1280×800, nothing open (measurement for the case study, not a criterion) | top of the button **1315 px** from the top of the page: below the fold, reached by scrolling |
 
-Screenshots in `docs/evidence/screenshots/`: `m3-brief-entry-empty`, `m3-error01-empty`, `m3-sample-only-notice`, `m3-building` (dev, `?simulate=slow`; shows the Next dev indicator), `m3-error02-unreadable` and `m3-error03-build-failed` (dev, simulated), `m3-plan-review` (with a deadline override of Dec 11), `m3-edit-step-3`, `m3-edit-requirements`, `m3-requirements-updated`, `m3-panel03-brief`, `m3-edit-step-375` (all `.png`). The preview URL screenshot waits for the URL.
+### Vercel preview (2026-11-18)
+
+Preview URL for `feat/m3-plan-entry-and-review`: https://momentum-oyry8u9z1-aidan-o-driscoll.vercel.app (Aidan confirmed it opens in a private window). It is a per-deployment URL, so it stays on that deployment; later pushes get new preview URLs.
+
+| Check | Result |
+| --- | --- |
+| HTTP codes, curl | `/` 200, `/plan` 200, `/step/abc` **404** |
+| Check 1, Chrome with fresh storage | brief entry, no save indicator, nothing written |
+| Check 4 | sample brief with deadline override Dec 11, 10:00 AM: `/plan`, "PSYC 3024 · Due Fri, Dec 11, 10:00 AM", "Saved in this browser", total "6 steps · about 3 h 20 min" |
+| Check 9 | Start step 1 opens working step 1; `/plan` then redirects to `/` |
+| Console | no errors |
+
+The production domain (https://momentum-five-xi.vercel.app) still serves `main` (M2): `/plan` returned 404 there on 2026-11-18.
+
+Screenshots in `docs/evidence/screenshots/`: `m3-brief-entry-empty`, `m3-error01-empty`, `m3-sample-only-notice`, `m3-building` (dev, `?simulate=slow`; shows the Next dev indicator), `m3-error02-unreadable` and `m3-error03-build-failed` (dev, simulated), `m3-plan-review` (with a deadline override of Dec 11), `m3-edit-step-3`, `m3-edit-requirements`, `m3-requirements-updated`, `m3-panel03-brief`, `m3-edit-step-375` (all `.png`). Preview: `m3-preview-brief-entry` (brief entry on the Vercel preview).
 
 ### Not verified
 
-- **The M3 preview.** Aidan deployed https://momentum-five-xi.vercel.app (2026-11-18), but the smoke test shows it serves `main` (M2), not this branch: `/` 200, **`/plan` 404**, `/step/abc` 404, and the page has no M3 brief entry. The branch is pushed (`3ef1435`); its own Vercel preview URL is needed for the smoke test (checks 1, 4, 9).
 - Safari, Firefox and screen readers (VoiceOver, NVDA). Live regions (building status, the notice, the stepper value) were checked in the DOM only.
 - Real `prefers-reduced-motion` (the spinner has `motion-reduce:animate-none`, not observed).
 

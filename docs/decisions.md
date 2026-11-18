@@ -138,29 +138,29 @@ Known limit: once plans live in local storage, the server can't know how many st
 
 ### Claude Code's choices
 
-Each entry is marked: "(Claude Code; accepted by Aidan, 2026-11-18)" or "(Claude Code, pending Aidan)".
+All accepted by Aidan on 2026-11-18. The four defaults first (Add a step draft, notice only on change, screen-reader start reason, and the 480/560 width tokens with AlertIcon; Aidan confirmed the fourth was the tokens and icon), then the remaining six.
 
 **Add a step adds nothing until Done editing.** (Claude Code; accepted by Aidan, 2026-11-18) The new step's card is a draft; Cancel leaves the plan unchanged, so an empty step can never be saved. `addStep` receives the finished step.
 
 **The notice shows only when the requirements actually changed.** (Claude Code; accepted by Aidan, 2026-11-18) Done with no change closes the card without "Requirements updated", which would otherwise be untrue.
 
-**While an edit card is open, all edit triggers are hidden** (Claude Code, pending Aidan) (row Edit links, requirements Edit, Add a step), so only one edit can be open. Setup 04 and 05 hide the row Edit links but still show Add a step and the requirements Edit.
+**While an edit card is open, all edit triggers are hidden** (Claude Code; accepted by Aidan, 2026-11-18) (row Edit links, requirements Edit, Add a step), so only one edit can be open. Setup 04 and 05 hide the row Edit links but still show Add a step and the requirements Edit.
 
 **"Finish editing to start." is screen-reader text only** (Claude Code; accepted by Aidan, 2026-11-18), linked to Start step 1 by `aria-describedby`. The frames show only a greyed button. Start step 1 uses `aria-disabled` so it stays focusable; the stepper's − does the same at 5 so focus isn't lost.
 
-**Focus after edits:** (Claude Code, pending Aidan) Done or Cancel returns focus to that step's Edit; adding a step focuses its new Edit; Cancel on a new step returns to Add a step; Delete moves focus to the "Suggested steps" heading; removing an item or requirement focuses the next field or the Add button.
+**Focus after edits:** (Claude Code; accepted by Aidan, 2026-11-18) Done or Cancel returns focus to that step's Edit; adding a step focuses its new Edit; Cancel on a new step returns to Add a step; Delete moves focus to the "Suggested steps" heading; removing an item or requirement focuses the next field or the Add button.
 
-**Simulated `slow` never resolves on its own** (Claude Code, pending Aidan); Cancel settles it. `failed` and `unreadable` resolve at once.
+**Simulated `slow` never resolves on its own** (Claude Code; accepted by Aidan, 2026-11-18); Cancel settles it. `failed` and `unreadable` resolve at once.
 
-**A source that throws counts as `failed`** (Claude Code, pending Aidan) (Error 03).
+**A source that throws counts as `failed`** (Claude Code; accepted by Aidan, 2026-11-18) (Error 03).
 
 **New width tokens** (Claude Code; accepted by Aidan, 2026-11-18) `--size-building` (480) and `--size-error-card` (560) from the handoff's layout list, rather than reusing the step-complete width for the error card.
 
 **`AlertIcon`** (Claude Code; accepted by Aidan, 2026-11-18) (circle with an exclamation mark), drawn from the error frames; it isn't in the handoff's icon list.
 
-**`TextInput`, `TextArea`, `FieldError` primitives.** (Claude Code, pending Aidan) The pause dialog's text area is unchanged (not refactored onto `TextArea` in this milestone).
+**`TextInput`, `TextArea`, `FieldError` primitives.** (Claude Code; accepted by Aidan, 2026-11-18) The pause dialog's text area is unchanged (not refactored onto `TextArea` in this milestone).
 
-**The draft saves 400 ms after typing pauses** (Claude Code, pending Aidan), and immediately on Break it down.
+**The draft saves 400 ms after typing pauses** (Claude Code; accepted by Aidan, 2026-11-18), and immediately on Break it down.
 
 ### Settled by Aidan (2026-11-18)
 

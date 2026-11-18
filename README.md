@@ -2,7 +2,7 @@
 
 Momentum helps students turn an assignment brief into steps and work through them one at a time. The student does the assignment in their own tools; Momentum only holds the plan and their progress. It is a course project for UX & Front-End Engineering.
 
-Status: **not deployed yet** (preview steps: [docs/deploy.md](docs/deploy.md)). Current milestone: **M3, brief entry and plan review** (M1 and M2 merged) (see [docs/status.md](docs/status.md)).
+Status: **preview deployed** for M3: https://momentum-oyry8u9z1-aidan-o-driscoll.vercel.app (branch `feat/m3-plan-entry-and-review`; steps in [docs/deploy.md](docs/deploy.md)). No production deploy yet. Current milestone: **M3, brief entry and plan review** (M1 and M2 merged) (see [docs/status.md](docs/status.md)).
 
 ## Requirements
 
