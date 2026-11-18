@@ -232,10 +232,14 @@ From [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.
 - **"Done when" uses the criterion as written.** `doneWhenSentence` no longer lowercases the first letter, and the instructions ask the model to start each criterion lowercase unless it begins with a proper noun (such as Turnitin). The sample plan's criteria are stored lowercase to match, so they read as before.
   - (Claude Code, follows from the fix) The working step's "Done when" well shows the criterion on its own as a sentence, so it capitalizes the first letter (`capitalizeFirst`); capitalizing never breaks a proper noun.
 - **No full stops at the end of requirement labels.** `toPlanDraft` removes them from labels and short labels, so chips don't end in punctuation. Full stops inside a label stay ("Dec. 4").
-- **No step for submitting.** The instructions say never to create one, because submission is already a reminder. As a backstop, `toPlanDraft` drops any step whose title starts with "Submit" (any case) before giving IDs and counting steps, so a plan still needs 1 to 12 steps after the drop; a plan of only Submit steps is unreadable (Error 02).
+- **No step for the final submission.** The instructions say never to create one, because the final submission is already a reminder; a step for an interim submission (a draft for peer feedback) is fine. As a backstop, `toPlanDraft` drops the **last** step only if its title starts with "Submit" (any case), before giving IDs and counting steps, so a plan still needs 1 to 12 steps after the drop; a plan whose only step is a Submit step is unreadable (Error 02). (Aidan, narrowed the same day from "any Submit step" so interim milestones aren't dropped.)
 
 ### Open for Aidan
 
 - **Building copy:** revisit after the preview timings (above).
 - **How to hide "Use a sample brief"** for M5: at the start of M5.
-- (Claude Code) **Side effects of the fixes, seen in one live run:** the reflective portfolio plan no longer has a step for reading peer feedback between the first draft and the final revision (the earlier run's "Submit the draft and review feedback" step); its revision step still exists. And a criterion that the student types with a capital in the edit card ("You have…") now reads "Done when You have…" on plan review, step complete and home.
+- (Claude Code) **Seen in one live run before the filter was narrowed:** the reflective portfolio plan had no step for reading peer feedback between the first draft and the final revision. The narrower rule allows that step again; not yet re-run live.
+
+### M6 candidates
+
+- **"Done when" prefix in the step editor.** A criterion the student types with a capital in the edit card ("You have…") reads "Done when You have…" on plan review, step complete and home. Idea: show "Done when" as a fixed prefix before the field, so the student writes the rest of the sentence. No UI change in M4.

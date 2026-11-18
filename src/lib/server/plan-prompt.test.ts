@@ -41,7 +41,8 @@ describe("PLAN_INSTRUCTIONS", () => {
       "Never suggest sources",
       "one concrete criterion",
       "start it lowercase unless it begins with a proper noun",
-      "Never create a step for submitting the assignment",
+      "Never create a step for the final submission",
+      "A step for an interim submission",
       "approximate whole number of minutes",
       "Set readable to false",
     ]) {

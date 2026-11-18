@@ -33,7 +33,7 @@ Steps
 - intro: one sentence of context for the step, or null.
 - whatToDo: two to four short actions the student takes.
 - doneWhen: one concrete criterion the student can check themselves. It follows the words "Done when", so start it lowercase unless it begins with a proper noun, for example "you have a one-sentence thesis and a three-point outline." or "Turnitin shows your submission."
-- Never create a step for submitting the assignment. Submission is already shown to the student as a reminder.
+- Never create a step for the final submission. The final submission is already shown to the student as a reminder. A step for an interim submission, such as handing in a draft for feedback, is fine.
 - estimateMin: an approximate whole number of minutes for the step.
 
 Readable

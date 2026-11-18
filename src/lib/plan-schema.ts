@@ -71,8 +71,8 @@ export function withoutFullStop(text: string): string {
   return text.trim().replace(/\.+$/, "").trim();
 }
 
-// "Submit the essay", "submit your PDF": a step for handing the work in. Submission is a reminder,
-// never a step; the prompt says so, and toPlanDraft drops these as a backstop.
+// "Submit the essay", "submit your PDF": a title for handing work in. The final submission is a
+// reminder, never a step; the prompt says so, and toPlanDraft drops a last step like this as a backstop.
 export function isSubmitStep(title: string): boolean {
   return /^submit/i.test(title.trim());
 }
@@ -92,9 +92,11 @@ export function toPlanDraft(model: ModelPlan): PlanDraft | null {
   // A plan needs at least one thing to check in the final check.
   if (!requirements.some((r) => r.kind !== "submission")) return null;
 
-  // Dropped before IDs and the step count, so the plan still needs 1 to 12 steps without them.
+  // Only the last step is dropped, and only if it is a Submit step: an earlier one is an interim
+  // milestone (a draft for peer feedback). Dropped before IDs and the step count, so the plan still
+  // needs 1 to 12 steps without it.
   const steps = model.steps
-    .filter((s) => !isSubmitStep(s.title))
+    .filter((s, index, all) => !(index === all.length - 1 && isSubmitStep(s.title)))
     .map((s, index): PlanStep => ({
       id: `s${index + 1}`,
       title: s.title.trim(),

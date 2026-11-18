@@ -64,20 +64,30 @@ describe("toPlanDraft", () => {
     expect([withoutFullStop("1,500 words"), withoutFullStop("Dec. 4 at 5 p.m.")]).toEqual(["1,500 words", "Dec. 4 at 5 p.m"]);
   });
 
-  it("drops steps whose title starts with Submit, before IDs are given", () => {
+  it("keeps a mid-plan Submit step and drops a final one, before IDs are given", () => {
     const plan = toPlanDraft(
-      modelPlan({ steps: [step(1), { ...step(2), title: "Submit the essay" }, { ...step(3), title: " submit your PDF" }, step(4)] }),
+      modelPlan({
+        steps: [
+          step(1),
+          { ...step(2), title: "Submit the draft for peer feedback" },
+          step(3),
+          { ...step(4), title: " submit the essay" },
+        ],
+      }),
     )!;
     expect(plan.steps.map((s) => [s.id, s.title])).toEqual([
       ["s1", "Step 1"],
-      ["s2", "Step 4"],
+      ["s2", "Submit the draft for peer feedback"],
+      ["s3", "Step 3"],
     ]);
+    // A last step that isn't a Submit step stays.
+    expect(toPlanDraft(modelPlan({ steps: [step(1), step(2)] }))?.steps).toHaveLength(2);
     expect([isSubmitStep("SUBMIT it"), isSubmitStep("Submission check"), isSubmitStep("Check before you submit")]).toEqual([true, false, false]);
   });
 
   it("counts steps after dropping Submit steps: still 1 to 12", () => {
     const submit = { ...step(0), title: "Submit the essay" };
-    // 13 steps from the model, one of them Submit: 12 remain, which is valid.
+    // 13 steps from the model, the last one Submit: 12 remain, which is valid.
     expect(toPlanDraft(modelPlan({ steps: [...Array.from({ length: 12 }, (_, i) => step(i + 1)), submit] }))?.steps).toHaveLength(12);
     // Only a Submit step: nothing remains, so the plan is unreadable.
     expect(toPlanDraft(modelPlan({ steps: [submit] }))).toBeNull();
