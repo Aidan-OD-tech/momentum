@@ -8,8 +8,8 @@ Legend: **planned** (not started), **implemented** (written, not independently c
 | --- | --- | --- |
 | M1 | Foundation and working-step screen | verified and merged (PR #1) |
 | M2 | Core loop on sample data with persistence: home, working step, pause and notes, completion and undo, timer, side panels, final check, completed home, review | verified and merged (PR #2) |
-| M3 | Brief entry, building, plan review and editing, error screens, preview deploy | implemented and verified on branch `feat/m3-plan-entry-and-review`, locally and on the Vercel preview; awaiting PR #3 |
-| M4 | AI generation (server-side, structured output) | planned |
+| M3 | Brief entry, building, plan review and editing, error screens, preview deploy | verified and merged (PR #3) |
+| M4 | AI generation (server-side, structured output) | implemented on branch `feat/m4-ai-generation`; route, limits and UI verified locally with a mocked model and against the real API's error paths; **live plan output not yet verified** (the OpenAI project has no credit) |
 | M5 | Evaluation (heuristic evaluation, task-based feedback) | planned |
 | M6 | Fixes from evaluation | planned |
 | M7 | Docs and case study | planned |
@@ -65,7 +65,7 @@ Screenshots in `docs/evidence/screenshots/`: `m2-home-paused-with-note`, `m2-hom
 
 ## M3
 
-Branch `feat/m3-plan-entry-and-review`, off `main` after PR #2. Not pushed, not deployed. Decisions: [decisions.md](decisions.md), sections "M3 (pre-build sign-offs)" and "M3". Scope: [reviews/2026-11-17-scope-m3-m4.md](reviews/2026-11-17-scope-m3-m4.md), accepted by Aidan.
+Merged in PR #3. Branch `feat/m3-plan-entry-and-review`, off `main` after PR #2. The record below is as verified at merge. Decisions: [decisions.md](decisions.md), sections "M3 (pre-build sign-offs)" and "M3". Scope: [reviews/2026-11-17-scope-m3-m4.md](reviews/2026-11-17-scope-m3-m4.md), accepted by Aidan.
 
 ### Built
 
@@ -124,3 +124,49 @@ Screenshots in `docs/evidence/screenshots/`: `m3-brief-entry-empty`, `m3-error01
 - Building and the error cards sit 64 px below the top bar (the largest spacing step); Figma has about 160 px (building) and 96 px (errors).
 - `/step/9` past the end of a plan is still a client Not found with HTTP 200 (from M2).
 - Untested in Safari, Firefox and screen readers.
+
+## M4
+
+Branch `feat/m4-ai-generation`, off `main` after PR #3. Not pushed, not deployed. Decisions: [decisions.md](decisions.md), section M4. Risk review: [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.md).
+
+### Built
+
+- `POST /api/plan` (`src/app/api/plan/route.ts`, Node.js runtime, `maxDuration` 60): zod request check (400), 12,000-character limit (413 `tooLong`), in-memory rate limit of 5 per IP per 10 minutes and 100 per hour overall (429 `rateLimited`), one OpenAI Responses API call with a strict zod schema and a 4,000-token output limit, stopped after 45 s (504) or when the browser cancels. 422 `unreadable` for a refusal, `readable: false`, no substantive or format requirement, 0 or more than 12 steps, or output that fails the schema. 502 `failed` for a missing key, an API or network error, or a reply cut off at the token limit. Logs status, reason and duration only.
+- `src/lib/server/openai.ts` (`server-only`, the only reader of `OPENAI_API_KEY`, no retries), `src/lib/server/plan-prompt.ts` (the instructions in plain sentences, and the user message with the brief inside `<brief>` delimiters), `src/lib/server/rate-limit.ts`, `src/lib/plan-schema.ts` (request and model schemas, and `toPlanDraft`: IDs, trimming, estimates to 5 min, substantive first, date-only deadlines kept, malformed ones dropped).
+- `apiPlanSource` replaces the M3 sample-only source and its notice: 200 → plan, 422 → Error 02, anything else (and network errors and Cancel) → Error 03.
+- Brief entry: `maxLength` 12,000 from one constant; a quiet count ("11,200 of 12,000 characters") within 10% of it, linked to the field; a polite live region that speaks once near the limit and once at it; one disclosure line merged with "No account needed"; a development-copy error if a stored draft is already over the limit (no request).
+- `formatDeadline` shows a date-only deadline as "Fri, Dec 4".
+- `npm run check:bundle` (`scripts/check-bundle.mjs`).
+
+### Verified (2026-11-18, Node 24.21.0, Chrome via Playwright on `npm run build && npm start`)
+
+| Check | Result |
+| --- | --- |
+| Baseline on the fresh branch before changes | lint, tsc, 130 tests, build: pass |
+| `npm run lint`, `npx tsc --noEmit` | pass |
+| `npm test` | 20 files, 179 tests pass, none using the network or a key. New: route (19: valid plan with IDs, rounding and order; 13 steps; refusal, `readable: false`, schema failure and non-JSON → 422; SDK error → 502 with only status and code logged, no brief or IP; cut-off reply → 502; timeout → 504; missing key → 502 with a log line naming the variable only; 400 ×5; 413 without calling the model; 12,000 exactly → 200; 6th request from one IP → 429 while another IP gets 200; Cancel aborts the upstream signal), rate limiter (3), schema and post-processing (11), prompt structure incl. the injection and delimiter-escape cases (4), `apiPlanSource` (11), brief entry (disclosure, `maxLength`, count and live region, over-limit draft), date-only `formatDeadline`. The abort and timeout tests were checked to fail when the route stops passing `request.signal` or stops returning 504. |
+| `npm run build` | passes; `/api/plan` is a dynamic route |
+| `npm run check:bundle` | passes (27 files in `.next/static`). It was checked to fail on a planted `sk-…` string. A bare `sk-` can't be used: React's own code contains `mask-type` |
+| Local curl | empty body → **400**; 13,000-character brief → **413** `{"reason":"tooLong"}`; GET → 405 |
+| Live check 6 (Cancel) | building shows, Cancel returns to entry with the text kept and focus in the brief; server log: `502 aborted-by-client 43ms` |
+| Live check 7 (rate limit) | six submits in the browser (Break it down, then Try again ×5): responses 502 ×5, then **429**, Error 03 each time |
+| Live check 8 (no key) | server started with `OPENAI_API_KEY` empty: Error 03, Edit the brief keeps the text; log line `[api/plan] 502 missing OPENAI_API_KEY 1ms` |
+| Brief entry, keyboard | Use a sample brief → text area → deadline (date parts) → Break it down. The disclosure line is a plain `<p>`, not focusable. Count appears at 10,800, not at 10,799; linked by `aria-describedby`; live region text changes only on crossing; typing stops at 12,000; pasting 13,000 characters keeps the first 12,000 |
+| Real API, model access | with the key in `.env.local`: `gpt-6.1-terra` → OpenAI **429 `credit_balance_exhausted`**; `gpt-4.1-mini` and `gpt-4o-mini` → **403 `model_not_found`**. Each showed Error 03 |
+
+Screenshots in `docs/evidence/screenshots/`: `m4-brief-entry` (full page, with the disclosure line), `m4-near-limit-count`.
+
+### Not verified
+
+- **Live checks 1–5 and 9, and the preview checks:** blocked until the OpenAI project has credit. No real plan has been generated yet, so model output quality, invented requirements, deadline extraction, prompt-injection resistance, timings and the "under a minute" copy are all unchecked. Screenshots still to take: building during a successful request, plan review from the sample brief and from a second brief, Error 02 from a recipe.
+- The default model in `src/lib/server/openai.ts` (`gpt-4.1-mini`) isn't available on this OpenAI project; it is replaced once a model is confirmed.
+- Safari, Firefox and screen readers (live regions checked in the DOM only).
+
+### Known limitations
+
+- **Rate limiting is best effort**: memory is per Vercel instance and resets on a cold start. The hard cost guard is the OpenAI project's monthly budget limit (docs/deploy.md). Requests that fail at OpenAI still count toward the limit.
+- **Prompt-injection resistance is checked by hand, not proven.** The tests check only that the brief sits inside the delimiters.
+- **Model output varies between runs.** The same brief can give different steps, labels and estimates.
+- **Pasting more than 12,000 characters keeps the first 12,000** (browser `maxLength`). The count shows "12,000 of 12,000 characters" and the live region says the limit was reached, but nothing says text was cut.
+- "Try again in a moment" on Error 03 can be up to 10 minutes when the cause is the rate limit.
+- "Today" in the model message is the server's UTC date.

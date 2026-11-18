@@ -169,3 +169,54 @@ All accepted by Aidan on 2026-11-18. The four defaults first (Add a step draft, 
 **Chip copy gap: leave `shortLabel ?? label` for M3.** (Aidan) Figma R3 03's short forms ("Clear position on the assigned question", "Submit via Turnitin") are not copied in. M4's prompt will generate matching `label` and `shortLabel` values.
 
 **"Use a sample brief" stays for M3.** (Aidan) Revisit right after M4's live AI route is verified: keep it as an optional helper, or hide it during the M5 evaluation sessions.
+
+## M4 (2026-11-18)
+
+### From Aidan's M4 prompt
+
+**OpenAI Structured Outputs through `OPENAI_API_KEY`.** (Aidan) The key is read only in `src/lib/server/openai.ts` (`import "server-only"`); no `NEXT_PUBLIC_` variable holds it. The model comes from `OPENAI_MODEL` (set to `gpt-6.1-terra` in `.env.local` and Vercel), with a default in code.
+
+**Limits.** (Aidan) Brief: 1 to 12,000 characters after trimming, from one constant (`src/lib/brief-limits.ts`); over it, 413 `tooLong`. Rate limit: 5 requests per 10 minutes per IP (first `x-forwarded-for` entry), plus 100 per hour overall; over it, 429 `rateLimited`. Model call stopped after 45 s (504) or when the browser cancels. `maxDuration` 60 (Vercel Hobby and Pro both allow up to 300 s with Fluid compute, checked 2026-11-18). No retries (scope item 7), no repair pass (scope item 15).
+- Limitation: the rate limiter lives in memory, so on Vercel it is per instance and resets on a cold start. Best effort, not a guarantee. The hard cost guard is the monthly budget limit on the OpenAI project, which Aidan sets (docs/deploy.md). Vercel overwrites `X-Forwarded-For`, so callers can't spoof it there.
+
+**Status mapping.** (Aidan, with risk item B) 200 plan; 422 `unreadable` → Error 02 (refusal, `readable: false`, no substantive or format requirement, 0 or more than 12 steps, output that fails the schema); everything else → Error 03: 400, 413, 429, 502 (missing key, API or network error, reply cut off at the token limit), 504. The client also treats network errors and Cancel as `failed`.
+
+**`samplePlanSource`, `sampleOnly` and its notice are removed.** (Aidan) "Use a sample brief" only fills the text area. `?simulate=` stays, development only. Whether to keep "Use a sample brief" for M5 is open (below).
+
+### /craft risk items accepted (Aidan, 2026-11-18)
+
+From [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.md):
+- **A. Date-only deadlines.** The model returns `YYYY-MM-DD` when the brief gives a date but no time, and the app shows "Due Fri, Dec 4" with no time. A deadline in neither shape is dropped (no deadline), not used to reject the plan.
+- **B. A reply cut off at the token limit is Error 03** (502 `failed`), not Error 02, because the brief wasn't the problem. Output limit 4,000 tokens.
+- **C. Several dates:** the instructions say to use the final submission date as the deadline.
+
+### Claude Code's choices (pending Aidan)
+
+**Disclosure merged with the M3 line.** (Claude Code) "No account needed. Your plan stays in this browser." repeated "stays in this browser", so brief entry now has one caption line: "To build your plan, your brief is sent to OpenAI. Your plan and progress stay in this browser. No account needed." The first two sentences are Aidan's development copy; the wording still needs his approval. Nothing is said about OpenAI's retention or training.
+
+**`responses.create` with `zodTextFormat`, then one `JSON.parse` and one `safeParse`.** (Claude Code) The SDK's `responses.parse` throws on a schema mismatch, which would look like an API failure; parsing in the route keeps "unreadable" and "failed" apart and shows the single parse attempt.
+
+**The model schema has no length, pattern or range rules;** (Claude Code) `toPlanDraft` applies them, so a rule can't be lost to what strict mode supports.
+
+**A plan needs at least one substantive or format requirement;** (Claude Code) a submission reminder alone is unreadable. Steps also need a title and Done when, as in the edit card.
+
+**IDs are `r1…` and `s1…` in order,** (Claude Code) like the sample.
+
+**"Today" is the server's UTC date, with its weekday** ("Wednesday, 2026-11-18"). (Claude Code)
+
+**`<brief>` tags inside the pasted text are removed** (Claude Code) so the brief can't close the delimiters early.
+
+**The student's deadline is accepted by the route but not sent to the model;** (Claude Code) the browser applies it over the plan's, as in M3.
+
+**A stored draft over the limit isn't sent.** (Claude Code) It can only come from M3, which had no limit. Brief entry shows "Your brief is longer than 12,000 characters. Shorten it to build a plan." (development copy) and makes no request, so the server's 413 never shows as Error 03's "not with your brief".
+
+**Character count announcements.** (Claude Code) The visible count is linked to the field with `aria-describedby` (read on focus). A separate polite live region changes only when the brief crosses 10,800 and when it reaches 12,000 (development copy: "Your brief is close to the 12,000-character limit." / "Your brief has reached the 12,000-character limit.").
+
+**Bundle check matches the shape of a key** (Claude Code) (`sk-` followed by 20 or more key characters), not a bare `sk-`, which React's `mask-type` attribute contains. It also fails on `OPENAI_API_KEY` and `api.openai.com`, and prints which rule matched, never the text.
+
+### Open for Aidan
+
+- **The model and the code default.** On 2026-11-18 the project answered `gpt-6.1-terra` with 429 `credit_balance_exhausted`, and `gpt-4.1-mini` and `gpt-4o-mini` with 403 `model_not_found`. The default stays `gpt-4.1-mini` until a model is confirmed with credit.
+- **Disclosure wording** (above).
+- **Building copy** "This usually takes under a minute": check against real timings.
+- **"Use a sample brief" for M5:** keep it or hide it during the sessions.

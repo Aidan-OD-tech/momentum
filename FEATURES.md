@@ -2,7 +2,7 @@
 
 What Momentum does, feature by feature. [docs/product.md](docs/product.md) is the source of truth for scope: if this file and it disagree, product.md wins and this file gets fixed. What has been checked, and how, is in [docs/status.md](docs/status.md).
 
-**Status values used here.** `built`: in code (M1–M2 merged to `main`; M3 on `feat/m3-plan-entry-and-review`), not deployed. `planned`: in the MVP, not in code yet. (This replaces /craft's "shipped", which means "in production"; nothing is deployed yet.)
+**Status values used here.** `built`: in code (M1–M3 merged to `main`; M4 on `feat/m4-ai-generation`). What is verified, and how, is in docs/status.md. `planned`: in the MVP, not in code yet. (This replaces /craft's "shipped", which means "in production"; nothing is deployed yet.)
 
 ## Summary
 Momentum helps a student turn a dense assignment brief into manageable steps, start working, and return after a pause without rebuilding their context. It holds one active assignment at a time and saves it in the student's browser. The student does the work in their own tools; Momentum never sees, checks or submits it. There are three areas: planning (brief to plan), working through steps, and finishing with a final requirements check. Saving honestly in the browser runs underneath all three.
@@ -10,7 +10,7 @@ Momentum helps a student turn a dense assignment brief into manageable steps, st
 ## Feature Map
 | Area | Major features | Supporting features | Status |
 |------|----------------|---------------------|--------|
-| Planning | Brief entry, Plan building, Plan review and editing | | built (sample source only; model generation planned for M4) |
+| Planning | Brief entry, Plan building, Plan review and editing | | built (live model generation from M4) |
 | Working through steps | Working step, Pause and return notes | Step completion and undo, Optional timer, Full plan and original brief | built |
 | Finishing | Final requirements check | Completed home and review | built |
 | Saving | Saved in this browser | | built |
@@ -19,29 +19,29 @@ Marketing rows are written for the portfolio case study; Momentum has no product
 
 ## Planning
 
-> **Area summary:** Gets a student from a pasted brief to a plan they trust: summary, requirements and steps with "Done when" criteria. Until M4, only the sample brief can be turned into a plan.
+> **Area summary:** Gets a student from a pasted brief to a plan they trust: summary, requirements and steps with "Done when" criteria.
 
 ### Brief entry
 
 | Field | Value |
 |-------|-------|
 | Scale | major |
-| Status | built (M3) |
+| Status | built (M3; limit and disclosure M4) |
 | One-liner | Paste your assignment brief and an optional deadline. |
 | Short | The student pastes the brief text and can add a deadline. PDF import is out of scope. |
 | Marketing | Paste the brief as you got it. Add a deadline if you have one. |
-| Technical | `/` with no open assignment. Pasted text and a native `datetime-local` deadline that overrides the plan's. The only check is "not empty" (Error 01, no request). The draft is saved in `briefDraft` as the student types and survives reload, failure and Cancel. "Use a sample brief" fills the sample (kept for M3; removal before evaluation is an open question). |
+| Technical | `/` with no open assignment. Pasted text and a native `datetime-local` deadline that overrides the plan's. The only checks are "not empty" (Error 01, no request) and the 12,000-character limit (`maxLength`, with a quiet count within 10% of it). The draft is saved in `briefDraft` as the student types and survives reload, failure and Cancel. One caption line discloses that the brief is sent to OpenAI. "Use a sample brief" fills the sample text only (keeping it for M5 is an open question). |
 
 ### Plan building
 
 | Field | Value |
 |-------|-------|
 | Scale | major |
-| Status | built (M3: building state, errors, sample-only source); planned (M4: model generation) |
+| Status | built (M4: live model); live output checks pending, see docs/status.md |
 | One-liner | Turns the brief into a summary, requirements and steps. |
 | Short | One server-side model request returns structured plan data, which is validated before use. After that, navigating and editing never call the model again. |
 | Marketing | Momentum reads your brief and suggests steps, each with what “done” looks like. |
-| Technical | `PlanSource` interface (`src/lib/plan-source.tsx`). M3: `samplePlanSource` builds only the sample brief and answers `sampleOnly` otherwise (temporary notice). One indeterminate building state with Cancel (aborts the signal). Errors 02 (unreadable) and 03 (failed) share `ErrorCard` and keep the brief. M4: a server-side request with validated structured output behind the same interface; the API key never reaches the browser; copy must then say the brief is sent to an AI service. |
+| Technical | `apiPlanSource` (`src/lib/plan-source.tsx`) posts to `POST /api/plan` (`src/app/api/plan/route.ts`), which makes one OpenAI Responses API call with a strict zod schema (`src/lib/plan-schema.ts`) and the instructions in `src/lib/server/plan-prompt.ts`. The key is read only in `src/lib/server/openai.ts` (`server-only`). Server checks: zod request, 12,000 characters (413), in-memory rate limit (429), 45 s timeout (504), abort on Cancel. Post-processing: estimates to 5 min, 1–12 steps, substantive first, date-only deadlines kept, malformed ones dropped. 422 → Error 02; anything else → Error 03; the brief is always kept. One indeterminate building state with Cancel. |
 
 ### Plan review and editing
 
