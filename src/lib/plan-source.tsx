@@ -28,7 +28,8 @@ export const apiPlanSource: PlanSource = {
       const response = await fetch("/api/plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
+        // The local date goes too, so "due this Friday" counts from the student's day, not UTC's (H-05).
+        body: JSON.stringify({ ...input, today: localDate(new Date()) }),
         signal,
       });
       if (response.status === 200) {
@@ -43,6 +44,12 @@ export const apiPlanSource: PlanSource = {
     }
   },
 };
+
+// "YYYY-MM-DD" in the browser's time zone.
+export function localDate(now: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
 
 // Never resolves on its own; it settles as "failed" only when the signal aborts (Cancel).
 function waitForAbort(signal: AbortSignal): Promise<BuildResult> {

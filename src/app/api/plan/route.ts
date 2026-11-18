@@ -3,7 +3,7 @@ import { MAX_BRIEF_CHARS } from "@/lib/brief-limits";
 import { ModelPlanSchema, PlanRequestSchema, toPlanDraft } from "@/lib/plan-schema";
 import type { PlanDraft } from "@/lib/types";
 import { getOpenAIClient, MAX_OUTPUT_TOKENS, planModel } from "@/lib/server/openai";
-import { buildUserMessage, PLAN_INSTRUCTIONS } from "@/lib/server/plan-prompt";
+import { buildUserMessage, PLAN_INSTRUCTIONS, resolveToday } from "@/lib/server/plan-prompt";
 import { allowPlanRequest, clientIp } from "@/lib/server/rate-limit";
 
 // POST /api/plan: turns a pasted brief into a plan with one model request.
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       {
         model: planModel(),
         instructions: PLAN_INSTRUCTIONS,
-        input: buildUserMessage(brief, new Date()),
+        input: buildUserMessage(brief, resolveToday(input.data.today, new Date())),
         text: { format: zodTextFormat(ModelPlanSchema, "plan") },
         max_output_tokens: MAX_OUTPUT_TOKENS,
       },

@@ -1,15 +1,40 @@
 import { describe, expect, it } from "vitest";
-import { buildUserMessage, PLAN_INSTRUCTIONS } from "@/lib/server/plan-prompt";
+import { buildUserMessage, PLAN_INSTRUCTIONS, resolveToday } from "@/lib/server/plan-prompt";
 
 // These check the message's structure only. Whether the model actually ignores an injected
 // instruction is checked by hand against the live model (docs/evidence/generation-checks.md).
 
-const today = new Date("2026-11-18T12:00:00Z");
+const today = "2026-11-18";
+
+describe("resolveToday", () => {
+  // 01:00 UTC on Nov 19 is 8 PM on Nov 18 in New York: the case H-05 describes.
+  const usEvening = new Date("2026-11-19T01:00:00Z");
+
+  it("uses the browser's date when it's within a day of the server's UTC date", () => {
+    expect(resolveToday("2026-11-18", usEvening)).toBe("2026-11-18");
+    expect(resolveToday("2026-11-20", usEvening)).toBe("2026-11-20");
+    expect(resolveToday("2026-11-19", usEvening)).toBe("2026-11-19");
+  });
+
+  it("falls back to the server's UTC date when the browser sent none (as before M6)", () => {
+    expect(resolveToday(undefined, usEvening)).toBe("2026-11-19");
+  });
+
+  it("falls back to the server's UTC date when the browser's date is far off", () => {
+    expect(resolveToday("2026-11-17", usEvening)).toBe("2026-11-19");
+    expect(resolveToday("2027-11-19", usEvening)).toBe("2026-11-19");
+  });
+});
 
 describe("buildUserMessage", () => {
   it("puts today's date first and the brief inside the delimiters", () => {
     const message = buildUserMessage("Essay on bees.", today);
     expect(message).toBe("Today's date: Wednesday, 2026-11-18\n\n<brief>\nEssay on bees.\n</brief>");
+  });
+
+  it("names the weekday of the calendar date it's given", () => {
+    expect(buildUserMessage("x", "2026-11-19")).toContain("Today's date: Thursday, 2026-11-19");
+    expect(buildUserMessage("x", "2028-02-29")).toContain("Today's date: Tuesday, 2028-02-29");
   });
 
   it("keeps an injected instruction inside the delimiters", () => {

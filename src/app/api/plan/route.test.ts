@@ -75,6 +75,39 @@ describe("POST /api/plan: success", () => {
   });
 });
 
+describe("POST /api/plan: today's date (H-05)", () => {
+  // 8 PM on Nov 18 in New York is already Nov 19 in UTC.
+  let create: ReturnType<typeof useClient>;
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-19T01:00:00Z"));
+    create = useClient(async () => reply(modelPlan()));
+  });
+  afterEach(() => vi.useRealTimers());
+
+  async function toldToday(body: object) {
+    const response = await post({ brief: "Due this Friday.", ...body });
+    expect(response.status).toBe(200);
+    return (create.mock.calls[0][0] as { input: string }).input.split("\n")[0];
+  }
+
+  it("a valid browser date within a day is used", async () => {
+    expect(await toldToday({ today: "2026-11-18" })).toBe("Today's date: Wednesday, 2026-11-18");
+  });
+
+  it("a missing date falls back to the server's UTC date", async () => {
+    expect(await toldToday({})).toBe("Today's date: Thursday, 2026-11-19");
+  });
+
+  it("a far-off date falls back to the server's UTC date", async () => {
+    expect(await toldToday({ today: "2026-10-01" })).toBe("Today's date: Thursday, 2026-11-19");
+  });
+
+  it.each(["18/11/2026", "2026-02-30", "today", 20261118, null])("a malformed date (%s) falls back, and isn't a 400", async (today) => {
+    expect(await toldToday({ today })).toBe("Today's date: Thursday, 2026-11-19");
+  });
+});
+
 describe("POST /api/plan: unreadable (422, Error 02)", () => {
   it("a refusal", async () => {
     useClient(async () => ({ ...reply(""), output: [{ type: "message", content: [{ type: "refusal", refusal: "No." }] }] }));
