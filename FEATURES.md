@@ -2,7 +2,7 @@
 
 What Momentum does, feature by feature. [docs/product.md](docs/product.md) is the source of truth for scope: if this file and it disagree, product.md wins and this file gets fixed. What has been checked, and how, is in [docs/status.md](docs/status.md).
 
-**Status values used here.** `built`: in code on `feat/m2-core-loop`, not merged or deployed. `planned`: in the MVP, not in code yet. (This replaces /craft's "shipped", which means "in production"; nothing is deployed yet.)
+**Status values used here.** `built`: in code (M1–M2 merged to `main`; M3 on `feat/m3-plan-entry-and-review`), not deployed. `planned`: in the MVP, not in code yet. (This replaces /craft's "shipped", which means "in production"; nothing is deployed yet.)
 
 ## Summary
 Momentum helps a student turn a dense assignment brief into manageable steps, start working, and return after a pause without rebuilding their context. It holds one active assignment at a time and saves it in the student's browser. The student does the work in their own tools; Momentum never sees, checks or submits it. There are three areas: planning (brief to plan), working through steps, and finishing with a final requirements check. Saving honestly in the browser runs underneath all three.
@@ -10,7 +10,7 @@ Momentum helps a student turn a dense assignment brief into manageable steps, st
 ## Feature Map
 | Area | Major features | Supporting features | Status |
 |------|----------------|---------------------|--------|
-| Planning | Brief entry, Plan building, Plan review and editing | | planned |
+| Planning | Brief entry, Plan building, Plan review and editing | | built (sample source only; model generation planned for M4) |
 | Working through steps | Working step, Pause and return notes | Step completion and undo, Optional timer, Full plan and original brief | built |
 | Finishing | Final requirements check | Completed home and review | built |
 | Saving | Saved in this browser | | built |
@@ -19,40 +19,40 @@ Marketing rows are written for the portfolio case study; Momentum has no product
 
 ## Planning
 
-> **Area summary:** Gets a student from a pasted brief to a plan they trust: summary, requirements and steps with "Done when" criteria. Until M3, every plan is a copy of the sample assignment.
+> **Area summary:** Gets a student from a pasted brief to a plan they trust: summary, requirements and steps with "Done when" criteria. Until M4, only the sample brief can be turned into a plan.
 
 ### Brief entry
 
 | Field | Value |
 |-------|-------|
 | Scale | major |
-| Status | planned (M3) |
+| Status | built (M3) |
 | One-liner | Paste your assignment brief and an optional deadline. |
 | Short | The student pastes the brief text and can add a deadline. PDF import is out of scope. |
 | Marketing | Paste the brief as you got it. Add a deadline if you have one. |
-| Technical | Pasted text only. Validation and empty states follow the handoff. Input is preserved if anything fails. |
+| Technical | `/` with no open assignment. Pasted text and a native `datetime-local` deadline that overrides the plan's. The only check is "not empty" (Error 01, no request). The draft is saved in `briefDraft` as the student types and survives reload, failure and Cancel. "Use a sample brief" fills the sample (kept for M3; removal before evaluation is an open question). |
 
 ### Plan building
 
 | Field | Value |
 |-------|-------|
 | Scale | major |
-| Status | planned (M3 building state, M4 real generation) |
+| Status | built (M3: building state, errors, sample-only source); planned (M4: model generation) |
 | One-liner | Turns the brief into a summary, requirements and steps. |
 | Short | One server-side model request returns structured plan data, which is validated before use. After that, navigating and editing never call the model again. |
 | Marketing | Momentum reads your brief and suggests steps, each with what “done” looks like. |
-| Technical | Server-side request with a validated structured output; the API key never reaches the browser. One indeterminate loading state unless real stages can be observed. The brief is kept when generation fails. Copy must say the brief is sent to an AI service even though progress stays in the browser. |
+| Technical | `PlanSource` interface (`src/lib/plan-source.tsx`). M3: `samplePlanSource` builds only the sample brief and answers `sampleOnly` otherwise (temporary notice). One indeterminate building state with Cancel (aborts the signal). Errors 02 (unreadable) and 03 (failed) share `ErrorCard` and keep the brief. M4: a server-side request with validated structured output behind the same interface; the API key never reaches the browser; copy must then say the brief is sent to an AI service. |
 
 ### Plan review and editing
 
 | Field | Value |
 |-------|-------|
 | Scale | major |
-| Status | planned (M3) |
+| Status | built (M3) |
 | One-liner | Check and adjust steps, estimates and requirements before starting. |
 | Short | The student can edit, add and delete steps, change estimates and edit requirements. Editing requirements updates the final checklist and shows "Requirements updated" without silently rewriting steps. |
 | Marketing | It’s your plan. Change the steps, the estimates or the requirements before you begin. |
-| Technical | Plans have any number of steps; nothing assumes six. Requirement edits flow to `finalChecks` only. |
+| Technical | `/plan`, only while the assignment is in `review`. One edit card at a time; Start step 1 is `aria-disabled` while one is open. Estimates in steps of 5, minimum 5. New steps are added at the end on Done editing. Requirement edits replace the list the final check reads and never touch steps; a changed label clears its short label. No reordering and no editing after Start step 1. Plans have any number of steps; nothing assumes six. |
 
 ## Working through steps
 

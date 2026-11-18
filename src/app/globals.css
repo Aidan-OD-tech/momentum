@@ -73,6 +73,8 @@
   --container-complete-card: var(--size-complete-card);
   --container-dialog: var(--size-dialog);
   --container-side-panel: var(--size-side-panel);
+  --container-building: var(--size-building);
+  --container-error-card: var(--size-error-card);
 
   /* sm: at 600px and up, dialogs and the side panel stop being full width.
      wide: at 960px and up, the rail sits beside the main column instead of above it. */

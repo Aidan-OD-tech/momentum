@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-// The six icons from the handoff: 16px, 1.5 stroke. Drawn inline so there is no icon library.
+// The six icons from the handoff (plus AlertIcon, below): 16px, 1.5 stroke. Drawn inline so there is no icon library.
 // They are decorative (aria-hidden); put the meaning in nearby text.
 
 type IconProps = { className?: string };
@@ -70,6 +70,16 @@ export function SavedCheckIcon(props: IconProps) {
     <Icon {...props}>
       <circle cx="8" cy="8" r="6" />
       <path d="M5.5 8.2l1.7 1.7 3.3-3.4" />
+    </Icon>
+  );
+}
+
+// Not in the handoff's icon list: drawn in the Figma error frames (Error 01 to 03).
+export function AlertIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="8" cy="8" r="6" />
+      <path d="M8 5v3.5M8 11h.01" />
     </Icon>
   );
 }

@@ -49,6 +49,8 @@
   --size-complete-card: 560px; /* step-complete card */
   --size-dialog: 520px; /* pause dialog */
   --size-side-panel: 520px; /* Plan / Original brief panel */
+  --size-building: 480px; /* building your plan */
+  --size-error-card: 560px; /* Errors 02 and 03 */
   --size-checkbox: 20px;
   --size-logo: 20px; /* the square in the wordmark */
   --size-badge: 24px; /* numbered step badge in the plan */

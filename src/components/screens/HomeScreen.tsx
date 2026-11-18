@@ -26,9 +26,9 @@ export function HomeScreen() {
 
   const heading = completed ? "All steps done" : pausedN ? "Pick up where you left off" : "Your next step";
 
+  // Opens brief entry. The completed record stays in storage.
   function startNewAssignment() {
-    // M3: open brief entry instead. The completed record stays in storage either way.
-    act({ type: "startNewAssignment", newId: crypto.randomUUID() });
+    act({ type: "startNewAssignment" });
   }
 
   let body: React.ReactNode;

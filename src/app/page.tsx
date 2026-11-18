@@ -1,10 +1,10 @@
+import { HomeRoute } from "@/components/screens/HomeRoute";
 import { WhenLoaded } from "@/lib/momentum-store";
-import { HomeScreen } from "@/components/screens/HomeScreen";
 
 export default function HomePage() {
   return (
     <WhenLoaded>
-      <HomeScreen />
+      <HomeRoute />
     </WhenLoaded>
   );
 }

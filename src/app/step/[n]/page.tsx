@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { StepScreen } from "@/components/screens/StepScreen";
-import { WhenLoaded } from "@/lib/momentum-store";
+import { WhenStarted } from "@/lib/momentum-store";
 import { parseStepParam } from "@/lib/step-state";
 
 // A malformed step number (/step/abc, /step/03) is a real 404 here on the server.
@@ -9,8 +9,8 @@ export default async function StepPage({ params }: { params: Promise<{ n: string
   const n = parseStepParam((await params).n);
   if (n === null) notFound();
   return (
-    <WhenLoaded>
+    <WhenStarted>
       <StepScreen n={n} />
-    </WhenLoaded>
+    </WhenStarted>
   );
 }

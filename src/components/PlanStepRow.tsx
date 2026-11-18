@@ -1,4 +1,5 @@
 import { CheckIcon } from "@/components/icons";
+import { Button } from "@/components/ui/button";
 import { doneWhenSentence, formatMinutes } from "@/lib/format";
 import type { Step } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -8,10 +9,13 @@ type PlanStepRowProps = {
   step: Step;
   // Extra content under the row, e.g. the step's note in review.
   children?: React.ReactNode;
+  // Plan review only ("Show edit" on): an Edit button after the estimate. Its id lets focus return to it.
+  onEdit?: () => void;
+  editId?: string;
 };
 
-// One step in the full plan (Figma "Plan step row", without Edit; editing is M3).
-export function PlanStepRow({ number, step, children }: PlanStepRowProps) {
+// One step in the full plan (Figma "Plan step row"; Edit shows on plan review).
+export function PlanStepRow({ number, step, children, onEdit, editId }: PlanStepRowProps) {
   const done = step.status === "done";
   const current = step.status === "inProgress";
   return (
@@ -23,7 +27,14 @@ export function PlanStepRow({ number, step, children }: PlanStepRowProps) {
             <span className="sr-only">Step {number}: </span>
             {step.title}
           </p>
-          <p className="shrink-0 text-caption text-text-tertiary">about {formatMinutes(step.estimateMin)}</p>
+          <div className="flex shrink-0 items-baseline gap-4">
+            <p className="text-caption text-text-tertiary">about {formatMinutes(step.estimateMin)}</p>
+            {onEdit && (
+              <Button id={editId} variant="tertiary" aria-label={`Edit step ${number}`} onClick={onEdit}>
+                Edit
+              </Button>
+            )}
+          </div>
         </div>
         <p className="text-body text-text-secondary">{doneWhenSentence(step.doneWhen)}</p>
         {(done || current) && <p className="text-caption text-text-secondary">{done ? "Done" : "In progress"}</p>}

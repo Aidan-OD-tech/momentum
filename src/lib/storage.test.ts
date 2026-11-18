@@ -38,4 +38,20 @@ describe("storage", () => {
     expect(load(storage).ok).toBe(false);
     expect(storage.getItem(STORAGE_KEY)).toBe("{not json");
   });
+
+  it("loads data saved by M2 unchanged (no briefDraft, statuses active and completed)", () => {
+    const m2 = makeData();
+    const completed = { ...m2.assignments[0], id: "old", status: "completed" as const };
+    const data = { ...m2, assignments: [completed, ...m2.assignments] };
+    const storage = memoryStorage({ [STORAGE_KEY]: JSON.stringify(data) });
+    expect(load(storage)).toEqual({ data, ok: true });
+    expect(storage.getItem(UNREADABLE_KEY)).toBeNull();
+  });
+
+  it("keeps briefDraft through save and load", () => {
+    const storage = memoryStorage();
+    const data = { version: 1 as const, activeAssignmentId: null, assignments: [], briefDraft: { text: "My brief", deadline: "2026-12-04T17:00" } };
+    save(data, storage);
+    expect(load(storage).data).toEqual(data);
+  });
 });

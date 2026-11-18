@@ -1,10 +1,10 @@
-import { WhenLoaded } from "@/lib/momentum-store";
+import { WhenStarted } from "@/lib/momentum-store";
 import { ReviewScreen } from "@/components/screens/ReviewScreen";
 
 export default function ReviewPage() {
   return (
-    <WhenLoaded>
+    <WhenStarted>
       <ReviewScreen />
-    </WhenLoaded>
+    </WhenStarted>
   );
 }

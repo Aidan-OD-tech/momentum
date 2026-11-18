@@ -99,3 +99,73 @@ Known limit: once plans live in local storage, the server can't know how many st
 **Plan building and Plan review and editing stay separate features.** (Aidan, 2026-11-17) They are distinct screens with different failure modes, both landing in M3.
 
 **FEATURES.md Marketing rows are written for the portfolio case study.** (Aidan, 2026-11-17)
+
+## M3 (pre-build sign-offs, 2026-11-17)
+
+**Between-steps home heading stays "Your next step".** (Aidan) It is fixed, not rotated. "Pick up where you left off" is used only in the paused state.
+
+**One backup key, `momentum:v1:unreadable`.** (Aidan) A later unreadable load overwrites the earlier backup. No backup history.
+
+**/craft scope recommendations for M3–M4 accepted.** (Aidan) From [reviews/2026-11-17-scope-m3-m4.md](reviews/2026-11-17-scope-m3-m4.md):
+- Don't build: the staged building checklist (Setup 02), regenerate, reordering steps, editing the plan after step 1 has started, editing a requirement's kind in the UI, brief validation beyond the empty check, auto-retry.
+- Simplify: one native `datetime-local` deadline field; one `ErrorCard` component for Errors 02 and 03; Add a step appends at the end and opens the edit card straight away; the "Requirements updated" notice is plain text with no history.
+- Delete step: only inside the edit card, no confirmation dialog. Figma Setup 04 agrees: "Delete step" is a tertiary button beside Cancel and Done editing, and there is no dialog frame.
+- A new requirement's kind is `substantive`.
+
+**"Use a sample brief" stays in M3, against scope item 8.** (Aidan) It is drawn in Figma R3 05 and Error 01, and it's the only way to get a plan before M4. No other demo path. Open question: remove it before the evaluation sessions? Decide before M4.
+
+**Cost guard and `/craft risk` deferred to M4.** (Aidan) The M3 preview has no generation route, so nothing can spend API credit. M4 adds a maximum brief length checked on the server and a simple per-IP rate limit, and runs `/craft risk` before the first deploy that includes the route.
+
+**AI disclosure line (scope item 14) deferred to M4.** (Aidan) In M3 nothing is sent anywhere, so the line would be false.
+
+**Text area border contrast (1.48:1) stays as it is in M3.** (Aidan) Still scheduled for M6.
+
+## M3 (2026-11-17)
+
+### From Aidan's M3 prompt
+
+**Assignment status `review`, set by createPlan; Start step 1 sets `active`.** (Aidan) Only `review` can be edited. `/plan` redirects to `/` with no plan, or once the plan has started.
+
+**`briefDraft` at the top level of the data, still version 1.** (Aidan) Saved as the student types; survives reload, a failed build and Cancel; cleared only when a plan is created. Data saved by M2 loads unchanged (tested).
+
+**No first-run seeding; Start a new assignment opens brief entry.** (Aidan) The completed record stays in storage. `createSampleAssignment` stays for tests.
+
+**PlanSource with a sample-only implementation.** (Aidan) Other text gets the temporary sample-only notice, never Error 02. No fake delay. `?simulate=` works only when `NODE_ENV` is development (tested on the production build).
+
+**Deadline override.** (Aidan) A typed deadline becomes `assignment.deadline`; blank keeps the plan's. The due text and chip derive from it.
+
+**Step and requirement edit rules.** (Aidan) Estimates in steps of 5, minimum 5. A new step starts empty at 15 min. Title and Done when required. Delete is hidden on the last step. Editing a requirement edits its full label and clears its short label. The "Requirements updated" notice is kept in memory only.
+
+### Claude Code's choices
+
+All accepted by Aidan on 2026-11-18. The four defaults first (Add a step draft, notice only on change, screen-reader start reason, and the 480/560 width tokens with AlertIcon; Aidan confirmed the fourth was the tokens and icon), then the remaining six.
+
+**Add a step adds nothing until Done editing.** (Claude Code; accepted by Aidan, 2026-11-18) The new step's card is a draft; Cancel leaves the plan unchanged, so an empty step can never be saved. `addStep` receives the finished step.
+
+**The notice shows only when the requirements actually changed.** (Claude Code; accepted by Aidan, 2026-11-18) Done with no change closes the card without "Requirements updated", which would otherwise be untrue.
+
+**While an edit card is open, all edit triggers are hidden** (Claude Code; accepted by Aidan, 2026-11-18) (row Edit links, requirements Edit, Add a step), so only one edit can be open. Setup 04 and 05 hide the row Edit links but still show Add a step and the requirements Edit.
+
+**"Finish editing to start." is screen-reader text only** (Claude Code; accepted by Aidan, 2026-11-18), linked to Start step 1 by `aria-describedby`. The frames show only a greyed button. Start step 1 uses `aria-disabled` so it stays focusable; the stepper's − does the same at 5 so focus isn't lost.
+
+**Focus after edits:** (Claude Code; accepted by Aidan, 2026-11-18) Done or Cancel returns focus to that step's Edit; adding a step focuses its new Edit; Cancel on a new step returns to Add a step; Delete moves focus to the "Suggested steps" heading; removing an item or requirement focuses the next field or the Add button.
+
+**Simulated `slow` never resolves on its own** (Claude Code; accepted by Aidan, 2026-11-18); Cancel settles it. `failed` and `unreadable` resolve at once.
+
+**A source that throws counts as `failed`** (Claude Code; accepted by Aidan, 2026-11-18) (Error 03).
+
+**New width tokens** (Claude Code; accepted by Aidan, 2026-11-18) `--size-building` (480) and `--size-error-card` (560) from the handoff's layout list, rather than reusing the step-complete width for the error card.
+
+**`AlertIcon`** (Claude Code; accepted by Aidan, 2026-11-18) (circle with an exclamation mark), drawn from the error frames; it isn't in the handoff's icon list.
+
+**`TextInput`, `TextArea`, `FieldError` primitives.** (Claude Code; accepted by Aidan, 2026-11-18) The pause dialog's text area is unchanged (not refactored onto `TextArea` in this milestone).
+
+**The draft saves 400 ms after typing pauses** (Claude Code; accepted by Aidan, 2026-11-18), and immediately on Break it down.
+
+### Settled by Aidan (2026-11-18)
+
+**Dated submission requirement vs a deadline override: leave the requirement text as it is in M3.** (Aidan) With an override, "Submit through Turnitin by Fri, Dec 4, 5:00 PM" can sit beside "Due Fri, Dec 11". No regex rewriting of the sample's text: M4's extraction will take dates from whatever brief is pasted.
+
+**Chip copy gap: leave `shortLabel ?? label` for M3.** (Aidan) Figma R3 03's short forms ("Clear position on the assigned question", "Submit via Turnitin") are not copied in. M4's prompt will generate matching `label` and `shortLabel` values.
+
+**"Use a sample brief" stays for M3.** (Aidan) Revisit right after M4's live AI route is verified: keep it as an optional helper, or hide it during the M5 evaluation sessions.

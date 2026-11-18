@@ -1,6 +1,6 @@
 import { act, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MomentumProvider, useMomentum, WhenLoaded } from "@/lib/momentum-store";
+import { MomentumProvider, useMomentum, useMomentumData, WhenLoaded } from "@/lib/momentum-store";
 import { STORAGE_KEY } from "@/lib/storage";
 import { makeData } from "@/test/fixtures";
 
@@ -13,6 +13,11 @@ function Probe() {
       <button onClick={() => apply({ type: "openStep", n: 1 })}>open</button>
     </>
   );
+}
+
+function EmptyProbe() {
+  const { assignment, saveStatus } = useMomentumData();
+  return <p>assignment: {assignment ? assignment.id : "none"}, status: {saveStatus}</p>;
 }
 
 const renderStore = () =>
@@ -30,10 +35,16 @@ afterEach(() => {
 });
 
 describe("MomentumProvider", () => {
-  it("seeds the sample plan on first run and reports saved after a successful write", () => {
-    renderStore();
-    expect(screen.getByText("status: saved")).toBeInTheDocument();
-    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).assignments).toHaveLength(1);
+  it("starts empty on first run and writes nothing until something changes", () => {
+    render(
+      <MomentumProvider>
+        <WhenLoaded>
+          <EmptyProbe />
+        </WhenLoaded>
+      </MomentumProvider>,
+    );
+    expect(screen.getByText("assignment: none, status: hidden")).toBeInTheDocument();
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
   });
 
   it("stays hidden on a return visit until something is written", () => {
@@ -45,11 +56,11 @@ describe("MomentumProvider", () => {
   });
 
   it("when setItem fails: shows failed and keeps working in memory", () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(makeData()));
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
       throw new DOMException("full", "QuotaExceededError");
     });
     renderStore();
-    expect(screen.getByText("status: failed")).toBeInTheDocument();
     act(() => screen.getByRole("button", { name: "open" }).click());
     expect(screen.getByText("step 1: inProgress")).toBeInTheDocument();
     expect(screen.getByText("status: failed")).toBeInTheDocument();
