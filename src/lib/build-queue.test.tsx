@@ -6,6 +6,7 @@ import { MomentumProvider, useMomentumData, WhenLoaded } from "@/lib/momentum-st
 import type { BuildResult, PlanSource } from "@/lib/plan-source";
 import { STORAGE_KEY } from "@/lib/storage";
 import type { MomentumData } from "@/lib/types";
+import { makeAssignment } from "@/test/fixtures";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -43,6 +44,14 @@ function storeDrafts() {
 }
 
 const stored = (): MomentumData => JSON.parse(localStorage.getItem(STORAGE_KEY)!);
+
+// What the browser does in this tab after another tab's setItem.
+function otherTabWrites(value: string) {
+  localStorage.setItem(STORAGE_KEY, value);
+  act(() => {
+    window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY, newValue: value }));
+  });
+}
 
 function Probe({ source }: { source: PlanSource }) {
   const queue = useBuildQueue();
@@ -179,6 +188,31 @@ describe("build queue", () => {
     vi.restoreAllMocks();
     expect(stored().assignments).toHaveLength(0);
     expect(stored().briefDrafts).toHaveLength(3);
+  });
+
+  it("skips a brief another tab has already built (risk 5a)", async () => {
+    const { source, calls } = controlledSource();
+    renderQueue(source);
+    click("start");
+    // Meanwhile another tab builds brief 2: its draft goes and a plan with its text is stored.
+    const other = stored();
+    other.briefDrafts = other.briefDrafts!.filter((d) => d.id !== "d2");
+    other.assignments.push({ ...makeAssignment("other", 1), status: "review", brief: "Brief text 2" });
+    otherTabWrites(JSON.stringify(other));
+    await calls[0].answer(plan("Plan one"));
+    expect(items()).toBe("items: 1:ready:Plan one 2:elsewhere 3:building");
+    expect(calls.map((c) => c.brief)).toEqual(["Brief text 1", "Brief text 3"]);
+  });
+
+  it("still builds a brief whose draft another tab removed without building it", async () => {
+    const { source, calls } = controlledSource();
+    renderQueue(source);
+    click("start");
+    const other = stored();
+    other.briefDrafts = other.briefDrafts!.filter((d) => d.id !== "d2");
+    otherTabWrites(JSON.stringify(other));
+    await calls[0].answer(plan("Plan one"));
+    expect(calls.map((c) => c.brief)).toEqual(["Brief text 1", "Brief text 2"]);
   });
 
   it("unmounting the provider aborts the request that is out", () => {

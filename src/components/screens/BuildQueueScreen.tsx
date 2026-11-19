@@ -18,6 +18,9 @@ export function queueRowText(item: QueueItem, running: boolean): string {
     case "notSaved":
       // The write failed, so the plan is only in this visit's memory (wording approved by Aidan, M7c review).
       return `${item.title} · built, but couldn’t be saved in this browser. It’s gone if you reload.`;
+    case "elsewhere":
+      // Wording approved by Aidan (M7c risk review).
+      return `Brief ${item.number} · built in another tab`;
     case "building":
       return `Brief ${item.number} · building the plan`;
     case "waiting":
@@ -30,7 +33,7 @@ export function queueRowText(item: QueueItem, running: boolean): string {
 
 function RowIcon({ item }: { item: QueueItem }) {
   if (item.state === "building") return <Spinner />;
-  if (item.state === "ready") return <CheckIcon className="shrink-0" />;
+  if (item.state === "ready" || item.state === "elsewhere") return <CheckIcon className="shrink-0" />;
   if (item.state === "waiting") return <ClockIcon className="shrink-0 text-text-tertiary" />;
   return <AlertIcon className="shrink-0" />;
 }

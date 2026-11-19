@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { readBriefDrafts } from "@/lib/brief-drafts";
 import { useMomentumStoreOrNull } from "@/lib/momentum-store";
 import type { BuildResult, PlanSource } from "@/lib/plan-source";
 
@@ -11,7 +12,8 @@ import type { BuildResult, PlanSource } from "@/lib/plan-source";
 
 // waiting: not sent yet. building: the request is out. ready: built and saved. notSaved: built, but the
 // write failed, so the plan is only in memory this visit (never called "ready"). failed: not built.
-export type QueueItemState = "waiting" | "building" | "ready" | "notSaved" | "failed";
+// elsewhere: another tab built it first, so it was skipped.
+export type QueueItemState = "waiting" | "building" | "ready" | "notSaved" | "failed" | "elsewhere";
 
 export type QueueItem = {
   draftId: string;
@@ -104,6 +106,15 @@ export function BuildQueueProvider({ children }: { children: React.ReactNode }) 
     while (!stopRef.current) {
       const next = itemsRef.current.filter((item) => item.state === "waiting").sort((a, b) => a.turn - b.turn)[0];
       if (!next) break;
+      // Another tab may have built this brief already (M7c risk review, finding 5a): its draft is gone and a
+      // plan from the same text is stored. Skip it rather than build it twice. A draft removed in another
+      // tab without a plan is still built, since nothing says it was meant to go.
+      const data = storeRef.current?.data;
+      const draftGone = data && !readBriefDrafts(data).some((draft) => draft.id === next.draftId);
+      if (draftGone && data.assignments.some((assignment) => assignment.brief === next.brief)) {
+        update(next.draftId, { state: "elsewhere" });
+        continue;
+      }
       update(next.draftId, { state: "building" });
       let result: BuildResult;
       try {
