@@ -89,7 +89,13 @@ export function MomentumProvider({ children }: { children: React.ReactNode }) {
         setSaveStatus("failed");
         return;
       }
-      const next = result.data ?? EMPTY_DATA;
+      const incoming = result.data ?? EMPTY_DATA;
+      // Two tabs can be open on different assignments. Keep this tab's open one while it still exists,
+      // so this tab doesn't jump to the other tab's assignment. Writes are unchanged, so after a reload
+      // whichever tab wrote last decides which assignment is open (docs/decisions.md, M7b).
+      const mine = dataRef.current?.activeAssignmentId;
+      const keepMine = Boolean(mine) && incoming.assignments.some((assignment) => assignment.id === mine);
+      const next = keepMine ? { ...incoming, activeAssignmentId: mine! } : incoming;
       dataRef.current = next;
       setData(next);
     }
