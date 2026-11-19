@@ -77,16 +77,16 @@ export function HomeListScreen() {
           </p>
         )}
 
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <h1 ref={headingRef} tabIndex={-1} className="text-display text-text-primary focus-visible:shadow-none">
               Your assignments
             </h1>
-            <p className="text-body text-text-secondary">
-              Soonest deadline first. Time left adds up the estimates for steps you haven’t finished, so it’s approximate.
-            </p>
+            {addAssignments("secondary")}
           </div>
-          {addAssignments("secondary")}
+          <p className="text-body text-text-secondary">
+            Soonest deadline first. Time left adds up the estimates for steps you haven’t finished, so it’s approximate.
+          </p>
         </div>
 
         {upNext ? (
