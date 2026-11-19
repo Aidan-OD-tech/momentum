@@ -33,3 +33,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Aidan's local case-study draft (kept out of the repo)
+docs/case-study-draft.md
