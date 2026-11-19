@@ -67,7 +67,7 @@ export type BriefDraft = { text: string; deadline: string };
 
 export type MomentumData = {
   version: 1;
-  // null means no assignment is open: "/" shows brief entry.
+  // null means no assignment is open (first run, before any plan exists).
   activeAssignmentId: string | null;
   assignments: Assignment[];
   // Added in M3. Optional, so data saved by M2 still loads as version 1.
