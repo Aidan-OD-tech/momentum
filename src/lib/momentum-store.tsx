@@ -14,11 +14,15 @@ type MomentumStore = {
   saveStatus: SaveStatus;
   // True only right after a confirmed Finish for now. Kept in memory, so a reload clears it.
   progressSaved: boolean;
+  // The assignment whose review was just finished (confirmed write), for the home list's one-time line.
+  // In memory like progressSaved: a reload or the next change clears it. Never stored.
+  justFinishedId: string | null;
   // Applies an action and writes the result. Returns true when the write succeeded.
   act: (action: Action) => boolean;
   // Writes the current data again (used by Finish for now on step complete). Returns true on success.
   saveNow: () => boolean;
   markProgressSaved: () => void;
+  markJustFinished: (id: string) => void;
 };
 
 const MomentumContext = createContext<MomentumStore | null>(null);
@@ -47,6 +51,7 @@ export function MomentumProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<MomentumData | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("hidden");
   const [progressSaved, setProgressSaved] = useState(false);
+  const [justFinishedId, setJustFinishedId] = useState<string | null>(null);
   // The latest data, readable synchronously by act() between renders.
   const dataRef = useRef<MomentumData | null>(null);
   // False when storage couldn't be read or backed up: work in memory and never write this session.
@@ -84,7 +89,13 @@ export function MomentumProvider({ children }: { children: React.ReactNode }) {
         setSaveStatus("failed");
         return;
       }
-      const next = result.data ?? EMPTY_DATA;
+      const incoming = result.data ?? EMPTY_DATA;
+      // Two tabs can be open on different assignments. Keep this tab's open one while it still exists,
+      // so this tab doesn't jump to the other tab's assignment. Writes are unchanged, so after a reload
+      // whichever tab wrote last decides which assignment is open (docs/decisions.md, M7b).
+      const mine = dataRef.current?.activeAssignmentId;
+      const keepMine = Boolean(mine) && incoming.assignments.some((assignment) => assignment.id === mine);
+      const next = keepMine ? { ...incoming, activeAssignmentId: mine! } : incoming;
       dataRef.current = next;
       setData(next);
     }
@@ -100,6 +111,7 @@ export function MomentumProvider({ children }: { children: React.ReactNode }) {
       // Nothing changed (e.g. reopening a step that is already in progress): no write, and "Progress saved" stays.
       if (next === current) return canWrite.current;
       setProgressSaved(false);
+      setJustFinishedId(null);
       dataRef.current = next;
       setData(next);
       return write(next);
@@ -109,9 +121,12 @@ export function MomentumProvider({ children }: { children: React.ReactNode }) {
 
   const saveNow = useCallback(() => (dataRef.current ? write(dataRef.current) : false), [write]);
   const markProgressSaved = useCallback(() => setProgressSaved(true), []);
+  const markJustFinished = useCallback((id: string) => setJustFinishedId(id), []);
 
   const assignment = data ? getActiveAssignment(data) : undefined;
-  const store = data ? { data, assignment, saveStatus, progressSaved, act, saveNow, markProgressSaved } : null;
+  const store = data
+    ? { data, assignment, saveStatus, progressSaved, justFinishedId, act, saveNow, markProgressSaved, markJustFinished }
+    : null;
 
   // Children always render, so the server still renders each page (and a page that calls notFound()
   // gets a real 404). Screens wait for the data inside <WhenLoaded>.
@@ -138,7 +153,7 @@ function Loading() {
 }
 
 // For the screens of a started plan (/step/n, /step/n/done, /final, /review). With no open assignment,
-// or a plan still in review, it sends the browser to "/", which shows brief entry or plan review.
+// or a plan still in review, it sends the browser to "/", which shows brief entry or the home list.
 export function WhenStarted({ children }: { children: React.ReactNode }) {
   const store = useContext(MomentumContext);
   const started = Boolean(store?.assignment && store.assignment.status !== "review");

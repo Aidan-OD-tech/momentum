@@ -13,7 +13,6 @@ export type Action =
   | { type: "setNoteHidden"; n: number; hidden: boolean }
   | { type: "toggleFinalCheck"; requirementId: string }
   | { type: "finishReview"; at: string }
-  | { type: "startNewAssignment" }
   // Several assignments (M7).
   | { type: "openAssignment"; id: string }
   // Brief entry and plan review (M3).
@@ -50,10 +49,6 @@ function replaceStep(assignment: Assignment, n: number, next: Step): Assignment 
 export function reducer(data: MomentumData, action: Action): MomentumData {
   const assignment = getActiveAssignment(data);
 
-  if (action.type === "startNewAssignment") {
-    // No open assignment means "/" shows brief entry. The completed record stays in `assignments`.
-    return { ...data, activeAssignmentId: null };
-  }
   if (action.type === "openAssignment") {
     // Only changes which assignment is open, never the assignments themselves.
     const exists = data.assignments.some((a) => a.id === action.id);

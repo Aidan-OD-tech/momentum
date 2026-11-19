@@ -1,10 +1,12 @@
 import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { BriefFlow } from "@/components/screens/BriefFlow";
 import { HomeRoute } from "@/components/screens/HomeRoute";
 import { sampleAssignment } from "@/data/sample-assignment";
 import { BRIEF_COUNT_FROM, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
 import { apiPlanSource, type BuildResult, type PlanSource } from "@/lib/plan-source";
 import { STORAGE_KEY } from "@/lib/storage";
+import { makeAssignment } from "@/test/fixtures";
 import { router } from "@/test/navigation-mock";
 import { renderApp } from "@/test/render-app";
 
@@ -153,7 +155,7 @@ describe("brief entry", () => {
     type(sampleAssignment.brief);
     fireEvent.change(screen.getByLabelText(/Deadline/), { target: { value: "2026-12-10T09:30" } });
     breakItDown();
-    await waitFor(() => expect(router.replace).toHaveBeenCalledWith("/plan"));
+    await waitFor(() => expect(router.push).toHaveBeenCalledWith("/plan"));
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
     expect(stored.briefDraft).toBeUndefined();
     expect(stored.assignments[0]).toMatchObject({ status: "review", deadline: "2026-12-10T09:30" });
@@ -228,5 +230,38 @@ describe("building and errors", () => {
     type("A brief");
     breakItDown();
     expect(await screen.findByRole("heading", { name: "We couldn’t build your plan just now." })).toBeInTheDocument();
+  });
+});
+
+describe("/new (brief entry when assignments exist)", () => {
+  const withAssignments = () =>
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, activeAssignmentId: "a1", assignments: [makeAssignment("a1", 3)] }));
+
+  it("shows no back link on first run", () => {
+    renderApp(<BriefFlow />);
+    expect(screen.queryByRole("link", { name: "Back to your assignments" })).not.toBeInTheDocument();
+  });
+
+  it("shows Back to your assignments, which goes to / and keeps the draft typed just before", () => {
+    withAssignments();
+    renderApp(<BriefFlow />);
+    const back = screen.getByRole("link", { name: "Back to your assignments" });
+    expect(back).toHaveAttribute("href", "/");
+    // Typed and left at once, before the delayed draft save would run.
+    type("Half a brief");
+    fireEvent.change(screen.getByLabelText(/Deadline/), { target: { value: "2026-12-10T09:30" } });
+    fireEvent.click(back);
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).briefDraft).toEqual({ text: "Half a brief", deadline: "2026-12-10T09:30" });
+  });
+
+  it("a built plan is added next to the others and goes to /plan", async () => {
+    withAssignments();
+    renderApp(<BriefFlow />);
+    type(sampleAssignment.brief);
+    breakItDown();
+    await waitFor(() => expect(router.push).toHaveBeenCalledWith("/plan"));
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
+    expect(stored.assignments).toHaveLength(2);
+    expect(stored.activeAssignmentId).toBe(stored.assignments[1].id);
   });
 });

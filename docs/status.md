@@ -12,8 +12,8 @@ Legend: **planned** (not started), **implemented** (written, not independently c
 | M4 | AI generation (server-side, structured output) | verified and merged (PR #4) |
 | M5 | Evaluation readiness: sample-brief flag, one tracked event, heuristic and accessibility review, session templates | verified and merged (PR #5); sessions and VoiceOver pending (Aidan) |
 | M6 | Fixes from evaluation | verified and merged (PR #6); VoiceOver pending |
-| M7a | Several assignments: data and ordering (logic only) | implemented and **verified** on branch `feat/m7a-multi-assignment-model` (see M7a); not pushed |
-| M7b | Several assignments: prioritized home list | planned |
+| M7a | Several assignments: data and ordering (logic only) | implemented and **verified** on branch `feat/m7a-multi-assignment-model` (PR #7) |
+| M7b | Several assignments: prioritized home list | implemented and **verified** on branch `feat/m7b-home-list` (see M7b); not pushed |
 | M7c | Several assignments: upload a week's briefs in one go | planned |
 | M7d | Several assignments: see Aidan's M7 plan (not in this repo) | planned |
 | — | Docs and case study (was the M7 row; where it goes now is for Aidan to confirm) | planned |
@@ -331,4 +331,37 @@ Several assignments, step 1: data and ordering only. No screen, route, CSS or `/
 
 ### Known limitations
 
-- Two tabs on different assignments switch each other, because the open assignment is one shared value (for M7b).
+- Two tabs on different assignments switch each other, because the open assignment is one shared value (fixed in M7b).
+
+## M7b
+
+The prioritized home list. Branched from `feat/m7a-multi-assignment-model` (PR #7 not merged when this started). No `/api/plan`, rate-limit or storage-version change. Decisions: [decisions.md](decisions.md), "M7b".
+
+### Built
+
+- "/" shows brief entry on first run, otherwise `HomeListScreen`: optional "Progress saved" or the one-time completion line, h1 "Your assignments" with "Add assignments", Up next (`UpNextCard`), After that, No deadline (rows: `AssignmentRow`), and a collapsed Finished group.
+- `/new`: brief entry with "Back to your assignments" when assignments exist.
+- `src/lib/home-list.ts`: status lines and where each row's button goes. `hasDeadline` and `deadlinePassed` in `priority.ts`; `assignmentMeta(…, passed)` and `formatDay` in `format.ts`.
+- Two-tab fix in `MomentumProvider`'s storage handler.
+- Removed: `HomeScreen` (replaced by `UpNextCard`) and the `startNewAssignment` action.
+
+### Verified (2026-11-18, Node 24.21.0)
+
+| Check | Result |
+| --- | --- |
+| `npm test` | **319 passed** (283 before; +36: home list screen 21, home-list lib 7, `/new` 3, priority 2, format 2, two tabs 2; −1 `startNewAssignment`). The two-tab test fails without the fix |
+| `npm run lint`, `npx tsc --noEmit`, `npm run build` | clean; `/new` is a static route |
+| Browser on `npm run dev` (Chrome via Playwright; `/api/plan` and `/api/event` answered by the script; mixed fixture `mixedHomeList()`) | 17/17 checks: h1 focused; h2 order; list order; no horizontal scroll at 600 px; empty list; first run with no back link; back link keeps a just-typed draft and `/new` restores it; row Open, Up next Resume and Review plan each open their own assignment; completion line after Finish review and gone after reload; two tabs stay on their own assignments. No console errors. `evidence/test-results/m7b-browser.json` |
+| axe (axe-core 4.10) on "/" | **0 violations**: mixed list at 1280 (Finished collapsed and open), at 600, empty list, first run |
+| Keyboard (Tab from the focused h1, mixed list) | Add assignments → Resume step 2 → View full plan → Review plan Problem set 6 → Open Reading response → Open Urban green spaces essay → Open Portfolio reflection → Finished (2) · kept in this browser. Enter and Space toggle Finished (unit test with user-event) |
+| Screenshots | `evidence/screenshots/m7b/`: list at 1280×800 and 600×800, Finished open, empty list, first run, `/new` with the back link, list after Finish review (the Next.js dev indicator shows bottom left; it isn't part of the app) |
+
+### Not verified
+
+- VoiceOver, and the Figma frame itself (no Figma access in this session; built from the prompt).
+- The production build in a browser (the browser checks ran on `npm run dev`).
+
+### Known limitations
+
+- After a reload, whichever tab wrote last decides which assignment opens.
+

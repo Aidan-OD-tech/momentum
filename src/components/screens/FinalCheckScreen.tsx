@@ -16,7 +16,7 @@ import { useRedirect } from "@/lib/use-redirect";
 
 // /final: the final requirements check (R3 01). Only while every step is done and the review isn't finished.
 export function FinalCheckScreen() {
-  const { assignment, saveStatus, act } = useMomentum();
+  const { assignment, saveStatus, act, markJustFinished } = useMomentum();
   const { openPanel } = usePanel();
   const router = useRouter();
   const headingRef = useFocusHeading<HTMLHeadingElement>();
@@ -34,7 +34,8 @@ export function FinalCheckScreen() {
 
   function finishReview() {
     setLeaving(true);
-    act({ type: "finishReview", at: new Date().toISOString() });
+    // The home list's completion line says the plan is kept, so it shows only after a confirmed write.
+    if (act({ type: "finishReview", at: new Date().toISOString() })) markJustFinished(assignment.id);
     router.push("/");
   }
 

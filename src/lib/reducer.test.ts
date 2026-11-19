@@ -129,14 +129,6 @@ describe("final checks and new assignments", () => {
     expect(active(data).finalChecks).toEqual({ r1: true, r2: true });
     expect(active(reducer(data, { type: "toggleFinalCheck", requirementId: "r1" })).finalChecks.r1).toBe(false);
   });
-
-  it("startNewAssignment keeps the completed record and leads to brief entry", () => {
-    const done = run(makeData(2), { type: "completeStep", n: 1 }, { type: "completeStep", n: 2 }, { type: "finishReview", at: AT });
-    const data = reducer(done, { type: "startNewAssignment" });
-    expect(data.assignments.map((a) => [a.id, a.status])).toEqual([["a1", "completed"]]);
-    // No open assignment: "/" shows brief entry.
-    expect(data.activeAssignmentId).toBeNull();
-  });
 });
 
 describe("several assignments (M7)", () => {

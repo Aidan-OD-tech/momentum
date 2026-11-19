@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  assignmentMeta,
   capitalizeFirst,
+  formatDay,
   doneWhenSentence,
   formatCountdown,
   formatDeadline,
@@ -79,5 +81,17 @@ describe("other formatters", () => {
   it("withFullStop adds a full stop only when missing", () => {
     expect(withFullStop("Submit by Friday")).toBe("Submit by Friday.");
     expect(withFullStop("Done.")).toBe("Done.");
+  });
+
+  it("assignmentMeta says Due date passed, neutrally, when asked", () => {
+    const assignment = { course: "CHEM 2010", deadline: "2026-11-16T17:00" };
+    expect(assignmentMeta(assignment)).toBe("CHEM 2010 · Due Mon, Nov 16, 5:00 PM");
+    expect(assignmentMeta(assignment, true)).toBe("CHEM 2010 · Due date passed · Mon, Nov 16, 5:00 PM");
+    expect(assignmentMeta({ deadline: "2026-11-16" }, true)).toBe("Due date passed · Mon, Nov 16");
+    expect(assignmentMeta({ course: "DES 2100" }, true)).toBe("DES 2100");
+  });
+
+  it("formatDay gives the local day", () => {
+    expect(formatDay(new Date(2026, 10, 10, 15, 0).toISOString())).toBe("Nov 10");
   });
 });

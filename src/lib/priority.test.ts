@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { currentAssignments, finishedAssignments, remainingMinutes } from "@/lib/priority";
+import { currentAssignments, deadlinePassed, finishedAssignments, hasDeadline, remainingMinutes } from "@/lib/priority";
 import type { Assignment, StepStatus } from "@/lib/types";
 import { makeAssignment } from "@/test/fixtures";
 
@@ -149,5 +149,24 @@ describe("current and finished", () => {
   it("both are empty for an empty list", () => {
     expect(currentAssignments([])).toEqual([]);
     expect(finishedAssignments([])).toEqual([]);
+  });
+});
+
+describe("hasDeadline and deadlinePassed (home list groups and meta)", () => {
+  const now = new Date(2026, 10, 18, 12, 0);
+  const due = (deadline?: string) => makeAssignment("a", 1, { deadline });
+
+  it("an invalid or missing deadline counts as none", () => {
+    expect(hasDeadline(due("2026-11-20T09:00"))).toBe(true);
+    expect(hasDeadline(due(undefined))).toBe(false);
+    expect(hasDeadline(due("2026-02-30"))).toBe(false);
+  });
+
+  it("passed only once the deadline is before now; a date-only deadline lasts all day", () => {
+    expect(deadlinePassed(due("2026-11-18T11:59"), now)).toBe(true);
+    expect(deadlinePassed(due("2026-11-18T12:30"), now)).toBe(false);
+    expect(deadlinePassed(due("2026-11-18"), now)).toBe(false);
+    expect(deadlinePassed(due("2026-11-17"), now)).toBe(true);
+    expect(deadlinePassed(due(undefined), now)).toBe(false);
   });
 });

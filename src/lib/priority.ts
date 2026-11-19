@@ -18,6 +18,17 @@ function deadlineTime(assignment: Assignment): number | null {
   return new Date(parts.year, parts.month - 1, parts.day, hour, minute).getTime();
 }
 
+// True when the assignment has a valid deadline. Without one, it goes in the home list's "No deadline" group.
+export function hasDeadline(assignment: Assignment): boolean {
+  return deadlineTime(assignment) !== null;
+}
+
+// True when the deadline is before `now`. The home list says "Due date passed", with no warning.
+export function deadlinePassed(assignment: Assignment, now: Date): boolean {
+  const due = deadlineTime(assignment);
+  return due !== null && due < now.getTime();
+}
+
 // Negative when a comes first. 0 keeps the array order (Array.prototype.sort is stable).
 function compareCurrent(a: Assignment, b: Assignment): number {
   const [aDue, bDue] = [deadlineTime(a), deadlineTime(b)];

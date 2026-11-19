@@ -2,7 +2,8 @@ import { act, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MomentumProvider, useMomentum, useMomentumData, WhenLoaded } from "@/lib/momentum-store";
 import { STORAGE_KEY } from "@/lib/storage";
-import { makeData } from "@/test/fixtures";
+import type { MomentumData } from "@/lib/types";
+import { makeAssignment, makeData } from "@/test/fixtures";
 
 function Probe() {
   const { saveStatus, assignment, act: apply } = useMomentum();
@@ -106,6 +107,62 @@ describe("MomentumProvider", () => {
       otherTabWrites(withNote("Written in tab A"));
       act(() => screen.getByRole("button", { name: "complete" }).click());
       expect(storedStep1()).toMatchObject({ status: "done", note: "Written in tab A" });
+    });
+
+    describe("open on different assignments (M7b)", () => {
+      // Two assignments of 1 and 3 steps, with `open` as the open one.
+      function twoAssignments(open: string): MomentumData {
+        return { version: 1, activeAssignmentId: open, assignments: [makeAssignment("a1", 1), makeAssignment("a2", 3)] };
+      }
+
+      function OpenProbe() {
+        const { assignment, act: apply } = useMomentumData();
+        return (
+          <>
+            <p>open: {assignment?.id ?? "none"}</p>
+            <button onClick={() => apply({ type: "openStep", n: 1 })}>open step 1</button>
+          </>
+        );
+      }
+
+      // This tab is on a1. The other tab (simulated by its writes) is on a2 and opens its step 1.
+      function setUp() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(twoAssignments("a1")));
+        render(
+          <MomentumProvider>
+            <WhenLoaded>
+              <OpenProbe />
+            </WhenLoaded>
+          </MomentumProvider>,
+        );
+        const otherTab = twoAssignments("a2");
+        otherTab.assignments[1].steps[0].status = "inProgress";
+        otherTabWrites(JSON.stringify(otherTab));
+      }
+
+      it("keeps this tab's open assignment and takes the other tab's changes", () => {
+        setUp();
+        expect(screen.getByText("open: a1")).toBeInTheDocument();
+        // This tab's next write keeps the other tab's progress on a2.
+        act(() => screen.getByRole("button", { name: "open step 1" }).click());
+        const stored: MomentumData = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
+        expect(stored.activeAssignmentId).toBe("a1");
+        expect(stored.assignments.map((a) => a.steps[0].status)).toEqual(["inProgress", "inProgress"]);
+      });
+
+      it("takes the other tab's open assignment when this tab's one no longer exists", () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(twoAssignments("a1")));
+        render(
+          <MomentumProvider>
+            <WhenLoaded>
+              <OpenProbe />
+            </WhenLoaded>
+          </MomentumProvider>,
+        );
+        const otherTab: MomentumData = { version: 1, activeAssignmentId: "a2", assignments: [makeAssignment("a2", 3)] };
+        otherTabWrites(JSON.stringify(otherTab));
+        expect(screen.getByText("open: a2")).toBeInTheDocument();
+      });
     });
 
     it("ignores other keys", () => {
