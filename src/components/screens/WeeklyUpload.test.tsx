@@ -256,10 +256,11 @@ describe("building several plans", () => {
     fireEvent.click(submitButton());
     await calls[0].answer({ ok: false, reason: "unreadable" });
     expect(inRows("Brief 1 · couldn’t find clear requirements")).toBeInTheDocument();
-    expect(screen.getByText("Your brief is kept. Edit it and try again.")).toBeInTheDocument();
-    // Not while brief 3 is being built.
+    // While brief 3 is being built there is no Edit brief, and the line says so (risk 11).
+    expect(screen.getByText("Your brief is kept. You can edit it once the others are done.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Edit brief 1" })).not.toBeInTheDocument();
     await calls[1].answer(plan("Problem set 7"));
+    expect(screen.getByText("Your brief is kept. Edit it and try again.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Edit brief 1" }));
     expect(screen.getByRole("heading", { level: 1, name: "Add this week’s assignments" })).toBeInTheDocument();
     expect(screen.getByLabelText("Assignment brief")).toHaveValue("First brief text");

@@ -94,7 +94,12 @@ export function BuildQueueScreen({ onEditBriefs }: { onEditBriefs: () => void })
                 {item.state === "failed" && (
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                     <p className="text-body text-text-secondary">
-                      {item.reason === "unreadable" ? "Your brief is kept. Edit it and try again." : "Your brief is kept."}
+                      {item.reason !== "unreadable"
+                        ? "Your brief is kept."
+                        : running
+                          ? // Edit brief only shows once nothing is being built (M7c risk review, finding 11; wording approved by Aidan).
+                            "Your brief is kept. You can edit it once the others are done."
+                          : "Your brief is kept. Edit it and try again."}
                     </p>
                     {item.reason === "unreadable" ? (
                       // Back to entry only once nothing is being built, so no brief is edited while it's sent.
