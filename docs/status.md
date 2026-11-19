@@ -389,6 +389,16 @@ A week's briefs at once. Branched from `main` after PR #8 (M7b) was merged. Deci
 
 The dev server used was one already running on port 3000 for this folder (not started by Claude Code), so it served this branch's working tree.
 
+### Risk review fixes (2026-11-19)
+
+Findings 3, 1, 2, 5a, 7, 9, 11 and 8 from [reviews/2026-11-19-risk-weekly-upload.md](reviews/2026-11-19-risk-weekly-upload.md), one commit and test each, plus Aidan's approved wording (decisions.md, "M7c risk review fixes"). 4, 6, 10 and 12 are M8 candidates.
+
+| Check | Result |
+| --- | --- |
+| `npm test` | **367 passed** (356 before the fixes; +11: weekly upload screens 9, queue 2) |
+| `npm run lint`, `npx tsc --noEmit`, `npm run build` | clean |
+| Browser (Playwright) | **not re-run** after the fixes; the browser results above are from before them |
+
 ### Not verified
 
 - Real `/api/plan` requests for a full week (no model calls were made), VoiceOver, and the Figma frames (no Figma access).
@@ -397,5 +407,5 @@ The dev server used was one already running on port 3000 for this folder (not st
 ### Known limitations
 
 - A reload or closing the tab stops the queue; the briefs not built stay as drafts, but the queue doesn't resume by itself.
-- Two tabs could each run a queue on the same drafts; nothing stops it (rare, and each plan is still saved once per request).
+- Two tabs: since risk 5a a queue skips a brief another tab has already built, but two queues started at the same moment can still build one brief twice.
 
