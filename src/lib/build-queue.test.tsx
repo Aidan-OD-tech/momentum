@@ -183,8 +183,11 @@ describe("build queue", () => {
     });
     click("start");
     await calls[0].answer(plan("Plan one"));
-    expect(items()).toMatch(/^items: 1:notSaved:Plan one/);
+    expect(items()).toBe("items: 1:notSaved:Plan one 2:waiting 3:waiting");
     expect(screen.getByText("assignments: 1")).toBeInTheDocument();
+    // It stops after that plan: no more requests for plans that couldn't be saved (risk 7).
+    expect(calls).toHaveLength(1);
+    expect(screen.getByText("running: false")).toBeInTheDocument();
     vi.restoreAllMocks();
     expect(stored().assignments).toHaveLength(0);
     expect(stored().briefDrafts).toHaveLength(3);

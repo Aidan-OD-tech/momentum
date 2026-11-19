@@ -371,6 +371,9 @@ describe("building several plans", () => {
     expect(screen.queryByText(/plan ready/)).not.toBeInTheDocument();
     expect(inRows("Lab report 5 · built, but couldn’t be saved in this browser. It’s gone if you reload.")).toBeInTheDocument();
     expect(screen.getByText("Couldn’t save in this browser")).toBeInTheDocument();
+    // The queue stopped; brief 3 is still a draft, and nothing more was sent.
+    expect(inRows("Brief 3 · not built yet · your brief is kept")).toBeInTheDocument();
+    expect(calls).toHaveLength(1);
     vi.restoreAllMocks();
   });
 

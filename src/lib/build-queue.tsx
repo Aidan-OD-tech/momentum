@@ -136,6 +136,9 @@ export function BuildQueueProvider({ children }: { children: React.ReactNode }) 
             at: new Date().toISOString(),
           }) ?? false;
         update(next.draftId, { state: saved ? "ready" : "notSaved", title: result.plan.title });
+        // Storage stopped working: later plans couldn't be saved either, so stop here. The rest stay
+        // drafts, and the top bar already shows the failed save (M7c risk review, finding 7).
+        if (!saved) break;
       } else if (result.reason === "rateLimited") {
         // Stop here. This brief and the later ones go back to waiting; their drafts are still stored.
         update(next.draftId, { state: "waiting" });
