@@ -186,7 +186,7 @@ Screenshots in `docs/evidence/screenshots/`: `m4-brief-entry` (full page, with t
 
 ## M5
 
-Branch `feat/m5-evaluation`, off `main` after PR #4. Not pushed (Aidan pushes). Decisions: [decisions.md](decisions.md), section M5. Evidence: [evidence/measurement.md](evidence/measurement.md), [evidence/heuristic-evaluation.md](evidence/heuristic-evaluation.md) (reviewed by Aidan, 2026-11-18), [evidence/accessibility.md](evidence/accessibility.md), [evidence/feedback/](evidence/feedback/). Reviews: [reviews/2026-11-18-risk-pause-saving.md](reviews/2026-11-18-risk-pause-saving.md), [reviews/2026-11-18-signal.md](reviews/2026-11-18-signal.md).
+Branch `feat/m5-evaluation`, off `main` after PR #4. Not pushed (Aidan pushes). Decisions: [decisions.md](decisions.md), section M5. Evidence: [evidence/measurement.md](evidence/measurement.md), [evidence/heuristic-evaluation.md](evidence/heuristic-evaluation.md) (reviewed by Aidan, 2026-11-18), [evidence/accessibility.md](evidence/accessibility.md), [evidence/session-guide.md](evidence/session-guide.md). Reviews: [reviews/2026-11-18-risk-pause-saving.md](reviews/2026-11-18-risk-pause-saving.md), [reviews/2026-11-18-signal.md](reviews/2026-11-18-signal.md).
 
 ### Built
 
@@ -228,7 +228,7 @@ Screenshots in `docs/evidence/screenshots/`: `m5-<screen>-1280.png` and `m5-<scr
 - **A real model plan** in the M5 browser runs: `/api/plan` was answered by the script with the sample plan (no OpenAI requests in M5).
 - **Screen readers:** VoiceOver script written for Aidan; not run. Live regions were checked in the DOM only.
 - **A manual keyboard pass by a person:** the pass was scripted key presses.
-- **Sessions:** not run yet; nothing in `evidence/feedback/` is filled in.
+- **Sessions:** not run yet; guide in [evidence/session-guide.md](evidence/session-guide.md).
 - Safari and Firefox.
 - The step edit card's required-field errors (3.3.1) weren't exercised in M5.
 

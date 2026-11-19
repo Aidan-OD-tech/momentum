@@ -16,7 +16,7 @@ This is a guide for task-based sessions with at least two people on the deployed
 - **Length:** about 25–30 minutes each, in person or on a screen-share call.
 - **Device:** a laptop at about 1280×800 in Chrome, using the deployed URL (https://momentum-five-xi.vercel.app). If you can, put a document window beside it, the way the product is meant to be used.
 - **Before each session:**
-  - clear Momentum's storage (see `docs/evidence/feedback/README.md`);
+  - clear Momentum's storage (see "Reset the browser" below);
   - check that "Use a sample brief" is hidden;
   - open a fresh tab.
 - **Requests per session and the shared limit (M7):** each session builds about 4 plans (1 in Task 1, 3 in Task 4), plus any Try again. The limit is 12 plans per 10 minutes **per network address**, shared by everyone on the same Wi-Fi. So don't run more than two sessions within 10 minutes on one network. If a participant sees "Too many plans were built from this network", note it, wait, and don't count it against them.
@@ -93,7 +93,7 @@ The three briefs (drafted by Claude Code; Aidan to check and replace if he prefe
 4. Would you use something like this for a real assignment? When?
 5. Is there anything you expected that wasn't there?
 
-## Observation sheet (one per participant: `docs/evidence/feedback/P<n>-<date>.md`)
+## Observation sheet (one per participant, kept with your own notes)
 
 | Field | Notes |
 |---|---|
@@ -113,7 +113,17 @@ The three briefs (drafted by Claude Code; Aidan to check and replace if he prefe
 
 ## Afterwards
 
-- Combine all sessions into one patterns table: each issue, how many participants it affected, severity, and the M6 fix. Put it in `docs/evidence/feedback/summary.md`, and only after the sessions have run.
+- Combine all sessions into one patterns table: each issue, how many participants it affected, severity, and the M6 fix. Write it up only after the sessions have run.
 - **Primary measure, as observed:** how many participants (n of N) built a plan and began step 1 without help.
 - **Complementary measure:** n of N resumed the right step after the pause, without help.
 - Keep these observed numbers separate from the event data in `measurement.md`.
+
+## Reset the browser
+
+Momentum keeps everything in this browser's local storage. To start the next participant clean, use a fresh Chrome Guest window, or:
+
+1. Open DevTools (Cmd+Option+I in Chrome) → **Application** → **Local storage** → the site's address.
+2. Delete `momentum:v1` and, if present, `momentum:v1:unreadable`.
+3. Reload. You should see brief entry with no "Saved in this browser".
+
+Close any other Momentum tabs first. Vercel Hobby keeps logs for 1 hour, so copy the participant's `[api/event]` and `[api/plan]` lines straight after the session.

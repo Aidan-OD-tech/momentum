@@ -41,7 +41,7 @@ None.
 
 **[4] The event's numbers disappear after an hour.** S2 × P3 × D2 = **12** (cost to the evaluation evidence, not to students)
 - Risk: on Hobby, runtime logs (where `/api/event` writes) are kept for 1 hour. Anything not read within the hour is lost, so the "gathered after launch" numbers can't be built up over days without someone watching.
-- Recommendation: for the sessions, keep the Logs tab open in Live mode and copy each line into the session file straight away (docs/evidence/feedback/README.md). After launch, Aidan decides between:
+- Recommendation: for the sessions, keep the Logs tab open in Live mode and copy each line into the session file straight away (see the session guide). After launch, Aidan decides between:
   - (a) reporting only what was copied within the hour;
   - (b) a paid plan, Log Drains or a store. Each is a scope or cost change, so not in M5.
 
@@ -66,7 +66,7 @@ None.
 - The student sees brief entry and notices at once, but the backup in `momentum:v1:unreadable` is reachable only through DevTools. Recommendation: none for the MVP. The rule is "never overwrite", and that holds.
 
 **[10] A previous participant's plan is still in the browser.** S2 × P2 × D1 = **4** (session-only)
-- If storage isn't cleared between sessions, the next participant sees someone else's brief and notes, and the "first visit" task is spoiled. Recommendation: the reset steps in [feedback/README.md](../evidence/feedback/README.md). A fresh Chrome Guest window per participant is the simplest way to start clean.
+- If storage isn't cleared between sessions, the next participant sees someone else's brief and notes, and the "first visit" task is spoiled. Recommendation: the reset steps in [session guide](../evidence/session-guide.md). A fresh Chrome Guest window per participant is the simplest way to start clean.
 
 **[11] An event lost on the way.** S1 × P2 × D3 = **6**
 - A blocked request (an extension, the network) means no event; the request is sent once and never retried. That undercounts. The student never sees it: a failed send is ignored (tested). Recommendation: read the after-launch numbers as a lower bound.

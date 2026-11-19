@@ -57,7 +57,7 @@ Nothing else is sent: no brief, plan or note text, no ids, no timestamps. The ro
 4. Count the start lines by `bucket=`. Primary measure = (starts with `<2`, `2–5` or `5–15`) ÷ plans created.
 
 **Retention: Hobby keeps runtime logs for 1 hour** ([Vercel docs](https://vercel.com/docs/logs/runtime), "Limits"). Lines older than an hour are gone. In practice:
-- **During a session:** keep Logs open in **Live** mode and copy the participant's lines into their session file (`docs/evidence/feedback/`) straight away.
+- **During a session:** keep Logs open in **Live** mode and copy the participant's lines into your session notes straight away.
 - **After launch (on Hobby):** numbers exist only for the hours when someone copied them.
 
 **Sessions vs a real launch.** The 1-hour window suits the sessions: Aidan is watching, and he copies each participant's lines within the hour. A real post-launch deployment would need durable collection instead, without adding a database to Momentum:
