@@ -2,7 +2,11 @@
 
 Momentum helps students turn an assignment brief into steps and work through them one at a time. The student does the assignment in their own tools; Momentum only holds the plan and their progress. It is a course project for UX & Front-End Engineering.
 
-Production: https://momentum-five-xi.vercel.app (serves `main`). Current milestone: **M6, fixes from the evaluation** on branch `feat/m6-fixes` (M1–M5 merged): tab sync, field contrast, the save status announcement, long pastes, the rate-limit line, the local date, Undo's description, a way back from a done step and the side-panel line. See [docs/status.md](docs/status.md).
+Production: https://momentum-five-xi.vercel.app (serves `main`). M1–M7 are merged; **M7d** (polish and evidence for several assignments) is on `feat/m7d-polish-evidence`, and M8 (participant sessions, VoiceOver, the case study) is next. See [docs/status.md](docs/status.md).
+
+**The list home (M7).** After the first plan, "/" is a list of every assignment kept in this browser, soonest deadline first. The first one is the "Up next" card, with its next step or the plan to review; the others are rows under "After that" and "No deadline", with finished ones in a collapsed group. Each shows an approximate time left: the estimates of the steps not done yet.
+
+**Weekly upload (M7).** "Add assignments" opens `/new`, where a student can paste up to 8 briefs, each with its own optional deadline. Momentum builds one plan per brief, one request at a time, and saves each one as soon as it arrives; each lands on the list as "Ready to review". Briefs that weren't built stay as drafts and show on the list as "N briefs not built yet".
 
 ## Requirements
 
@@ -28,7 +32,7 @@ The first visit shows brief entry. "Use a sample brief" appears only when `NEXT_
 
 In development only, `/?simulate=unreadable`, `failed` or `slow` replaces the plan source, to see the error and building screens. A production build ignores it.
 
-Routes: `/` brief entry or home, `/plan` plan review, `/step/n` working step, `/step/n/done` step complete, `/final` final check, `/review` review a completed assignment.
+Routes: `/` brief entry on first run, otherwise the list of assignments; `/new` brief entry for more assignments and Building your plans; `/plan` plan review, `/step/n` working step, `/step/n/done` step complete, `/final` final check, `/review` review a completed assignment.
 
 ## Docs
 

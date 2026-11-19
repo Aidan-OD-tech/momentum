@@ -14,8 +14,10 @@ Legend: **planned** (not started), **implemented** (written, not independently c
 | M6 | Fixes from evaluation | verified and merged (PR #6); VoiceOver pending |
 | M7a | Several assignments: data and ordering (logic only) | implemented and **verified** on branch `feat/m7a-multi-assignment-model` (PR #7) |
 | M7b | Several assignments: prioritized home list | verified and merged (PR #8) |
-| M7c | Several assignments: upload a week's briefs in one go | implemented and **verified** on branch `feat/m7c-weekly-upload` (see M7c); not pushed |
-| M7d | Several assignments: see Aidan's M7 plan (not in this repo) | planned |
+| M7c | Several assignments: upload a week's briefs in one go | verified and merged (PR #9) |
+| M7d | Several assignments: polish and evidence | implemented and **verified** on branch `feat/m7d-polish-evidence` (see M7d); the real-model check waits for Aidan |
+| **M7** | **Several assignments (M7a–M7d)** | **complete: implemented and verified**, except VoiceOver, participant sessions and (until Aidan runs it) the real-model check |
+| M8 | Participant sessions, VoiceOver, case study, and the M8 candidates in decisions.md | next |
 | — | Docs and case study (was the M7 row; where it goes now is for Aidan to confirm) | planned |
 
 ## M1 summary
@@ -408,4 +410,29 @@ Findings 3, 1, 2, 5a, 7, 9, 11 and 8 from [reviews/2026-11-19-risk-weekly-upload
 
 - A reload or closing the tab stops the queue; the briefs not built stay as drafts, but the queue doesn't resume by itself.
 - Two tabs: since risk 5a a queue skips a brief another tab has already built, but two queues started at the same moment can still build one brief twice.
+
+## M7d
+
+Polish and evidence for several assignments. No new features. Branched from `main` after PR #9 (M7c) was merged.
+
+### Done
+
+- `/craft compose` and `/craft responsive` on the home list, `/new` with three briefs and Building your plans, at 1280, 600 and 375 px: [reviews/2026-11-19-compose-responsive-m7.md](reviews/2026-11-19-compose-responsive-m7.md). Three small fixes, one commit each: C1 (`c9321e2`), R1 (`1cf1f30`), R2 (`3621691`). C5, C6, C7 and R3 are M8 candidates in decisions.md.
+- Session guide updated for the list home, with a weekly-upload task and its question (dated note at the top; measures unchanged, decisions.md "M7d: session guide").
+- README, FEATURES.md, the M7 summary for the case study (decisions.md) and the AI log.
+
+### Verified (2026-11-19, Node 24.21.0)
+
+| Check | Result |
+| --- | --- |
+| `npm test` | **367 passed** (367 at the start of M7d; the fixes are layout classes only, checked in the browser) |
+| `npm run lint`, `npx tsc --noEmit`, `npm run build` | clean |
+| Browser (production build, Chrome via Playwright; `/api/plan` answered by the script, no model calls) | 3 screens in 5 states at 1280, 600 and 375: no horizontal scroll and nothing wider than the viewport, before and after the fixes; no console errors. `evidence/test-results/m7d-compose-responsive-*.json`, screenshots in `evidence/screenshots/m7d/` |
+| axe (axe-core 4.10) | **0 violations** in all 15 captures, before and after the fixes |
+
+### Not verified
+
+- **Real model (step 1):** Aidan's check on the production site with 3 real briefs. To be recorded in `evidence/test-results/m7-real-model.md` from his notes only.
+- VoiceOver, and participant sessions (M8).
+- The Figma frames M7-1 to M7-3 against the build (no Figma access in these sessions).
 

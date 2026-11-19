@@ -5,7 +5,11 @@ What Momentum does, feature by feature. [docs/product.md](docs/product.md) is th
 **Status values used here.** `built`: in code (M1–M4 merged to `main`; M5 on `feat/m5-evaluation`). What is verified, and how, is in docs/status.md. `planned`: in the MVP, not in code yet. (This replaces /craft's "shipped", which means "in production".)
 
 ## Summary
-Momentum helps a student turn a dense assignment brief into manageable steps, start working, and return after a pause without rebuilding their context. It holds one active assignment at a time and saves it in the student's browser. The student does the work in their own tools; Momentum never sees, checks or submits it. There are three areas: planning (brief to plan), working through steps, and finishing with a final requirements check. Saving honestly in the browser runs underneath all three.
+Momentum helps a student turn a dense assignment brief into manageable steps, start working, and return after a pause without rebuilding their context. Since M7 it keeps several assignments, one open at a time, and saves them in the student's browser. The student does the work in their own tools; Momentum never sees, checks or submits it. There are three areas: planning (brief to plan), working through steps, and finishing with a final requirements check. Saving honestly in the browser runs underneath all three.
+
+**The list home (M7b).** After the first plan, "/" lists every assignment, soonest deadline first, with an approximate time left for each (the estimates of the steps not done). The first is shown as the Up next card with its next step; plans still in review show "Ready to review"; finished ones sit in a collapsed group, kept in this browser.
+
+**Weekly upload (M7c).** "Add assignments" opens `/new`, where up to 8 briefs can be pasted, each with its own optional deadline. Momentum builds one plan per brief, one request at a time, saving each as it arrives; briefs that couldn't be built are kept and shown on the list as "N briefs not built yet".
 
 ## Feature Map
 | Area | Major features | Supporting features | Status |

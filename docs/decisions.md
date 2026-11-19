@@ -439,3 +439,28 @@ From [reviews/2026-11-19-risk-weekly-upload.md](reviews/2026-11-19-risk-weekly-u
 - **Task 4 (weekly upload)** has its own success line (all three added and built without help). It isn't a new study measure. It observes whether participants understand the order and the time-left estimate, plus one question: "What did 'About 2 h of steps left' mean to you?"
 - **The three Task 4 briefs were drafted by Claude Code.** They are not from any course. Aidan checks or replaces them before the first session.
 
+### M8 candidates from the M7 compose and responsive review (2026-11-19)
+
+From [reviews/2026-11-19-compose-responsive-m7.md](reviews/2026-11-19-compose-responsive-m7.md). Fixed in M7d: C1 (list header order below 600 px), R1 (entry disclosure full width below 600 px), R2 (Up next card padding below 600 px).
+- **C5.** The list's status links ("1 brief not built yet", "Building plans: X of N ready") use the same style and place as "Back to your assignments" on `/new`, so they may read as navigation. Possible change: show them as a status line with the link in the text.
+- **C6.** On a finished run with an unreadable brief, "Edit brief" and "Back to your briefs" do the same thing side by side. Possible change: drop the row's Edit brief once Back to your briefs shows.
+- **C7.** Brief cards use 8-row text areas, so 8 briefs make a very long page. Possible change: 5 rows in cards, or watch in sessions.
+- **R3.** At 375 px, meta lines break inside a date ("Mon, Nov 16, / 5:00 PM"). Possible change: keep the date on one line. Phones aren't a target.
+
+## M7 summary for the case study (2026-11-19)
+
+- **What changed.** Momentum went from one assignment at a time to several:
+  - a home list ordered soonest deadline first, with an approximate time left for each (M7a, M7b);
+  - a weekly upload of up to 8 briefs, built into plans one at a time (M7c);
+  - review, compose, responsive and accessibility passes on those screens, and a session task for them (M7d).
+- **Why.** Aidan's product decision (2026-11-18): "it's Sunday and you want to upload all your assignments for the week". It wasn't participant feedback; no sessions had run. It reverses the professor's advice to defer multiple-assignment management, and the case study should say so.
+- **Trade-offs:**
+  - **Deadline first, not a "start-by" score.** It's easy to explain in one sentence. A slack score would rest on the model's estimates, which run long (H-04). Time left only breaks ties.
+  - **Time left is approximate.** It is the sum of the estimates of steps not done; a step in progress counts in full, because Momentum doesn't track partial work. It is labelled "About …" and never counts down.
+  - **One request per brief, one at a time.** A bad brief or a cut-off response fails only that brief, and each plan is saved as it arrives. It is slower (about 15–18 s per plan on the model in use, as Aidan measured).
+  - **Per-IP limit raised from 5 to 12 per 10 minutes**, so a full upload fits. The hourly global limit stays at 100, and the OpenAI monthly budget stays the hard cap. The limit is shared by everyone on one network.
+- **Known limits:**
+  - A reload or closed tab stops a queue: built plans are kept, the rest stay drafts, and the list says how many weren't built.
+  - Two tabs: each tab keeps its own open assignment, but after a reload the last tab to write decides which one opens. A queue skips a brief another tab already built, but two queues started at the same moment can still build one brief twice.
+  - The model's estimates run long (H-04), so "About … of steps left" can overstate the work.
+  - Not yet checked with participants or VoiceOver.

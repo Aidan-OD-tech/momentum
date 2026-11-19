@@ -105,7 +105,34 @@ Records what AI tools produced and where Aidan changed, corrected or decided. Ke
 - Asked for the keyboard script to be re-run with the wordmark as a Tab stop. The re-run (scripted, both widths) also corrected an M5 note: the deadline stop the script flagged is Chrome's calendar button, which shows Chrome's own ring, not a timing artifact (2026-11-18).
 - Added a preview check for item 6: after 7 PM local time, a brief due "this Friday" (2026-11-18).
 
-## M7c: a week's briefs at once (2026-11-18)
+## M7: several assignments (2026-11-18 to 2026-11-19)
+
+- **Aidan decided:**
+  - to add several assignments (his product idea, not participant feedback) and to build M7 before the sessions;
+  - the scope of each milestone, in his written M7a–M7d prompts;
+  - Up next as the top of the priority order;
+  - after review: hiding the header "Add assignments" on the empty list, and the product.md wording;
+  - which M7c risk findings to fix and how. He rewrote finding 3 (count a removed brief toward the 8, rather than "Remove another brief to undo") and finding 7 (stop the queue after a failed save);
+  - all wording marked "approved by Aidan" in decisions.md;
+  - deferring risk findings 4, 6, 10 and 12 to M8.
+- **Claude Code drafted and implemented:**
+  - all M7 code and tests;
+  - the reviews (`/craft risk` for M7c, `/craft compose` and `/craft responsive` for M7d);
+  - the browser scripts and their evidence;
+  - the docs updates;
+  - the session-guide changes, including the three Task 4 briefs, which are invented teaching examples for Aidan to check.
+- **Choices Claude Code made and flagged** (each in decisions.md under its milestone), for example:
+  - M7b: the row buttons' `aria-label`, and no time left on the final-check card;
+  - M7c: one brief keeps today's layout with no card, and Edit brief waits until nothing is building;
+  - M7c risk 5a: "built in another tab" only when a plan from the same text exists.
+- **What Claude Code did not do:** it made no OpenAI requests in any M7 check (every browser check answered `/api/plan` itself), used no screen reader, had no Figma access, ran no participant sessions, and merged nothing.
+- **Claude Code's own corrections:**
+  - M7b: a visually hidden span lost its space in the accessible name; replaced by `aria-label`.
+  - M7c: it branched from the M7b branch first, then from `main` once PR #8 was merged.
+  - M7d: none in the product. Browser-script mistakes were fixed in the scripts.
+- **M7a** was done in an earlier session; this log has no separate record of it beyond status.md and decisions.md.
+
+### M7c: a week's briefs at once (2026-11-18)
 
 - Implemented by Claude Code from Aidan's written M7c prompt, in small commits on `feat/m7c-weekly-upload`. M7a and M7b have no entry in this log.
 - **What Claude Code did not do:** it made no OpenAI requests (the browser checks answered `/api/plan` themselves), used no screen reader, had no Figma access (built from the prompt), and didn't push or merge.
