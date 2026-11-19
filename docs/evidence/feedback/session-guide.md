@@ -1,5 +1,13 @@
 # Momentum · M5 session guide (for Aidan)
 
+> **Updated 2026-11-19 for M7 (several assignments).** "/" is now a list of assignments after the first plan, the completed home is replaced by a one-time line on that list, and you can add a week's briefs at once. Changes:
+> - Tasks 2 and 3 are worded for the list.
+> - New Task 4 (weekly upload), with one question after it.
+> - Task 4 and the new question are added to the observation sheet.
+> - Network note under "Before each session".
+>
+> The primary and complementary measures are unchanged (see decisions.md, M7d). The three Task 4 briefs are drafted by Claude Code for Aidan to check before the first session.
+
 This is a guide for task-based sessions with at least two people on the deployed build. It uses the suggested tasks and measures from `docs/MOMENTUM_CONTEXT.md`. Write down only what happens. If something wasn't observed, leave it blank.
 
 ## Who and how
@@ -11,6 +19,7 @@ This is a guide for task-based sessions with at least two people on the deployed
   - clear Momentum's storage (see `docs/evidence/feedback/README.md`);
   - check that "Use a sample brief" is hidden;
   - open a fresh tab.
+- **Requests per session and the shared limit (M7):** each session builds about 4 plans (1 in Task 1, 3 in Task 4), plus any Try again. The limit is 12 plans per 10 minutes **per network address**, shared by everyone on the same Wi-Fi. So don't run more than two sessions within 10 minutes on one network. If a participant sees "Too many plans were built from this network", note it, wait, and don't count it against them.
 - **Brief to give them:** if they have a real brief of their own that they're happy to paste, use it, and note that they did. Otherwise, give them the PSYC 3024 essay brief as plain text to copy.
   - Remind them that the brief is sent to OpenAI. They shouldn't paste anything private.
 - **Recording:** take notes. Record the screen only if they agree. Don't record their face or voice unless they agree to that too.
@@ -35,24 +44,44 @@ Read each task as written, then stay quiet. If they're stuck for about 60 second
   - any hesitation at building or at an error.
 
 **Task 2: Pause with a note, then return.**
-"Imagine you've got a few minutes into this step, but you have to stop. Leave it so you can pick it up later." When they finish, have them close the tab and chat for about 3 minutes about something unrelated. Then say: "You're back. Carry on where you left off."
+"Imagine you've got a few minutes into this step, but you have to stop. Leave it so you can pick it up later." When they finish, have them close the tab and chat for about 3 minutes about something unrelated. Then reopen Momentum and say: "You're back. Find the assignment you should work on next and start its next step."
 - **Success:**
   - they pause with a note that would actually help them;
-  - after reopening, they find and resume the same step, without help.
+  - after reopening, on the list of assignments, they find and resume the same step, without help.
 - **Note:**
   - whether they found Pause for later;
   - what they wrote, paraphrased, not quoted unless they agree;
   - whether they noticed "Progress saved" or the save status;
+  - whether they used the Up next card or looked elsewhere on the list;
   - how long it took them to resume.
 
 **Task 3: Finish and explain the final check.**
 "Pretend you've done the work for each step. Take it to the end." On the final check, ask: "What does this checklist tell you? What doesn't it tell you?"
 - **Success:**
-  - they complete the steps and reach the completed home;
+  - they complete the steps, finish the review, and are back on the list with the line "…all steps done. Your plan and final check are kept in this browser…";
   - they say the check is their own self-check, and that Momentum didn't verify or submit anything.
 - **Note:**
   - whether they used Undo, or would want to;
   - any belief that Momentum submitted or checked their work.
+
+**Task 4: Add a week's assignments (M7).**
+Give them the three briefs below as plain text to copy. "It's Sunday and you want to set up your week. Add all three of these to Momentum. Then tell me which one you'd work on first, and why."
+- **Success:** they add all three briefs, build the plans, and the three appear on the list, without help.
+- **Note:**
+  - whether they found "Add assignments" and "Add another brief";
+  - whether they pasted each brief into its own card, or all three into one;
+  - whether they used the deadline fields;
+  - what they did while the plans were building (waited, went to the list, did something else);
+  - whether they reviewed the plans ("Ready to review") or went straight to a step;
+  - which assignment they chose first, and whether their reason matches the list's order (soonest deadline first) or something else (size, interest, the time left);
+  - whether they read "About … of steps left" as an estimate, or as a countdown or a promise.
+- **Then ask:** "What did 'About 2 h of steps left' mean to you?" (Use the figure on their screen if it differs, and say which you used.)
+
+The three briefs (drafted by Claude Code; Aidan to check and replace if he prefers real ones). Relative due dates count from the session day:
+
+1. HIST 1050 · Short source analysis. Choose one primary source from the week 9 reading list and write 600–800 words on who made it, for whom, and what it leaves out. Cite the source and one secondary reading in Chicago style. Submit as a PDF on the course page by this Friday at 5 PM.
+2. CHEM 2010 · Lab report 5. Write up the titration lab: aim, method, a results table, an error analysis and a short conclusion. Use the department template, 1,500 words maximum, and include your raw data as an appendix. Due next Wednesday at 9 AM.
+3. DES 2100 · Portfolio reflection. Write a 400-word reflection on the project you're proudest of this term: what you set out to do, what changed, and what you'd do differently. Add two images of the work with captions. No fixed due date; bring it to your next tutorial.
 
 **Optional, if there's time:** edit one step's time estimate or Done when, then add a requirement. Note whether the "Requirements updated" notice made sense.
 
@@ -74,6 +103,8 @@ Read each task as written, then stay quiet. If they're stuck for about 60 second
 | Task 1 result (unaided / with help / not completed), time to Start step 1 | |
 | Task 2 result, time to resume | |
 | Task 3 result, and what they said the check means | |
+| Task 4 result (unaided / with help / not completed), which assignment they'd start first and why | |
+| Task 4: what "About … of steps left" meant to them (and the figure used) | |
 | Help given (word for word) | |
 | Issues seen (screen, what happened, severity 0–4) | |
 | Ease of knowing what to do next (1–5), and their reason | |

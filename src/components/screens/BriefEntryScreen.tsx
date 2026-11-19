@@ -132,7 +132,9 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
           )}
 
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-1 flex-col gap-2">
+            {/* Below 600 px the captions take the full width and the button wraps under them, instead of
+                squeezing the disclosure into a narrow column (M7d responsive R1). */}
+            <div className="flex basis-full flex-col gap-2 sm:basis-0 sm:flex-1">
               {several && withText < briefs.length && (
                 <p className="text-caption text-text-secondary">{plural(withText, "brief")} ready. Empty briefs are skipped.</p>
               )}

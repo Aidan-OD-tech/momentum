@@ -1,0 +1,196 @@
+{
+  "axe": {
+    "home-list-1280": [],
+    "new-three-briefs-1280": [],
+    "building-mid-run-1280": [],
+    "building-with-failure-1280": [],
+    "building-done-1280": [],
+    "home-list-600": [],
+    "new-three-briefs-600": [],
+    "building-mid-run-600": [],
+    "building-with-failure-600": [],
+    "building-done-600": [],
+    "home-list-375": [],
+    "new-three-briefs-375": [],
+    "building-mid-run-375": [],
+    "building-with-failure-375": [],
+    "building-done-375": []
+  },
+  "layout": {
+    "home-list-1280": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        },
+        {
+          "text": "Review Annotated bibliography",
+          "h": 0
+        },
+        {
+          "text": "Review Quiz prep",
+          "h": 0
+        }
+      ]
+    },
+    "new-three-briefs-1280": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        }
+      ]
+    },
+    "building-mid-run-1280": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        }
+      ]
+    },
+    "building-with-failure-1280": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        }
+      ]
+    },
+    "building-done-1280": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        }
+      ]
+    },
+    "home-list-600": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        },
+        {
+          "text": "Review Annotated bibliography",
+          "h": 0
+        },
+        {
+          "text": "Review Quiz prep",
+          "h": 0
+        }
+      ]
+    },
+    "new-three-briefs-600": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        }
+      ]
+    },
+    "building-mid-run-600": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        }
+      ]
+    },
+    "building-with-failure-600": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        }
+      ]
+    },
+    "building-done-600": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        }
+      ]
+    },
+    "home-list-375": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        },
+        {
+          "text": "Review Annotated bibliography",
+          "h": 0
+        },
+        {
+          "text": "Review Quiz prep",
+          "h": 0
+        }
+      ]
+    },
+    "new-three-briefs-375": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        }
+      ]
+    },
+    "building-mid-run-375": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        }
+      ]
+    },
+    "building-with-failure-375": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        }
+      ]
+    },
+    "building-done-375": {
+      "pageScroll": false,
+      "wide": [],
+      "smallTargets": [
+        {
+          "text": "Momentum, home",
+          "h": 22
+        }
+      ]
+    }
+  },
+  "consoleErrors": []
+}
