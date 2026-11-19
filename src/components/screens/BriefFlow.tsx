@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ErrorCard } from "@/components/ErrorCard";
 import { BriefEntryScreen } from "@/components/screens/BriefEntryScreen";
@@ -19,11 +20,12 @@ type Phase =
   | { name: "building" }
   | { name: "error"; reason: FailureReason };
 
-// "/" with no open assignment: brief entry, building, and Errors 02 and 03. The brief and deadline are
-// kept as a draft in storage, so they survive a reload, a failed build and Cancel. When a plan is
-// created, the store opens it in review and "/" sends the browser to /plan.
+// "/" on first run, and /new: brief entry, building, and Errors 02 and 03. The brief and deadline are
+// kept as a draft in storage, so they survive a reload, a failed build, Cancel and "Back to your
+// assignments". When a plan is created, the store opens it in review and the browser goes to /plan.
 export function BriefFlow() {
   const { data, act } = useMomentumData();
+  const router = useRouter();
   const source = usePlanSource();
   const [text, setText] = useState(data.briefDraft?.text ?? "");
   const [deadline, setDeadline] = useState(data.briefDraft?.deadline ?? "");
@@ -89,6 +91,7 @@ export function BriefFlow() {
 
     if (result.ok) {
       act({ type: "createPlan", id: crypto.randomUUID(), plan: result.plan, brief: text, deadlineOverride: deadline, at: new Date().toISOString() });
+      router.push("/plan");
     } else {
       setPhase({ name: "error", reason: result.reason });
     }
@@ -148,6 +151,8 @@ export function BriefFlow() {
         if (entryError === "tooLong" && briefLength(next) <= MAX_BRIEF_CHARS) setEntryError(null);
       }}
       onDeadlineChange={setDeadline}
+      // Saves the draft now: a save still waiting for typing to pause would be dropped on leaving.
+      onBack={data.assignments.length > 0 ? () => saveDraft(text, deadline) : undefined}
       onUseSample={
         showSampleBrief()
           ? () => {

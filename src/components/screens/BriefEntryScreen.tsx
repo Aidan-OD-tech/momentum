@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { TopBar } from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,9 @@ type BriefEntryScreenProps = {
   deadline: string;
   onTextChange: (text: string) => void;
   onDeadlineChange: (deadline: string) => void;
+  // Shows "Back to your assignments" (to "/") when given; called before leaving, e.g. to save the draft.
+  // Leave out on first run, when there is no list to go back to.
+  onBack?: () => void;
   // Leave out to hide "Use a sample brief" (see showSampleBrief in src/lib/flags.ts).
   onUseSample?: () => void;
   onSubmit: () => void;
@@ -25,7 +29,7 @@ type BriefEntryScreenProps = {
 
 const count = (n: number) => n.toLocaleString("en-US");
 
-// "/" with no open assignment: brief entry (R3 05, Error 01). No save indicator before a plan exists
+// "/" on first run, and /new: brief entry (R3 05, Error 01). No save indicator before a plan exists
 // (handoff decision 4).
 export function BriefEntryScreen(props: BriefEntryScreenProps) {
   const { text, deadline, error, focus, focusKey } = props;
@@ -44,6 +48,11 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
     <>
       <TopBar mode="home" />
       <main className="mx-auto flex w-full max-w-home flex-col gap-8 px-4 pt-12 pb-16">
+        {props.onBack && (
+          <Link href="/" onClick={props.onBack} className="flex h-button-text items-center self-start rounded-sm text-link text-text-primary">
+            Back to your assignments
+          </Link>
+        )}
         <div className="flex flex-col gap-3">
           <h1 ref={headingRef} tabIndex={-1} className="text-display text-text-primary focus-visible:shadow-none">
             Turn an assignment brief into small, doable steps.
