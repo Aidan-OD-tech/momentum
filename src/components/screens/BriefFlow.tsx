@@ -100,8 +100,12 @@ function BriefEntryFlow({ atNew, onQueueStarted }: { atNew: boolean; onQueueStar
     if (emptyError && next.some((brief) => brief.text.trim())) setEmptyError(false);
   }
 
+  // A removed brief that can still be undone keeps its place among the 8, so Undo always fits and
+  // the list never passes 8 (Aidan, M7c risk review, finding 3).
+  const canAdd = briefs.length + (removed ? 1 : 0) < MAX_BRIEFS;
+
   function add() {
-    if (briefs.length >= MAX_BRIEFS) return;
+    if (!canAdd) return;
     const brief = emptyBrief();
     setBriefs([...briefs, brief]);
     moveFocus({ target: "brief", id: brief.id });
@@ -124,7 +128,7 @@ function BriefEntryFlow({ atNew, onQueueStarted }: { atNew: boolean; onQueueStar
     if (!removed) return;
     const next = [...briefs];
     next.splice(Math.min(removed.index, next.length), 0, removed.brief);
-    setBriefs(next.slice(0, MAX_BRIEFS));
+    setBriefs(next);
     setRemoved(null);
     moveFocus({ target: "brief", id: removed.brief.id });
   }
@@ -133,7 +137,7 @@ function BriefEntryFlow({ atNew, onQueueStarted }: { atNew: boolean; onQueueStar
     const empty = briefs.find((brief) => !brief.text.trim());
     if (empty) {
       change(empty.id, { text: sampleAssignment.brief });
-    } else if (briefs.length < MAX_BRIEFS) {
+    } else if (canAdd) {
       setBriefs([...briefs, { ...emptyBrief(), text: sampleAssignment.brief }]);
     }
     setEmptyError(false);
@@ -243,6 +247,7 @@ function BriefEntryFlow({ atNew, onQueueStarted }: { atNew: boolean; onQueueStar
       briefs={briefs}
       onChange={change}
       onAdd={add}
+      canAdd={canAdd}
       onRemove={remove}
       removed={removed && { index: removed.index, number: removed.index + 1, onUndo: undoRemove }}
       // Saves the drafts now: a save still waiting for typing to pause would be dropped on leaving.

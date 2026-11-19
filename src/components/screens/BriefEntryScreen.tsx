@@ -20,6 +20,8 @@ type BriefEntryScreenProps = {
   briefs: BriefDraftItem[];
   onChange: (id: string, change: BriefChange) => void;
   onAdd: () => void;
+  // False at 8 briefs, counting a removed one that can still be undone.
+  canAdd: boolean;
   onRemove: (id: string) => void;
   // A brief with text that was just removed, shown in its place with Undo. Null when there is none.
   removed: { index: number; number: number; onUndo: () => void } | null;
@@ -42,6 +44,7 @@ const plural = (n: number, word: string) => `${n} ${n === 1 ? word : `${word}s`}
 export const briefFieldId = (id: string) => `brief-${id}`;
 const cardHeadingId = (id: string) => `brief-heading-${id}`;
 const ADD_BRIEF_ID = "add-brief";
+const UNDO_REMOVE_ID = "undo-remove";
 
 // Brief entry (R3 05, Error 01), for "/" on first run and /new. One brief looks as it always has;
 // two or more are numbered cards, each with its own deadline, one plan per brief (M7-2).
@@ -54,7 +57,8 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
   useEffect(() => {
     if (focus.target === "heading") return;
     const id = focus.target === "add" ? ADD_BRIEF_ID : focus.target === "card" ? cardHeadingId(focus.id) : briefFieldId(focus.id);
-    document.getElementById(id)?.focus();
+    // At 8 there is no Add another brief; the Undo of the brief just removed is the next control.
+    (document.getElementById(id) ?? document.getElementById(UNDO_REMOVE_ID))?.focus();
   }, [focus, focusKey]);
 
   const withText = briefs.filter((brief) => brief.text.trim()).length;
@@ -78,7 +82,7 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
       0,
       <div key="removed" role="status" className="flex items-center justify-between gap-4 rounded-md bg-surface-subtle p-4">
         <p className="text-body text-text-primary">Brief {removed.number} removed.</p>
-        <Button variant="tertiary" onClick={removed.onUndo}>
+        <Button id={UNDO_REMOVE_ID} variant="tertiary" onClick={removed.onUndo}>
           Undo
         </Button>
       </div>,
@@ -115,7 +119,7 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
         >
           <div className="flex flex-col gap-4">{fields}</div>
 
-          {briefs.length < MAX_BRIEFS ? (
+          {props.canAdd ? (
             <Button id={ADD_BRIEF_ID} variant="secondary" className="self-start" onClick={props.onAdd}>
               Add another brief
             </Button>

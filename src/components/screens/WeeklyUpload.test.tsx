@@ -134,6 +134,34 @@ describe("brief entry with several briefs", () => {
     expect(screen.getByRole("button", { name: "Add another brief" })).toHaveFocus();
   });
 
+  it("at 8, a removed brief that can be undone keeps its place: Add hides, and Undo brings it back (risk 3)", () => {
+    withAssignment();
+    renderNew();
+    for (let i = 0; i < 7; i++) addBrief();
+    for (let n = 1; n <= 8; n++) typeIn(n, `Text ${n}`);
+    fireEvent.click(screen.getByRole("button", { name: "Remove brief 3" }));
+    // 7 on screen plus the one that can be undone: no room to add.
+    expect(screen.queryByRole("button", { name: "Add another brief" })).not.toBeInTheDocument();
+    expect(screen.getByText("You can add up to 8 briefs at a time.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Brief 3" })).toHaveFocus();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    const texts = screen.getAllByRole("textbox").filter((t) => t.tagName === "TEXTAREA").map((t) => (t as HTMLTextAreaElement).value);
+    expect(texts).toEqual(["Text 1", "Text 2", "Text 3", "Text 4", "Text 5", "Text 6", "Text 7", "Text 8"]);
+  });
+
+  it("at 8, removing the last brief with text focuses its Undo; an empty one frees a place", () => {
+    withAssignment();
+    renderNew();
+    for (let i = 0; i < 7; i++) addBrief();
+    typeIn(8, "Text 8");
+    fireEvent.click(screen.getByRole("button", { name: "Remove brief 8" }));
+    expect(screen.getByRole("button", { name: "Undo" })).toHaveFocus();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    typeIn(8, "");
+    fireEvent.click(screen.getByRole("button", { name: "Remove brief 8" }));
+    expect(screen.getByRole("button", { name: "Add another brief" })).toHaveFocus();
+  });
+
   it("no brief with text: Error 01 on the first brief, focus there, no request", () => {
     const { source, calls } = controlledSource();
     withAssignment();
