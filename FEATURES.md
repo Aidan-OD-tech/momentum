@@ -27,11 +27,11 @@ Marketing rows are written for the portfolio case study; Momentum has no product
 | Field | Value |
 |-------|-------|
 | Scale | major |
-| Status | built (M3; limit and disclosure M4) |
-| One-liner | Paste your assignment brief and an optional deadline. |
+| Status | built (M3; limit and disclosure M4; several briefs M7c) |
+| One-liner | Paste your assignment brief and an optional deadline, or a week's briefs at once. |
 | Short | The student pastes the brief text and can add a deadline. PDF import is out of scope. |
 | Marketing | Paste the brief as you got it. Add a deadline if you have one. |
-| Technical | `/` with no open assignment. Pasted text and a native `datetime-local` deadline that overrides the plan's. The only checks are "not empty" (Error 01, no request) and the 12,000-character limit (since M6 a longer paste is kept whole; the over-limit message shows at once and blocks the build; a quiet count within 10% of the limit; all three, and the server's 413, count the trimmed length). The draft is saved in `briefDraft` as the student types and survives reload, failure and Cancel. One caption line discloses that the brief is sent to OpenAI. "Use a sample brief" fills the sample text only, and shows only when `NEXT_PUBLIC_SHOW_SAMPLE_BRIEF` is `"true"` (hidden for the M5 sessions). |
+| Technical | `/` with no open assignment. Pasted text and a native `datetime-local` deadline that overrides the plan's. The only checks are "not empty" (Error 01, no request) and the 12,000-character limit (since M6 a longer paste is kept whole; the over-limit message shows at once and blocks the build; a quiet count within 10% of the limit; all three, and the server's 413, count the trimmed length). The drafts are saved in `briefDrafts` (since M7c; an old `briefDraft` still reads as one) as the student types and survive reload, failure, Cancel and Back. Since M7c, `/new` holds up to 8 briefs (cards with their own deadline, Remove with Undo); two or more build one plan each through the in-memory build queue (`src/lib/build-queue.tsx`), one request at a time, each saved as it arrives and shown on the list as Ready to review. One caption line discloses that the brief is sent to OpenAI. "Use a sample brief" fills the sample text only, and shows only when `NEXT_PUBLIC_SHOW_SAMPLE_BRIEF` is `"true"` (hidden for the M5 sessions). |
 
 ### Plan building
 
