@@ -1,17 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { BriefFlow } from "@/components/screens/BriefFlow";
-import { HomeScreen } from "@/components/screens/HomeScreen";
+import { HomeListScreen } from "@/components/screens/HomeListScreen";
 import { useMomentumData } from "@/lib/momentum-store";
-import { useRedirect } from "@/lib/use-redirect";
 
-// "/" shows one of three things: brief entry when no assignment is open, the plan review (at /plan)
-// while a plan hasn't started, or home once it has.
+// "/": brief entry on first run (no assignments at all), otherwise the home list. Plans in review
+// are on the list as "Ready to review"; there is no redirect to /plan.
 export function HomeRoute() {
-  const { assignment } = useMomentumData();
-  const inReview = assignment?.status === "review";
-  useRedirect(inReview ? "/plan" : null);
-  if (!assignment) return <BriefFlow />;
-  if (inReview) return null;
-  return <HomeScreen />;
+  const { data } = useMomentumData();
+  // Decided once, when "/" opens: a plan built from first-run brief entry goes to /plan itself,
+  // so the list must not flash up in between.
+  const [firstRun] = useState(data.assignments.length === 0);
+  return firstRun ? <BriefFlow /> : <HomeListScreen />;
 }

@@ -92,8 +92,16 @@ export function assignmentContext(assignment: { course?: string; title: string }
   return [assignment.course, assignment.title].filter(Boolean).join(" · ");
 }
 
-// "PSYC 3024 · Due Fri, Dec 4, 5:00 PM" (assignment cards).
-export function assignmentMeta(assignment: { course?: string; deadline?: string }): string {
+// "PSYC 3024 · Due Fri, Dec 4, 5:00 PM" (assignment cards). With `passed` (the home list, once the
+// deadline is before now): "PSYC 3024 · Due date passed · Fri, Dec 4, 5:00 PM". Neutral on purpose.
+export function assignmentMeta(assignment: { course?: string; deadline?: string }, passed = false): string {
   const due = assignment.deadline ? formatDeadline(assignment.deadline) : null;
-  return [assignment.course, due && `Due ${due}`].filter(Boolean).join(" · ");
+  const dueText = due && (passed ? `Due date passed · ${due}` : `Due ${due}`);
+  return [assignment.course, dueText].filter(Boolean).join(" · ");
+}
+
+// An ISO timestamp as its local day: "Nov 18".
+export function formatDay(at: string): string {
+  const date = new Date(at);
+  return `${MONTHS[date.getMonth()]} ${date.getDate()}`;
 }
