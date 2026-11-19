@@ -287,6 +287,20 @@ describe("building several plans", () => {
     expect(inRows("Brief 3 · not built yet · your brief is kept")).toBeInTheDocument();
     expect(calls).toHaveLength(1);
     expect(stored().briefDrafts).toHaveLength(2);
+    // Back to your briefs returns to entry with both, ready to build again (risk 2).
+    fireEvent.click(screen.getByRole("button", { name: "Back to your briefs" }));
+    expect(brief(1)).toHaveValue("First brief text");
+    expect(brief(2)).toHaveValue("Third brief text");
+  });
+
+  it("offers Back to your briefs only when the run ended with briefs not built", async () => {
+    const { source, calls } = controlledSource();
+    threeBriefs(source);
+    fireEvent.click(submitButton());
+    expect(screen.queryByRole("button", { name: "Back to your briefs" })).not.toBeInTheDocument();
+    await calls[0].answer(plan("Lab report 5"));
+    await calls[1].answer(plan("Problem set 7"));
+    expect(screen.queryByRole("button", { name: "Back to your briefs" })).not.toBeInTheDocument();
   });
 
   it("Stop after this one finishes the current request; the rest stay drafts", async () => {

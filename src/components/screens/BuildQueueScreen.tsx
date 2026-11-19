@@ -44,6 +44,7 @@ export function BuildQueueScreen({ onEditBriefs }: { onEditBriefs: () => void })
   const headingRef = useFocusHeading<HTMLHeadingElement>();
   const { items, running } = queue;
   const goToList = () => router.push("/");
+  const notBuilt = items.some((item) => item.state === "waiting" || item.state === "failed");
 
   return (
     <>
@@ -120,9 +121,18 @@ export function BuildQueueScreen({ onEditBriefs }: { onEditBriefs: () => void })
             )}
           </div>
         ) : (
-          <Button variant="primary" className="self-start" onClick={goToList}>
-            Go to your assignments
-          </Button>
+          <div className="flex flex-wrap items-center gap-4">
+            <Button variant="primary" onClick={goToList}>
+              Go to your assignments
+            </Button>
+            {notBuilt && (
+              // Back to entry with the briefs not built, after Stop, a 429 or a failure (M7c risk review,
+              // finding 2; wording approved by Aidan).
+              <Button variant="tertiary" onClick={onEditBriefs}>
+                Back to your briefs
+              </Button>
+            )}
+          </div>
         )}
       </main>
     </>
