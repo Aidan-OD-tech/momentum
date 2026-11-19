@@ -16,13 +16,13 @@ export function queueRowText(item: QueueItem, running: boolean): string {
     case "ready":
       return `${item.title} · plan ready`;
     case "notSaved":
-      // Development copy: the write failed, so the plan is only in this visit's memory.
-      return `${item.title} · built, but not saved in this browser`;
+      // The write failed, so the plan is only in this visit's memory (wording approved by Aidan, M7c review).
+      return `${item.title} · built, but couldn’t be saved in this browser. It’s gone if you reload.`;
     case "building":
       return `Brief ${item.number} · building the plan`;
     case "waiting":
-      // Development copy for the stopped case.
-      return running ? `Brief ${item.number} · waiting` : `Brief ${item.number} · not built yet`;
+      // After Stop or a 429 nothing is waiting (wording approved by Aidan, M7c review).
+      return running ? `Brief ${item.number} · waiting` : `Brief ${item.number} · not built yet · your brief is kept`;
     case "failed":
       return item.reason === "unreadable" ? `Brief ${item.number} · couldn’t find clear requirements` : `Brief ${item.number} · couldn’t build this plan`;
   }
@@ -111,8 +111,8 @@ export function BuildQueueScreen({ onEditBriefs }: { onEditBriefs: () => void })
               Go to your assignments
             </Button>
             {queue.stopRequested ? (
-              // Development copy.
-              <p className="text-caption text-text-secondary">Stopping after this one.</p>
+              // Wording approved by Aidan (M7c review).
+              <p className="text-caption text-text-secondary">Stopping after the plan being built now.</p>
             ) : (
               <Button variant="tertiary" onClick={queue.stopAfterCurrent}>
                 Stop after this one

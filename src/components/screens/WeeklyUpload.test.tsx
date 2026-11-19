@@ -255,8 +255,8 @@ describe("building several plans", () => {
     fireEvent.click(submitButton());
     await calls[0].answer({ ok: false, reason: "rateLimited" });
     expect(screen.getByText("Too many plans were built from this network. Try again in about 10 minutes.")).toBeInTheDocument();
-    expect(inRows("Brief 1 · not built yet")).toBeInTheDocument();
-    expect(inRows("Brief 3 · not built yet")).toBeInTheDocument();
+    expect(inRows("Brief 1 · not built yet · your brief is kept")).toBeInTheDocument();
+    expect(inRows("Brief 3 · not built yet · your brief is kept")).toBeInTheDocument();
     expect(calls).toHaveLength(1);
     expect(stored().briefDrafts).toHaveLength(2);
   });
@@ -266,10 +266,10 @@ describe("building several plans", () => {
     threeBriefs(source);
     fireEvent.click(submitButton());
     fireEvent.click(screen.getByRole("button", { name: "Stop after this one" }));
-    expect(screen.getByText("Stopping after this one.")).toBeInTheDocument();
+    expect(screen.getByText("Stopping after the plan being built now.")).toBeInTheDocument();
     await calls[0].answer(plan("Lab report 5"));
     expect(calls).toHaveLength(1);
-    expect(inRows("Brief 3 · not built yet")).toBeInTheDocument();
+    expect(inRows("Brief 3 · not built yet · your brief is kept")).toBeInTheDocument();
     expect(stored().briefDrafts!.map((d) => d.text)).toEqual(["Third brief text"]);
   });
 
@@ -327,7 +327,7 @@ describe("building several plans", () => {
     });
     await calls[0].answer(plan("Lab report 5"));
     expect(screen.queryByText(/plan ready/)).not.toBeInTheDocument();
-    expect(inRows("Lab report 5 · built, but not saved in this browser")).toBeInTheDocument();
+    expect(inRows("Lab report 5 · built, but couldn’t be saved in this browser. It’s gone if you reload.")).toBeInTheDocument();
     expect(screen.getByText("Couldn’t save in this browser")).toBeInTheDocument();
     vi.restoreAllMocks();
   });
