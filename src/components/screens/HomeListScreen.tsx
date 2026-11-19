@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AssignmentRow } from "@/components/AssignmentRow";
@@ -8,6 +9,8 @@ import { usePanel } from "@/components/SidePanel";
 import { TopBar } from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
 import { UpNextCard } from "@/components/UpNextCard";
+import { readBriefDrafts } from "@/lib/brief-drafts";
+import { useBuildQueue } from "@/lib/build-queue";
 import { currentStatusLine, finishedStatusLine, openPath } from "@/lib/home-list";
 import { useMomentumData } from "@/lib/momentum-store";
 import { currentAssignments, deadlinePassed, finishedAssignments, hasDeadline } from "@/lib/priority";
@@ -21,6 +24,7 @@ import { cn } from "@/lib/utils";
 export function HomeListScreen() {
   const { data, saveStatus, progressSaved, justFinishedId, act } = useMomentumData();
   const { openPanel } = usePanel();
+  const queue = useBuildQueue();
   const router = useRouter();
   const headingRef = useFocusHeading<HTMLHeadingElement>();
   // Collapsed on every visit; not stored.
@@ -33,6 +37,9 @@ export function HomeListScreen() {
   const undated = rest.filter((assignment) => !hasDeadline(assignment));
   const finished = finishedAssignments(data.assignments);
   const justFinished = data.assignments.find((assignment) => assignment.id === justFinishedId);
+  // Briefs kept as drafts but not built: after Error 02 or 03, Stop, a 429 or a reload mid-queue
+  // (M7c risk review, finding 1). Shown only when no queue is running, which has its own line.
+  const unbuilt = readBriefDrafts(data).filter((draft) => draft.text.trim()).length;
 
   function go(assignment: Assignment, path: string) {
     act({ type: "openAssignment", id: assignment.id });
@@ -60,6 +67,18 @@ export function HomeListScreen() {
     <>
       <TopBar mode="home" saveStatus={saveStatus} />
       <main className="mx-auto flex w-full max-w-home flex-col gap-8 px-4 pt-12 pb-16">
+        {queue.running && (
+          // A week's plans are still being built (M7c). Back to the building screen.
+          <Link href="/new" className="flex h-button-text items-center self-start rounded-sm text-link text-text-primary">
+            Building plans: {queue.items.filter((item) => item.state === "ready").length} of {queue.items.length} ready
+          </Link>
+        )}
+        {!queue.running && unbuilt > 0 && (
+          // Wording approved by Aidan (M7c risk review).
+          <Link href="/new" className="flex h-button-text items-center self-start rounded-sm text-link text-text-primary">
+            {unbuilt} {unbuilt === 1 ? "brief" : "briefs"} not built yet
+          </Link>
+        )}
         {progressSaved && saveStatus !== "failed" && (
           <p role="status" className="flex items-center gap-2 text-caption text-text-secondary">
             <SavedCheckIcon />

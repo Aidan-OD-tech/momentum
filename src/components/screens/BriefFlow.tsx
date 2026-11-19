@@ -3,109 +3,213 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ErrorCard } from "@/components/ErrorCard";
-import { BriefEntryScreen } from "@/components/screens/BriefEntryScreen";
+import { BriefEntryScreen, type EntryFocus } from "@/components/screens/BriefEntryScreen";
 import { BuildingScreen } from "@/components/screens/BuildingScreen";
+import { BuildQueueScreen } from "@/components/screens/BuildQueueScreen";
 import { TopBar } from "@/components/TopBar";
 import { sampleAssignment } from "@/data/sample-assignment";
-import { briefLength, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
+import { readBriefDrafts } from "@/lib/brief-drafts";
+import { briefLength, MAX_BRIEF_CHARS, MAX_BRIEFS } from "@/lib/brief-limits";
+import { useBuildQueue } from "@/lib/build-queue";
 import { showSampleBrief } from "@/lib/flags";
 import { useMomentumData } from "@/lib/momentum-store";
 import { simulatedSource, usePlanSource, type BuildResult, type FailureReason } from "@/lib/plan-source";
+import type { BriefDraftItem } from "@/lib/types";
 
-// How long typing pauses before the draft is written to storage.
+// How long typing pauses before the drafts are written to storage.
 const DRAFT_SAVE_DELAY_MS = 400;
 
-type Phase =
-  | { name: "entry"; focus: "heading" | "brief" }
-  | { name: "building" }
-  | { name: "error"; reason: FailureReason };
+type Phase = { name: "entry" } | { name: "building" } | { name: "error"; reason: FailureReason };
 
-// "/" on first run, and /new: brief entry, building, and Errors 02 and 03. The brief and deadline are
-// kept as a draft in storage, so they survive a reload, a failed build, Cancel and "Back to your
-// assignments". When a plan is created, the store opens it in review and the browser goes to /plan.
-export function BriefFlow() {
+const emptyBrief = (): BriefDraftItem => ({ id: crypto.randomUUID(), text: "", deadline: "" });
+
+// "/" on first run, and /new (`atNew`). While a week's plans are being built, and until the student
+// leaves after the run, it shows the queue (M7-3). Otherwise brief entry. Opening it after a run has
+// ended starts fresh: the briefs that weren't built are drafts again.
+export function BriefFlow({ atNew = false }: { atNew?: boolean }) {
+  const queue = useBuildQueue();
+  const [showRun, setShowRun] = useState(queue.running);
+  if (queue.items.length > 0 && (queue.running || showRun)) {
+    return (
+      <BuildQueueScreen
+        onEditBriefs={() => {
+          queue.clear();
+          setShowRun(false);
+        }}
+      />
+    );
+  }
+  return <BriefEntryFlow atNew={atNew} onQueueStarted={() => setShowRun(true)} />;
+}
+
+// Brief entry, and for a single brief: building and Errors 02 and 03. The briefs are kept as drafts in
+// storage, so they survive a reload, a failed build, Cancel and "Back to your assignments". One brief
+// with text builds as it always has (then /plan); two or more go to the build queue.
+function BriefEntryFlow({ atNew, onQueueStarted }: { atNew: boolean; onQueueStarted: () => void }) {
   const { data, act } = useMomentumData();
   const router = useRouter();
   const source = usePlanSource();
-  const [text, setText] = useState(data.briefDraft?.text ?? "");
-  const [deadline, setDeadline] = useState(data.briefDraft?.deadline ?? "");
-  const [phase, setPhase] = useState<Phase>({ name: "entry", focus: "heading" });
-  const [entryError, setEntryError] = useState<"empty" | "tooLong" | null>(null);
+  const queue = useBuildQueue();
+  const [briefs, setBriefs] = useState<BriefDraftItem[]>(() => {
+    const stored = readBriefDrafts(data);
+    return stored.length > 0 ? stored : [emptyBrief()];
+  });
+  const [phase, setPhase] = useState<Phase>({ name: "entry" });
+  const [emptyError, setEmptyError] = useState(false);
+  // Briefs with text removed this visit, oldest first, so Undo can bring them all back (M7c risk review,
+  // finding 8). Each index is where the brief was when it was removed.
+  const [removed, setRemoved] = useState<{ brief: BriefDraftItem; index: number }[]>([]);
+  const [focus, setFocus] = useState<EntryFocus>({ target: "heading" });
   const [focusKey, setFocusKey] = useState(0);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const build = useRef<AbortController | null>(null);
 
-  const saveDraft = useCallback(
-    (nextText: string, nextDeadline: string) => {
+  const saveDrafts = useCallback(
+    (next: BriefDraftItem[]) => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
       saveTimer.current = null;
-      act({ type: "setBriefDraft", draft: { text: nextText, deadline: nextDeadline } });
+      act({ type: "setBriefDrafts", drafts: next });
     },
     [act],
   );
 
-  // Save the draft once typing pauses. A pending save is dropped when the screen goes away.
+  // Save the drafts once typing pauses. A pending save is dropped when the screen goes away; leaving
+  // and building save straight away instead.
   useEffect(() => {
-    saveTimer.current = setTimeout(() => saveDraft(text, deadline), DRAFT_SAVE_DELAY_MS);
+    saveTimer.current = setTimeout(() => saveDrafts(briefs), DRAFT_SAVE_DELAY_MS);
     return () => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
     };
-  }, [text, deadline, saveDraft]);
+  }, [briefs, saveDrafts]);
 
-  // Leaving the screen stops a build that is still running.
+  // Leaving the screen stops a single build that is still running (a week's queue keeps going).
   useEffect(() => () => build.current?.abort(), []);
 
-  function backToEntry() {
-    setPhase({ name: "entry", focus: "brief" });
+  function moveFocus(next: EntryFocus) {
+    setFocus(next);
     setFocusKey((key) => key + 1);
   }
 
-  async function submit() {
-    if (!text.trim()) {
-      // Error 01: nothing to send, so no request.
-      setEntryError("empty");
-      backToEntry();
-      return;
-    }
-    if (briefLength(text) > MAX_BRIEF_CHARS) {
-      // The over-limit message is already showing; this moves focus back to the brief.
-      setEntryError("tooLong");
-      backToEntry();
-      return;
-    }
-    setEntryError(null);
-    saveDraft(text, deadline);
+  function backToEntry(id: string) {
+    setPhase({ name: "entry" });
+    moveFocus({ target: "brief", id });
+  }
 
+  function change(id: string, patch: Partial<Pick<BriefDraftItem, "text" | "deadline">>) {
+    const next = briefs.map((brief) => (brief.id === id ? { ...brief, ...patch } : brief));
+    setBriefs(next);
+    if (emptyError && next.some((brief) => brief.text.trim())) setEmptyError(false);
+  }
+
+  // A removed brief that can still be undone keeps its place among the 8, so Undo always fits and
+  // the list never passes 8 (Aidan, M7c risk review, finding 3).
+  const canAdd = briefs.length + removed.length < MAX_BRIEFS;
+
+  function add() {
+    if (!canAdd) return;
+    const brief = emptyBrief();
+    setBriefs([...briefs, brief]);
+    moveFocus({ target: "brief", id: brief.id });
+  }
+
+  function remove(id: string) {
+    const index = briefs.findIndex((brief) => brief.id === id);
+    const brief = briefs[index];
+    const next = briefs.filter((b) => b.id !== id);
+    setBriefs(next);
+    // A brief with words in it can be brought back; an empty one just goes.
+    // Removing an empty one keeps the briefs already waiting for Undo.
+    if (brief.text.trim()) setRemoved([...removed, { brief, index }]);
+    // Focus goes to the card that took its place, or to Add another brief. With one brief left there
+    // are no card headings, so focus goes to Add another brief.
+    const following = next[index];
+    moveFocus(next.length > 1 && following ? { target: "card", id: following.id } : { target: "add" });
+  }
+
+  function undoRemove() {
+    if (removed.length === 0) return;
+    // Newest first, each back where it was. (An empty brief removed in between can shift a position by
+    // one; the text is always kept.)
+    const next = [...briefs];
+    for (const { brief, index } of [...removed].reverse()) next.splice(Math.min(index, next.length), 0, brief);
+    setBriefs(next);
+    setRemoved([]);
+    moveFocus({ target: "brief", id: removed[0].brief.id });
+  }
+
+  function fillSample() {
+    const empty = briefs.find((brief) => !brief.text.trim());
+    if (empty) {
+      change(empty.id, { text: sampleAssignment.brief });
+    } else if (canAdd) {
+      setBriefs([...briefs, { ...emptyBrief(), text: sampleAssignment.brief }]);
+    }
+    setEmptyError(false);
+  }
+
+  async function buildOne(brief: BriefDraftItem, activeSource: typeof source) {
     const controller = new AbortController();
     build.current = controller;
     setPhase({ name: "building" });
-    // In development, "?simulate=" can stand in for the source (for screenshots). Never in production.
-    const activeSource = simulatedSource(window.location.search) ?? source;
     let result: BuildResult;
     try {
-      result = await activeSource.build({ brief: text, deadline: deadline || undefined }, controller.signal);
+      result = await activeSource.build({ brief: brief.text, deadline: brief.deadline || undefined }, controller.signal);
     } catch {
       result = { ok: false, reason: "failed" };
     }
     if (controller.signal.aborted) return;
 
     if (result.ok) {
-      act({ type: "createPlan", id: crypto.randomUUID(), plan: result.plan, brief: text, deadlineOverride: deadline, at: new Date().toISOString() });
+      act({ type: "createPlan", id: crypto.randomUUID(), plan: result.plan, brief: brief.text, deadlineOverride: brief.deadline, at: new Date().toISOString() });
       router.push("/plan");
     } else {
       setPhase({ name: "error", reason: result.reason });
     }
   }
 
+  function submit() {
+    const withText = briefs.filter((brief) => brief.text.trim());
+    if (withText.length === 0) {
+      // Error 01: nothing to send, so no request.
+      setEmptyError(true);
+      backToEntry(briefs[0].id);
+      return;
+    }
+    const tooLong = withText.find((brief) => briefLength(brief.text) > MAX_BRIEF_CHARS);
+    if (tooLong) {
+      // Its over-limit message is already showing; this moves focus to it. Nothing is sent.
+      backToEntry(tooLong.id);
+      return;
+    }
+    setEmptyError(false);
+    setRemoved([]);
+    saveDrafts(briefs);
+
+    // In development, "?simulate=" can stand in for the source (for screenshots). Never in production.
+    const activeSource = simulatedSource(window.location.search) ?? source;
+    if (withText.length === 1) {
+      void buildOne(withText[0], activeSource);
+      return;
+    }
+    // Brief N is the card's position on screen, empty cards included.
+    queue.start(
+      withText.map((brief) => ({ ...brief, number: briefs.indexOf(brief) + 1 })),
+      activeSource,
+    );
+    onQueueStarted();
+    if (!atNew) router.push("/new");
+  }
+
   function cancel() {
     build.current?.abort();
-    backToEntry();
+    backToEntry(briefs.find((brief) => brief.text.trim())?.id ?? briefs[0].id);
   }
 
   if (phase.name === "building") return <BuildingScreen onCancel={cancel} />;
 
   if (phase.name === "error") {
-    const editBrief = { label: "Edit the brief", onClick: backToEntry };
+    const built = briefs.find((brief) => brief.text.trim()) ?? briefs[0];
+    const editBrief = { label: "Edit the brief", onClick: () => backToEntry(built.id) };
     const tryAgain = { label: "Try again", onClick: submit };
     return (
       <div className="flex min-h-screen flex-col">
@@ -127,7 +231,7 @@ export function BriefFlow() {
               heading="We couldn’t build your plan just now."
               body={
                 phase.reason === "rateLimited"
-                  ? // The route allows 5 plans per IP address in 10 minutes (and 100 an hour in all), so no
+                  ? // The route allows 12 plans per IP address in 10 minutes (and 100 an hour in all), so no
                     // promise of an exact wait. Wording approved by Aidan (decisions.md, M6, item 5).
                     "Too many plans were built from this network. Try again in about 10 minutes."
                   : "Something went wrong on our side, not with your brief. Try again in a moment."
@@ -143,28 +247,23 @@ export function BriefFlow() {
 
   return (
     <BriefEntryScreen
-      text={text}
-      deadline={deadline}
-      onTextChange={(next) => {
-        setText(next);
-        if (entryError === "empty" && next.trim()) setEntryError(null);
-        if (entryError === "tooLong" && briefLength(next) <= MAX_BRIEF_CHARS) setEntryError(null);
-      }}
-      onDeadlineChange={setDeadline}
-      // Saves the draft now: a save still waiting for typing to pause would be dropped on leaving.
-      onBack={data.assignments.length > 0 ? () => saveDraft(text, deadline) : undefined}
-      onUseSample={
-        showSampleBrief()
-          ? () => {
-              setText(sampleAssignment.brief);
-              setEntryError(null);
-            }
-          : undefined
+      variant={atNew ? "week" : "first"}
+      briefs={briefs}
+      onChange={change}
+      onAdd={add}
+      canAdd={canAdd}
+      onRemove={remove}
+      removed={
+        removed.length > 0
+          ? { index: removed[removed.length - 1].index, count: removed.length, number: removed[0].index + 1, onUndo: undoRemove }
+          : null
       }
+      // Saves the drafts now: a save still waiting for typing to pause would be dropped on leaving.
+      onBack={data.assignments.length > 0 ? () => saveDrafts(briefs) : undefined}
+      onUseSample={showSampleBrief() ? fillSample : undefined}
       onSubmit={submit}
-      // Over the limit shows the message straight away (a paste is no longer cut at the limit).
-      error={entryError ?? (briefLength(text) > MAX_BRIEF_CHARS ? "tooLong" : null)}
-      focus={phase.focus}
+      emptyError={emptyError}
+      focus={focus}
       focusKey={focusKey}
     />
   );

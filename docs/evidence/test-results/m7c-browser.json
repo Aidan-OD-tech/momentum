@@ -1,0 +1,131 @@
+{
+  "checks": [
+    {
+      "name": "1280x800 button says Build 3 plans",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1280x800 mid-run rows",
+      "ok": true,
+      "detail": "[\"Brief 1 · building the plan\",\"Brief 2 · waiting\",\"Brief 3 · waiting\"]"
+    },
+    {
+      "name": "list shows the building line mid-run",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "queue kept running on the list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "after the run, /new is entry with only the unbuilt brief",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1280x800 stored: two plans in review, the unreadable brief kept, open assignment unchanged",
+      "ok": true,
+      "detail": "{\"review\":[\"Urban green spaces essay\",\"Lab report 5\",\"Problem set 7\"],\"drafts\":1,\"open\":\"a1\"}"
+    },
+    {
+      "name": "1280x800 requests one at a time",
+      "ok": true,
+      "detail": "200,422,200"
+    },
+    {
+      "name": "600x800 button says Build 3 plans",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "600: no horizontal scroll on entry",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "600x800 mid-run rows",
+      "ok": true,
+      "detail": "[\"Brief 1 · building the plan\",\"Brief 2 · waiting\",\"Brief 3 · waiting\"]"
+    },
+    {
+      "name": "600x800 finished rows",
+      "ok": true,
+      "detail": "[\"Lab report 5 · plan ready\",\"Brief 2 · couldn’t find clear requirementsYour brief is kept. Edit it and try again.Edit brief\",\"Problem set 7 · plan ready\"]"
+    },
+    {
+      "name": "600x800 stored: two plans in review, the unreadable brief kept, open assignment unchanged",
+      "ok": true,
+      "detail": "{\"review\":[\"Urban green spaces essay\",\"Lab report 5\",\"Problem set 7\"],\"drafts\":1,\"open\":\"a1\"}"
+    },
+    {
+      "name": "600x800 requests one at a time",
+      "ok": true,
+      "detail": "200,422,200"
+    },
+    {
+      "name": "429: one request, rows not built, drafts kept",
+      "ok": true,
+      "detail": "[\"Brief 1 · not built yet\",\"Brief 2 · not built yet\"]"
+    }
+  ],
+  "consoleErrors": [],
+  "axe": {
+    "entry-1280x800": [],
+    "building-1280x800": [],
+    "entry-600x800": [],
+    "building-600x800": [],
+    "rate-limited": []
+  },
+  "requests": [
+    {
+      "width": 1280,
+      "at": 1795062150117,
+      "status": 200,
+      "brief": "CHEM 2010 Lab report"
+    },
+    {
+      "width": 1280,
+      "at": 1795062151623,
+      "status": 422,
+      "brief": "A recipe for lemon c"
+    },
+    {
+      "width": 1280,
+      "at": 1795062153127,
+      "status": 200,
+      "brief": "MATH 2210 Problem se"
+    },
+    {
+      "width": 600,
+      "at": 1795062155801,
+      "status": 200,
+      "brief": "CHEM 2010 Lab report"
+    },
+    {
+      "width": 600,
+      "at": 1795062157307,
+      "status": 422,
+      "brief": "A recipe for lemon c"
+    },
+    {
+      "width": 600,
+      "at": 1795062158810,
+      "status": 200,
+      "brief": "MATH 2210 Problem se"
+    },
+    {
+      "width": 1280,
+      "at": 1795062161085,
+      "status": 429,
+      "brief": "CHEM 2010 Lab report"
+    }
+  ],
+  "tabOrder": [
+    "button[button]: Remove brief 1",
+    "textarea[textarea]: Brief 1",
+    "input[datetime-local]: Deadline for brief 1Optional"
+  ]
+}

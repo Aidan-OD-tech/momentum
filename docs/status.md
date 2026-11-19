@@ -13,8 +13,8 @@ Legend: **planned** (not started), **implemented** (written, not independently c
 | M5 | Evaluation readiness: sample-brief flag, one tracked event, heuristic and accessibility review, session templates | verified and merged (PR #5); sessions and VoiceOver pending (Aidan) |
 | M6 | Fixes from evaluation | verified and merged (PR #6); VoiceOver pending |
 | M7a | Several assignments: data and ordering (logic only) | implemented and **verified** on branch `feat/m7a-multi-assignment-model` (PR #7) |
-| M7b | Several assignments: prioritized home list | implemented and **verified** on branch `feat/m7b-home-list` (see M7b); not pushed |
-| M7c | Several assignments: upload a week's briefs in one go | planned |
+| M7b | Several assignments: prioritized home list | verified and merged (PR #8) |
+| M7c | Several assignments: upload a week's briefs in one go | implemented and **verified** on branch `feat/m7c-weekly-upload` (see M7c); not pushed |
 | M7d | Several assignments: see Aidan's M7 plan (not in this repo) | planned |
 | — | Docs and case study (was the M7 row; where it goes now is for Aidan to confirm) | planned |
 
@@ -364,4 +364,48 @@ The prioritized home list. Branched from `feat/m7a-multi-assignment-model` (PR #
 ### Known limitations
 
 - After a reload, whichever tab wrote last decides which assignment opens.
+
+## M7c
+
+A week's briefs at once. Branched from `main` after PR #8 (M7b) was merged. Decisions: [decisions.md](decisions.md), "M7c".
+
+### Built
+
+- `briefDrafts` in storage (`readBriefDrafts`, `setBriefDrafts`, `addPlanFromDraft`); `MAX_BRIEFS = 8`.
+- Brief entry with up to 8 briefs, Remove with Undo, unique labels, "Build N plans"; `/new` has its own heading and intro.
+- `BuildQueueProvider` and `BuildQueueScreen` ("Building your plans"); the home list's building line.
+- `PER_IP_LIMIT` 12 per 10 minutes.
+
+### Verified (2026-11-18, Node 24.21.0)
+
+| Check | Result |
+| --- | --- |
+| `npm test` | **356 passed** (319 before; +37: weekly upload screens 20, queue 8, drafts and `addPlanFromDraft` 9, storage 1, minus the 1 replaced `setBriefDraft` test). Existing BriefFlow single-brief tests unchanged except M7b's `/new` draft test, which now reads `briefDrafts` |
+| `npm run lint`, `npx tsc --noEmit`, `npm run build` | clean |
+| Browser on `npm run dev` (Chrome via Playwright; `/api/plan` answered by the script with a 1.5 s delay: 200, 422, 200, then a separate 429 run; no model calls) | 14/14 checks at 1280 and 600: "Build 3 plans"; rows mid-run; requests one at a time (each started ≥1.4 s after the one before); two plans in review, the unreadable brief kept as the only draft, the open assignment unchanged; the list's building line mid-run and the queue finishing while on the list; `/new` afterwards shows only the unbuilt brief; no horizontal scroll at 600; 429: one request, rows "not built yet", both drafts kept. No console errors other than the browser's reports of the 422 and 429 the script returned. `evidence/test-results/m7c-browser.json` |
+| axe (axe-core 4.10) | **0 violations**: entry with three briefs (1280, 600), building mid-run (1280, 600), rate-limited |
+| Keyboard (Tab from the h1, three briefs) | Remove brief 1 → Brief 1 → Deadline for brief 1 → Remove brief 2 → Brief 2 → Deadline for brief 2 → Remove brief 3 → Brief 3 → Deadline for brief 3 → Add another brief → Build 3 plans. "Back to your assignments" is before the h1 |
+| Screenshots | `evidence/screenshots/m7c/`: entry with three briefs, building mid-run, building with a failure (1280 and 600); building done (600); list while building and after (1280; after also 600); rate-limited (1280). The stubbed plans reuse the sample plan's course and deadline |
+
+The dev server used was one already running on port 3000 for this folder (not started by Claude Code), so it served this branch's working tree.
+
+### Risk review fixes (2026-11-19)
+
+Findings 3, 1, 2, 5a, 7, 9, 11 and 8 from [reviews/2026-11-19-risk-weekly-upload.md](reviews/2026-11-19-risk-weekly-upload.md), one commit and test each, plus Aidan's approved wording (decisions.md, "M7c risk review fixes"). 4, 6, 10 and 12 are M8 candidates.
+
+| Check | Result |
+| --- | --- |
+| `npm test` | **367 passed** (356 before the fixes; +11: weekly upload screens 9, queue 2) |
+| `npm run lint`, `npx tsc --noEmit`, `npm run build` | clean |
+| Browser (Playwright) | **not re-run** after the fixes; the browser results above are from before them |
+
+### Not verified
+
+- Real `/api/plan` requests for a full week (no model calls were made), VoiceOver, and the Figma frames (no Figma access).
+- The production build in a browser.
+
+### Known limitations
+
+- A reload or closing the tab stops the queue; the briefs not built stay as drafts, but the queue doesn't resume by itself.
+- Two tabs: since risk 5a a queue skips a brief another tab has already built, but two queues started at the same moment can still build one brief twice.
 

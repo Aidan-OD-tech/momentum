@@ -63,15 +63,22 @@ export type Assignment = {
 
 // What the student has typed on brief entry, kept until a plan is created.
 // deadline is the datetime-local value ("2026-12-04T17:00") or "" when blank.
+// The M3 shape, one brief. Still read from old data; new writes use BriefDraftItem (M7c).
 export type BriefDraft = { text: string; deadline: string };
+
+// One brief on brief entry (M7c, several at once). The id keeps it apart while plans are built.
+export type BriefDraftItem = { id: string; text: string; deadline: string };
 
 export type MomentumData = {
   version: 1;
   // null means no assignment is open (first run, before any plan exists).
   activeAssignmentId: string | null;
   assignments: Assignment[];
-  // Added in M3. Optional, so data saved by M2 still loads as version 1.
+  // Added in M3. Optional, so data saved by M2 still loads as version 1. Read through readBriefDrafts;
+  // the first write that touches drafts removes it in favour of briefDrafts.
   briefDraft?: BriefDraft;
+  // Added in M7c: the briefs on brief entry, in card order. Only briefs with text or a deadline are kept.
+  briefDrafts?: BriefDraftItem[];
 };
 
 // A plan as a PlanSource returns it, before the student has started or edited anything.

@@ -104,3 +104,12 @@ Records what AI tools produced and where Aidan changed, corrected or decided. Ke
 - Approved the wording for items 3, 5, 9 and 10, kept `border/rule` at #d4d4d4 for label-identified controls, added the estimate stepper's +/− boundary as an M7 candidate, and corrected his item 8 line to VoiceOver step 7 (2026-11-18).
 - Asked for the keyboard script to be re-run with the wordmark as a Tab stop. The re-run (scripted, both widths) also corrected an M5 note: the deadline stop the script flagged is Chrome's calendar button, which shows Chrome's own ring, not a timing artifact (2026-11-18).
 - Added a preview check for item 6: after 7 PM local time, a brief due "this Friday" (2026-11-18).
+
+## M7c: a week's briefs at once (2026-11-18)
+
+- Implemented by Claude Code from Aidan's written M7c prompt, in small commits on `feat/m7c-weekly-upload`. M7a and M7b have no entry in this log.
+- **What Claude Code did not do:** it made no OpenAI requests (the browser checks answered `/api/plan` themselves), used no screen reader, had no Figma access (built from the prompt), and didn't push or merge.
+- **Decided by Claude Code, flagged for Aidan** (decisions.md, M7c): one brief keeps today's layout with no card; Edit brief waits until nothing is being built; "not built yet" for briefs left after Stop or a 429; the copy for a plan built but not saved; the page heading is an h1 in the Heading L style.
+- **Claude Code's own corrections during M7c:** it first branched from the M7b branch, then recreated the branch from `main` once it saw PR #8 had been merged. A planned check of the old single-draft migration would have rewritten storage on the first visit; the same-value rule was changed so an unchanged list writes nothing in either shape. Several browser-script mistakes (substring label matches, waiting for a row button that is the Up next card's) were fixed in the script, not the app.
+- The dev server used for the browser checks was one already running for this folder on port 3000; Claude Code didn't start or stop it.
+

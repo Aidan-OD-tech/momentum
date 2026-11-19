@@ -30,7 +30,8 @@ export function BuildingScreen({ onCancel }: { onCancel: () => void }) {
 }
 
 // Indeterminate: it shows that work is happening, not how much is done. Still with reduced motion.
-function Spinner() {
+// Also on the rows of Building your plans (M7c).
+export function Spinner() {
   return (
     <span
       aria-hidden="true"

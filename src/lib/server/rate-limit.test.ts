@@ -1,12 +1,13 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { allowPlanRequest, clientIp, GLOBAL_LIMIT, PER_IP_WINDOW_MS, resetPlanRateLimit } from "@/lib/server/rate-limit";
+import { allowPlanRequest, clientIp, GLOBAL_LIMIT, PER_IP_LIMIT, PER_IP_WINDOW_MS, resetPlanRateLimit } from "@/lib/server/rate-limit";
 
 beforeEach(resetPlanRateLimit);
 
 describe("allowPlanRequest", () => {
-  it("allows 5 per IP in 10 minutes, then again once the window has passed", () => {
+  it("allows 12 per IP in 10 minutes (the 13th is refused), then again once the window has passed", () => {
     const t = 1_000_000;
-    for (let i = 0; i < 5; i++) expect(allowPlanRequest("a", t + i)).toBe(true);
+    expect(PER_IP_LIMIT).toBe(12);
+    for (let i = 0; i < 12; i++) expect(allowPlanRequest("a", t + i)).toBe(true);
     expect(allowPlanRequest("a", t + 10)).toBe(false);
     expect(allowPlanRequest("b", t + 10)).toBe(true);
     expect(allowPlanRequest("a", t + PER_IP_WINDOW_MS + 5)).toBe(true);

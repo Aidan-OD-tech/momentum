@@ -3,14 +3,12 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FinalCheckScreen } from "@/components/screens/FinalCheckScreen";
 import { HomeRoute } from "@/components/screens/HomeRoute";
-import { SidePanelProvider } from "@/components/SidePanel";
-import { MomentumProvider, WhenLoaded, WhenStarted } from "@/lib/momentum-store";
-import { PlanSourceProvider } from "@/lib/plan-source";
+import { WhenLoaded, WhenStarted } from "@/lib/momentum-store";
 import { STORAGE_KEY } from "@/lib/storage";
 import type { MomentumData } from "@/lib/types";
 import { HOME_LIST_NOW, makeAssignment, mixedHomeList } from "@/test/fixtures";
 import { router } from "@/test/navigation-mock";
-import { renderApp, samplePlanStub } from "@/test/render-app";
+import { AppProviders, renderApp } from "@/test/render-app";
 
 vi.mock("next/navigation", () => import("@/test/navigation-mock"));
 
@@ -214,21 +212,17 @@ describe("Finish review, then the home list", () => {
   // The app's providers around whichever screen the route shows, so state survives the route change.
   function App({ route }: { route: "/final" | "/" }) {
     return (
-      <MomentumProvider>
-        <SidePanelProvider>
-          <PlanSourceProvider source={samplePlanStub}>
-            <WhenLoaded>
-              {route === "/final" ? (
-                <WhenStarted>
-                  <FinalCheckScreen />
-                </WhenStarted>
-              ) : (
-                <HomeRoute />
-              )}
-            </WhenLoaded>
-          </PlanSourceProvider>
-        </SidePanelProvider>
-      </MomentumProvider>
+      <AppProviders>
+        <WhenLoaded>
+          {route === "/final" ? (
+            <WhenStarted>
+              <FinalCheckScreen />
+            </WhenStarted>
+          ) : (
+            <HomeRoute />
+          )}
+        </WhenLoaded>
+      </AppProviders>
     );
   }
 

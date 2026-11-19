@@ -1,4 +1,5 @@
-import type { Assignment, BriefDraft, MomentumData, PlanDraft, PlanStep, Requirement, Step } from "@/lib/types";
+import { keptDrafts, readBriefDrafts, sameDrafts, withDrafts } from "@/lib/brief-drafts";
+import type { Assignment, BriefDraftItem, MomentumData, PlanDraft, PlanStep, Requirement, Step } from "@/lib/types";
 
 // Every rule for changing Momentum's data lives here, as a pure function, so it can be tested without React.
 // Steps are addressed by number n (1-based), like the URLs. Actions apply to the active assignment.
@@ -15,9 +16,10 @@ export type Action =
   | { type: "finishReview"; at: string }
   // Several assignments (M7).
   | { type: "openAssignment"; id: string }
-  // Brief entry and plan review (M3).
-  | { type: "setBriefDraft"; draft: BriefDraft }
+  // Brief entry and plan review (M3). Several briefs at once (M7c).
+  | { type: "setBriefDrafts"; drafts: BriefDraftItem[] }
   | { type: "createPlan"; id: string; plan: PlanDraft; brief: string; deadlineOverride: string; at: string }
+  | { type: "addPlanFromDraft"; draftId: string; id: string; plan: PlanDraft; brief: string; deadlineOverride: string; at: string }
   | { type: "updateStep"; n: number; step: PlanStep }
   | { type: "addStep"; step: PlanStep }
   | { type: "deleteStep"; n: number }
@@ -32,6 +34,29 @@ export function clampEstimate(minutes: number): number {
 // A plan step as stored: upcoming, with no note.
 function newStep(step: PlanStep): Step {
   return { ...step, estimateMin: clampEstimate(step.estimateMin), status: "upcoming", note: "", noteSavedAt: null, noteHidden: false };
+}
+
+type NewPlan = { id: string; plan: PlanDraft; brief: string; deadlineOverride: string; at: string };
+
+// A new assignment in review, from a built plan. Shared by createPlan and addPlanFromDraft.
+function newAssignment({ id, plan, brief, deadlineOverride, at }: NewPlan): Assignment {
+  return {
+    id,
+    status: "review",
+    brief,
+    // A deadline the student typed wins over the one found in the brief; blank keeps the plan's.
+    deadline: deadlineOverride.trim() || plan.deadline,
+    course: plan.course,
+    title: plan.title,
+    summary: plan.summary,
+    requirements: plan.requirements,
+    steps: plan.steps.map(newStep),
+    finalChecks: {},
+    lastUndo: null,
+    completedAt: null,
+    finalReviewedAt: null,
+    planCreatedAt: at,
+  };
 }
 
 export function getActiveAssignment(data: MomentumData): Assignment | undefined {
@@ -54,33 +79,22 @@ export function reducer(data: MomentumData, action: Action): MomentumData {
     const exists = data.assignments.some((a) => a.id === action.id);
     return !exists || data.activeAssignmentId === action.id ? data : { ...data, activeAssignmentId: action.id };
   }
-  if (action.type === "setBriefDraft") {
-    // No stored draft counts as an empty one, so a first visit writes nothing until the student types.
-    const same = (data.briefDraft?.text ?? "") === action.draft.text && (data.briefDraft?.deadline ?? "") === action.draft.deadline;
-    return same ? data : { ...data, briefDraft: action.draft };
+  if (action.type === "setBriefDrafts") {
+    // Empty cards aren't stored, so a first visit writes nothing until the student types. An unchanged
+    // list writes nothing either, even in the old shape: storage is only rewritten when a draft changes.
+    const next = keptDrafts(action.drafts);
+    return sameDrafts(next, readBriefDrafts(data)) ? data : withDrafts(data, next);
   }
   if (action.type === "createPlan") {
-    const { plan } = action;
-    // A deadline the student typed wins over the one found in the brief; blank keeps the plan's.
-    const deadline = action.deadlineOverride.trim() || plan.deadline;
-    const created: Assignment = {
-      id: action.id,
-      status: "review",
-      brief: action.brief,
-      deadline,
-      course: plan.course,
-      title: plan.title,
-      summary: plan.summary,
-      requirements: plan.requirements,
-      steps: plan.steps.map(newStep),
-      finalChecks: {},
-      lastUndo: null,
-      completedAt: null,
-      finalReviewedAt: null,
-      planCreatedAt: action.at,
-    };
-    // The draft has become a plan, so it is cleared.
-    return { ...data, activeAssignmentId: created.id, assignments: [...data.assignments, created], briefDraft: undefined };
+    // The single-brief path: the plan opens in review, and the drafts have become a plan, so they are cleared.
+    const created = newAssignment(action);
+    return { ...withDrafts(data, []), activeAssignmentId: created.id, assignments: [...data.assignments, created] };
+  }
+  if (action.type === "addPlanFromDraft") {
+    // Several briefs: each plan is added as it arrives, without opening it, and only its own draft goes.
+    const created = newAssignment(action);
+    const drafts = readBriefDrafts(data).filter((draft) => draft.id !== action.draftId);
+    return { ...withDrafts(data, drafts), assignments: [...data.assignments, created] };
   }
   if (!assignment) return data;
 

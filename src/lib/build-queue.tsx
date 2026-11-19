@@ -1,0 +1,201 @@
+"use client";
+
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { readBriefDrafts } from "@/lib/brief-drafts";
+import { useMomentumStoreOrNull } from "@/lib/momentum-store";
+import type { BuildResult, PlanSource } from "@/lib/plan-source";
+
+// Builds one plan per brief for a week's upload (M7c): one request at a time, in card order, each plan
+// saved as soon as it arrives. It lives above every screen (providers.tsx), so it keeps going while the
+// student looks at the list. Its state is only in memory: a reload stops it, and the briefs not built
+// yet are still drafts in storage.
+
+// waiting: not sent yet. building: the request is out. ready: built and saved. notSaved: built, but the
+// write failed, so the plan is only in memory this visit (never called "ready"). failed: not built.
+// elsewhere: another tab built it first, so it was skipped.
+export type QueueItemState = "waiting" | "building" | "ready" | "notSaved" | "failed" | "elsewhere";
+
+export type QueueItem = {
+  draftId: string;
+  // "Brief N": the card's position when the upload started.
+  number: number;
+  brief: string;
+  deadline: string;
+  state: QueueItemState;
+  // Set when failed: unreadable (no clear requirements) or failed (anything else).
+  reason?: "unreadable" | "failed";
+  // Set once built.
+  title?: string;
+  // Lower goes first. Try again gives the item a later turn, so it is built after the others.
+  turn: number;
+};
+
+export type QueueBrief = { id: string; text: string; deadline: string; number: number };
+
+// One change of an item's state, for the screen's live region. seq only grows, so it can be a key.
+export type QueueChange = { seq: number; item: QueueItem };
+
+type BuildQueue = {
+  items: QueueItem[];
+  // A request is out, or the next one is about to be sent.
+  running: boolean;
+  // Stop after this one was pressed and the current request hasn't come back yet.
+  stopRequested: boolean;
+  // The last run stopped on a 429. No automatic retry.
+  rateLimited: boolean;
+  // The latest changes of an item's state (newest last), so a screen reader hears each one once.
+  changes: QueueChange[];
+  start: (briefs: QueueBrief[], source: PlanSource) => void;
+  stopAfterCurrent: () => void;
+  retry: (draftId: string) => void;
+  // Forgets a finished run, so brief entry shows again. Does nothing while running.
+  clear: () => void;
+};
+
+const BuildQueueContext = createContext<BuildQueue | null>(null);
+
+export function useBuildQueue(): BuildQueue {
+  const queue = useContext(BuildQueueContext);
+  if (!queue) throw new Error("useBuildQueue must be used inside <BuildQueueProvider>");
+  return queue;
+}
+
+export function BuildQueueProvider({ children }: { children: React.ReactNode }) {
+  const store = useMomentumStoreOrNull();
+  const [items, setItems] = useState<QueueItem[]>([]);
+  const [running, setRunning] = useState(false);
+  const [stopRequested, setStopRequested] = useState(false);
+  const [rateLimited, setRateLimited] = useState(false);
+  const [changes, setChanges] = useState<QueueChange[]>([]);
+  const nextSeq = useRef(0);
+
+  // Read by the running loop between awaits, so it always sees the latest values.
+  const itemsRef = useRef<QueueItem[]>([]);
+  const runningRef = useRef(false);
+  const stopRef = useRef(false);
+  const sourceRef = useRef<PlanSource | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const nextTurn = useRef(0);
+  const storeRef = useRef(store);
+  useEffect(() => {
+    storeRef.current = store;
+  });
+
+  // Unmounting (closing the app) stops the request that is out.
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  const update = useCallback((draftId: string, patch: Partial<QueueItem>) => {
+    const before = itemsRef.current.find((item) => item.draftId === draftId);
+    itemsRef.current = itemsRef.current.map((item) => (item.draftId === draftId ? { ...item, ...patch } : item));
+    setItems(itemsRef.current);
+    const after = itemsRef.current.find((item) => item.draftId === draftId);
+    if (after && before?.state !== after.state) {
+      const change = { seq: nextSeq.current++, item: after };
+      setChanges((list) => [...list.slice(-4), change]);
+    }
+  }, []);
+
+  const run = useCallback(async () => {
+    if (runningRef.current || !sourceRef.current) return;
+    runningRef.current = true;
+    setRunning(true);
+    setRateLimited(false);
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    while (!stopRef.current) {
+      const next = itemsRef.current.filter((item) => item.state === "waiting").sort((a, b) => a.turn - b.turn)[0];
+      if (!next) break;
+      // Another tab may have built this brief already (M7c risk review, finding 5a): its draft is gone and a
+      // plan from the same text is stored. Skip it rather than build it twice. A draft removed in another
+      // tab without a plan is still built, since nothing says it was meant to go.
+      const data = storeRef.current?.data;
+      const draftGone = data && !readBriefDrafts(data).some((draft) => draft.id === next.draftId);
+      if (draftGone && data.assignments.some((assignment) => assignment.brief === next.brief)) {
+        update(next.draftId, { state: "elsewhere" });
+        continue;
+      }
+      update(next.draftId, { state: "building" });
+      let result: BuildResult;
+      try {
+        result = await sourceRef.current.build({ brief: next.brief, deadline: next.deadline || undefined }, controller.signal);
+      } catch {
+        result = { ok: false, reason: "failed" };
+      }
+      if (controller.signal.aborted) return;
+
+      if (result.ok) {
+        const saved =
+          storeRef.current?.act({
+            type: "addPlanFromDraft",
+            draftId: next.draftId,
+            id: crypto.randomUUID(),
+            plan: result.plan,
+            brief: next.brief,
+            deadlineOverride: next.deadline,
+            at: new Date().toISOString(),
+          }) ?? false;
+        update(next.draftId, { state: saved ? "ready" : "notSaved", title: result.plan.title });
+        // Storage stopped working: later plans couldn't be saved either, so stop here. The rest stay
+        // drafts, and the top bar already shows the failed save (M7c risk review, finding 7).
+        if (!saved) break;
+      } else if (result.reason === "rateLimited") {
+        // Stop here. This brief and the later ones go back to waiting; their drafts are still stored.
+        update(next.draftId, { state: "waiting" });
+        setRateLimited(true);
+        break;
+      } else {
+        // Keep its draft and go on with the next brief.
+        update(next.draftId, { state: "failed", reason: result.reason });
+      }
+    }
+
+    runningRef.current = false;
+    stopRef.current = false;
+    setRunning(false);
+    setStopRequested(false);
+  }, [update]);
+
+  const start = useCallback(
+    (briefs: QueueBrief[], source: PlanSource) => {
+      if (runningRef.current) return;
+      sourceRef.current = source;
+      itemsRef.current = briefs.map((brief) => ({
+        draftId: brief.id,
+        number: brief.number,
+        brief: brief.text,
+        deadline: brief.deadline,
+        state: "waiting",
+        turn: nextTurn.current++,
+      }));
+      setItems(itemsRef.current);
+      void run();
+    },
+    [run],
+  );
+
+  const stopAfterCurrent = useCallback(() => {
+    if (!runningRef.current) return;
+    stopRef.current = true;
+    setStopRequested(true);
+  }, []);
+
+  const retry = useCallback(
+    (draftId: string) => {
+      update(draftId, { state: "waiting", reason: undefined, turn: nextTurn.current++ });
+      void run();
+    },
+    [run, update],
+  );
+
+  const clear = useCallback(() => {
+    if (runningRef.current) return;
+    itemsRef.current = [];
+    setItems([]);
+    setChanges([]);
+    setRateLimited(false);
+  }, []);
+
+  const value = { items, running, stopRequested, rateLimited, changes, start, stopAfterCurrent, retry, clear };
+  return <BuildQueueContext.Provider value={value}>{children}</BuildQueueContext.Provider>;
+}

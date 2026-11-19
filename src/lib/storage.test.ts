@@ -78,6 +78,21 @@ describe("storage", () => {
     expect(load(storage)).toEqual({ data, ok: true });
   });
 
+  it("keeps briefDrafts through save and load (M7c)", () => {
+    const storage = memoryStorage();
+    const data = {
+      version: 1 as const,
+      activeAssignmentId: null,
+      assignments: [],
+      briefDrafts: [
+        { id: "a", text: "First", deadline: "" },
+        { id: "b", text: "Second", deadline: "2026-12-04T17:00" },
+      ],
+    };
+    expect(save(data, storage)).toBe(true);
+    expect(load(storage)).toEqual({ data, ok: true });
+  });
+
   it("keeps briefDraft through save and load", () => {
     const storage = memoryStorage();
     const data = { version: 1 as const, activeAssignmentId: null, assignments: [], briefDraft: { text: "My brief", deadline: "2026-12-04T17:00" } };

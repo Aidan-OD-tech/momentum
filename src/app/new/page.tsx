@@ -5,7 +5,7 @@ import { WhenLoaded } from "@/lib/momentum-store";
 export default function NewAssignmentPage() {
   return (
     <WhenLoaded>
-      <BriefFlow />
+      <BriefFlow atNew />
     </WhenLoaded>
   );
 }

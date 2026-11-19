@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createSamplePlan } from "@/data/sample-assignment";
+import { OLD_DRAFT_ID, readBriefDrafts } from "@/lib/brief-drafts";
 import { clampEstimate, getActiveAssignment, reducer, type Action } from "@/lib/reducer";
 import type { MomentumData, PlanStep } from "@/lib/types";
 
@@ -10,17 +11,96 @@ const run = (data: MomentumData, ...actions: Action[]) => actions.reduce(reducer
 const active = (data: MomentumData) => getActiveAssignment(data)!;
 
 function inReview(deadlineOverride = ""): MomentumData {
-  const withDraft = reducer(EMPTY, { type: "setBriefDraft", draft: { text: "the brief", deadline: deadlineOverride } });
+  const withDraft = reducer(EMPTY, { type: "setBriefDrafts", drafts: [{ id: "d1", text: "the brief", deadline: deadlineOverride }] });
   return reducer(withDraft, { type: "createPlan", id: "p1", plan: createSamplePlan(), brief: "the brief", deadlineOverride, at: "2026-11-17T09:00:00.000Z" });
 }
 
 const extraStep = (id: string): PlanStep => ({ id, title: `Extra ${id}`, whatToDo: [], doneWhen: "It exists.", estimateMin: 15 });
 
-describe("setBriefDraft", () => {
-  it("stores the draft, and treats no draft as an empty one", () => {
-    expect(reducer(EMPTY, { type: "setBriefDraft", draft: { text: "", deadline: "" } })).toBe(EMPTY);
-    const data = reducer(EMPTY, { type: "setBriefDraft", draft: { text: "hi", deadline: "" } });
-    expect(data.briefDraft).toEqual({ text: "hi", deadline: "" });
+describe("setBriefDrafts (M7c)", () => {
+  const OLD: MomentumData = { ...EMPTY, briefDraft: { text: "Old brief", deadline: "2026-12-01T09:00" } };
+
+  it("stores briefs with text or a deadline, and treats no drafts as empty cards", () => {
+    expect(reducer(EMPTY, { type: "setBriefDrafts", drafts: [{ id: "a", text: "", deadline: "" }] })).toBe(EMPTY);
+    const data = reducer(EMPTY, {
+      type: "setBriefDrafts",
+      drafts: [
+        { id: "a", text: "hi", deadline: "" },
+        { id: "b", text: "", deadline: "" },
+        { id: "c", text: "", deadline: "2026-12-01T09:00" },
+      ],
+    });
+    expect(data.briefDrafts).toEqual([
+      { id: "a", text: "hi", deadline: "" },
+      { id: "c", text: "", deadline: "2026-12-01T09:00" },
+    ]);
+  });
+
+  it("an unchanged list writes nothing, in either stored shape", () => {
+    const data = reducer(EMPTY, { type: "setBriefDrafts", drafts: [{ id: "a", text: "hi", deadline: "" }] });
+    expect(reducer(data, { type: "setBriefDrafts", drafts: [{ id: "a", text: "hi", deadline: "" }] })).toBe(data);
+    expect(reducer(OLD, { type: "setBriefDrafts", drafts: readBriefDrafts(OLD) })).toBe(OLD);
+  });
+
+  it("the first change to an old draft stores briefDrafts and drops briefDraft", () => {
+    const [old] = readBriefDrafts(OLD);
+    const data = reducer(OLD, { type: "setBriefDrafts", drafts: [{ ...old, text: "Old brief, edited" }, { id: "n", text: "New", deadline: "" }] });
+    expect(data.briefDraft).toBeUndefined();
+    expect(data.briefDrafts).toEqual([
+      { id: OLD_DRAFT_ID, text: "Old brief, edited", deadline: "2026-12-01T09:00" },
+      { id: "n", text: "New", deadline: "" },
+    ]);
+  });
+
+  it("clearing every brief leaves no drafts at all", () => {
+    const data = reducer(OLD, { type: "setBriefDrafts", drafts: [] });
+    expect(data.briefDraft).toBeUndefined();
+    expect(data.briefDrafts).toBeUndefined();
+  });
+});
+
+describe("readBriefDrafts (M7c)", () => {
+  it("reads the new shape, the old one as one item, and nothing as none", () => {
+    expect(readBriefDrafts({ ...EMPTY, briefDrafts: [{ id: "x", text: "t", deadline: "" }] })).toEqual([{ id: "x", text: "t", deadline: "" }]);
+    expect(readBriefDrafts({ ...EMPTY, briefDraft: { text: "t", deadline: "d" } })).toEqual([{ id: OLD_DRAFT_ID, text: "t", deadline: "d" }]);
+    expect(readBriefDrafts(EMPTY)).toEqual([]);
+  });
+
+  it("prefers briefDrafts when both are present", () => {
+    const both = { ...EMPTY, briefDraft: { text: "old", deadline: "" }, briefDrafts: [{ id: "x", text: "new", deadline: "" }] };
+    expect(readBriefDrafts(both).map((d) => d.text)).toEqual(["new"]);
+  });
+});
+
+describe("addPlanFromDraft (M7c)", () => {
+  const plan = createSamplePlan();
+  const drafts = [
+    { id: "d1", text: "First brief", deadline: "" },
+    { id: "d2", text: "Second brief", deadline: "2026-12-10T09:30" },
+  ];
+  const start = (): MomentumData => reducer({ ...EMPTY, activeAssignmentId: null }, { type: "setBriefDrafts", drafts });
+  const add = (data: MomentumData, draftId: string, id: string, deadlineOverride = "") =>
+    reducer(data, { type: "addPlanFromDraft", draftId, id, plan, brief: `brief ${id}`, deadlineOverride, at: "2026-11-18T09:00:00.000Z" });
+
+  it("adds the plan in review, built as createPlan builds it, and removes only its own draft", () => {
+    const data = add(start(), "d2", "p2", "2026-12-10T09:30");
+    const created = reducer(EMPTY, { type: "createPlan", id: "p2", plan, brief: "brief p2", deadlineOverride: "2026-12-10T09:30", at: "2026-11-18T09:00:00.000Z" });
+    expect(data.assignments).toEqual(created.assignments);
+    expect(data.briefDrafts).toEqual([drafts[0]]);
+  });
+
+  it("doesn't change which assignment is open", () => {
+    const open = { ...start(), activeAssignmentId: "x" };
+    expect(add(open, "d1", "p1").activeAssignmentId).toBe("x");
+    expect(add(start(), "d1", "p1").activeAssignmentId).toBeNull();
+  });
+
+  it("removes an old-shape draft by its read id", () => {
+    const old: MomentumData = { ...EMPTY, briefDraft: { text: "Old", deadline: "" } };
+    const data = add(old, OLD_DRAFT_ID, "p1");
+    expect(data.briefDraft).toBeUndefined();
+    expect(data.briefDrafts).toBeUndefined();
+    expect(data.assignments).toHaveLength(1);
   });
 });
 
@@ -28,6 +108,7 @@ describe("createPlan", () => {
   it("opens the plan in review, upcoming and without notes, and clears the draft", () => {
     const data = inReview();
     expect(data.briefDraft).toBeUndefined();
+    expect(data.briefDrafts).toBeUndefined();
     expect(data.activeAssignmentId).toBe("p1");
     expect(active(data)).toMatchObject({ status: "review", brief: "the brief", finalChecks: {}, lastUndo: null });
     expect(active(data).steps.every((s) => s.status === "upcoming" && s.note === "" && !s.noteHidden)).toBe(true);

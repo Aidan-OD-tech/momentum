@@ -393,3 +393,40 @@ Which assignment is open is one shared value in storage. Two tabs on different a
 - **Final-check state of Up next** shows no time left (it would read "About 0 min of steps left").
 - **Empty current list:** "Nothing in progress." with a Primary "Add assignments". The header's Secondary "Add assignments" is hidden in that state, so there is only one (Aidan, 2026-11-18, after review).
 
+### M7c: a week's briefs at once (2026-11-18)
+
+- **Drafts.** `briefDrafts: BriefDraftItem[]` (`{ id, text, deadline }`) replaces `briefDraft` for new writes; still `version: 1` under `momentum:v1`. `readBriefDrafts` (`src/lib/brief-drafts.ts`) reads either shape (an old `briefDraft` is one item with id `brief-1`) and nothing is rewritten on load. The first `setBriefDrafts` that changes something stores `briefDrafts` and drops `briefDraft`; an unchanged list writes nothing, in either shape. Only briefs with text or a deadline are stored, so a first visit still writes nothing.
+- **`addPlanFromDraft`** appends the plan in `review`, built by the same `newAssignment` code as `createPlan`, removes only its own draft and leaves `activeAssignmentId` alone. `createPlan` (one brief) now clears every draft, as it cleared `briefDraft` before.
+- **One brief looks as it always has.** With one brief there is no card, no "Brief 1" heading and the labels stay "Assignment brief" and "Deadline", so the single-brief path and its tests are unchanged. Cards ("Brief N", Remove, "Deadline for brief N") appear at two or more. The Figma draft M7-2 may show a single card; this follows the prompt's "existing BriefFlow tests still pass unchanged".
+- **Removing.** A brief with text shows "Brief N removed." with Undo in its place, for this visit only. An empty one just goes. Focus goes to the heading of the card that took its place, or to Add another brief (also when one brief is left, since it has no heading).
+- **The queue** (`src/lib/build-queue.tsx`) sits in `providers.tsx` above every screen, in memory only. One request at a time, in card order, through the same `PlanSource` (so `?simulate=` and test stubs work). A plan is "ready" only after a confirmed write; if the write fails the item is `notSaved` ("<title> · built, but not saved in this browser", development copy) and the plan stays in memory for the visit. Unreadable and failed briefs keep their drafts and the queue goes on; a 429 stops it, puts this brief and the later ones back to waiting, and shows the M6 line. No automatic retry. Unmounting the provider aborts the request that is out.
+- **Brief N** is the card's position on screen when the upload started, empty cards included, so the row names match what the student saw.
+- **Building your plans** is an h1 in the Heading L style (like the single Building screen); the prompt said "h2-level", read as the type style, since it is the page's only top heading.
+- **Edit brief** (unreadable rows) shows only once nothing is being built, so a brief can't be edited while another request is out and the queue's copy can't be written back over it. Until then the row says "Your brief is kept. Edit it and try again." without the button.
+- **After Stop or a 429** the rows of briefs not sent say "Brief N · not built yet" (development copy), not "waiting", since nothing is waiting. While running they say "waiting". After Stop is pressed, the Stop button becomes the caption "Stopping after this one." (development copy).
+- **Leaving and coming back.** Go to your assignments keeps the queue running. The list shows "Building plans: X of N ready" as a link to `/new` while it runs. After a run has ended, opening `/new` again starts fresh brief entry with the briefs not built; the results show only until the student leaves.
+- **From first run**, building two or more moves to `/new` (the queue's route). "/" shows the list rather than brief entry while a queue runs, even before the first plan is ready.
+- **Rate limit:** `PER_IP_LIMIT` 5 → 12 per 10 minutes; global 100 an hour and the event limits unchanged. The OpenAI monthly budget is still the hard cap; a full upload of 8 briefs costs about 8 requests (Aidan measured 15–18 s each). See deploy.md.
+- **Live region.** Each change of a brief's state is added as a new line to one polite status region (the last five are kept), so each change is heard once and nothing ticks.
+
+### M7c risk review fixes (Aidan, 2026-11-19)
+
+From [reviews/2026-11-19-risk-weekly-upload.md](reviews/2026-11-19-risk-weekly-upload.md). Fixed in this order, one commit and test each: 3, 1, 2, 5a, 7, 9, 11, 8.
+- **3:** a removed brief that can still be undone counts toward the 8 (Aidan's version, instead of "Remove another brief to undo"). Add another brief hides at 8 including it, so Undo always fits and the list never passes 8.
+- **1:** the home list shows "N briefs not built yet" (link to `/new`) whenever drafts with text remain and no queue is running. A brief with only a deadline isn't counted.
+- **2:** after a run that left briefs unbuilt, the building screen offers "Back to your briefs".
+- **5a:** before each request the queue checks the brief is still a stored draft. If it's gone **and** a plan from the same brief text is stored, the row says "Brief N · built in another tab" and nothing is sent. If the draft is gone without such a plan (removed in another tab), it is still built, since "built in another tab" wouldn't be true. Remaining limit: two queues started at the same moment can still build one brief twice.
+- **7:** when a plan can't be saved, the queue stops after that brief, the rest stay drafts, and the top bar shows the existing failed save status.
+- **9:** Stop after this one focuses Go to your assignments (now one element in both states); Try again focuses its row; when the run ends with focus on Stop, it goes to Go to your assignments.
+- **11:** while others are building, an unreadable row says "Your brief is kept. You can edit it once the others are done."
+- **8:** every brief with text removed this visit collects into one notice ("2 briefs removed.") whose Undo restores them all. An empty brief removed in between can shift a restored brief's position by one; its text is always kept.
+- **Wording approved:** "Brief N · not built yet · your brief is kept", "Stopping after the plan being built now.", "<title> · built, but couldn't be saved in this browser. It's gone if you reload.", and the new lines above.
+- **For M7d (session guide):** the per-IP limit (12 per 10 minutes) is shared by everyone on one network. Run participant sessions on networks that don't share one IP, or space them apart, so a session doesn't hit the 429 by accident.
+
+### M8 candidates (deferred from the M7c risk review, Aidan 2026-11-19)
+
+- **Risk 4, both draft shapes stored at once** (S2 × P1 × D3 = 6). Only during a deploy, with a tab still on the M7b build: it writes `briefDraft` while `briefDrafts` exists, `readBriefDrafts` prefers `briefDrafts`, and the next write drops the newer single draft unseen. Proposed fix: when both exist and the `briefDraft` text isn't in the list, read it as one more brief.
+- **Risk 6, a reload mid-queue** (S1 × P2 × D2 = 4). The request that was out still runs on the server, counts against the limit, and its plan is thrown away. Nothing is lost (the rest are drafts), and risk 1's line now shows what's left. A "leave this page?" prompt was not recommended: the browser's text is generic and it adds friction.
+- **Risk 10, one IP can use more of the shared hourly limit** (S2 × P1 × D2 = 4). At 12 per 10 minutes one address can use 72 of the 100 an hour (30 at 5), and each Vercel instance counts separately. The OpenAI monthly budget stays the hard cap: check it and its alert before the sessions, and look for 429s in the `[api/plan]` log lines after each session day.
+- **Risk 12, brief numbers change after Edit brief** (S1 × P2 × D1 = 2). Entry renumbers the briefs left, so "Brief 2" on the building screen can become "Brief 1". Revisit only if sessions show confusion, for example by naming rows with the brief's first words.
+

@@ -158,6 +158,7 @@ describe("brief entry", () => {
     await waitFor(() => expect(router.push).toHaveBeenCalledWith("/plan"));
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
     expect(stored.briefDraft).toBeUndefined();
+    expect(stored.briefDrafts).toBeUndefined();
     expect(stored.assignments[0]).toMatchObject({ status: "review", deadline: "2026-12-10T09:30" });
   });
 });
@@ -251,7 +252,7 @@ describe("/new (brief entry when assignments exist)", () => {
     type("Half a brief");
     fireEvent.change(screen.getByLabelText(/Deadline/), { target: { value: "2026-12-10T09:30" } });
     fireEvent.click(back);
-    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).briefDraft).toEqual({ text: "Half a brief", deadline: "2026-12-10T09:30" });
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).briefDrafts).toMatchObject([{ text: "Half a brief", deadline: "2026-12-10T09:30" }]);
   });
 
   it("a built plan is added next to the others and goes to /plan", async () => {
