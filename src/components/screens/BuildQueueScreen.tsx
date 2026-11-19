@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { AlertIcon, CheckIcon, ClockIcon } from "@/components/icons";
 import { Spinner } from "@/components/screens/BuildingScreen";
 import { TopBar } from "@/components/TopBar";
@@ -31,6 +32,8 @@ export function queueRowText(item: QueueItem, running: boolean): string {
   }
 }
 
+const rowId = (item: QueueItem) => `queue-row-${item.draftId}`;
+
 function RowIcon({ item }: { item: QueueItem }) {
   if (item.state === "building") return <Spinner />;
   if (item.state === "ready" || item.state === "elsewhere") return <CheckIcon className="shrink-0" />;
@@ -47,6 +50,21 @@ export function BuildQueueScreen({ onEditBriefs }: { onEditBriefs: () => void })
   const headingRef = useFocusHeading<HTMLHeadingElement>();
   const { items, running } = queue;
   const goToList = () => router.push("/");
+  const goRef = useRef<HTMLButtonElement>(null);
+
+  // Focus never falls to the page when the control a keyboard user is on goes away (M7c risk review, finding 9).
+  function stop() {
+    queue.stopAfterCurrent();
+    goRef.current?.focus();
+  }
+  function retry(item: QueueItem) {
+    queue.retry(item.draftId);
+    document.getElementById(rowId(item))?.focus();
+  }
+  // When the run ends, Stop after this one goes away. If focus was on it, it is on the page now.
+  useEffect(() => {
+    if (!running && document.activeElement === document.body) goRef.current?.focus();
+  }, [running]);
   const notBuilt = items.some((item) => item.state === "waiting" || item.state === "failed");
 
   return (
@@ -70,7 +88,9 @@ export function BuildQueueScreen({ onEditBriefs }: { onEditBriefs: () => void })
                 <RowIcon item={item} />
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <p className="text-body-l text-text-primary">{queueRowText(item, running)}</p>
+                <p id={rowId(item)} tabIndex={-1} className="text-body-l text-text-primary focus-visible:shadow-none">
+                  {queueRowText(item, running)}
+                </p>
                 {item.state === "failed" && (
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                     <p className="text-body text-text-secondary">
@@ -84,7 +104,7 @@ export function BuildQueueScreen({ onEditBriefs }: { onEditBriefs: () => void })
                         </Button>
                       )
                     ) : (
-                      <Button variant="tertiary" aria-label={`Try again: brief ${item.number}`} onClick={() => queue.retry(item.draftId)}>
+                      <Button variant="tertiary" aria-label={`Try again: brief ${item.number}`} onClick={() => retry(item)}>
                         Try again
                       </Button>
                     )}
@@ -109,34 +129,31 @@ export function BuildQueueScreen({ onEditBriefs }: { onEditBriefs: () => void })
           </p>
         )}
 
-        {running ? (
-          <div className="flex flex-wrap items-center gap-4">
-            <Button variant="secondary" onClick={goToList}>
-              Go to your assignments
+        {/* One element for Go to your assignments in both states, so focus stays on it when it turns
+            Primary. The other actions are keyed, so a removed one is never reused for another. */}
+        <div className="flex flex-wrap items-center gap-4">
+          <Button key="go" ref={goRef} variant={running ? "secondary" : "primary"} onClick={goToList}>
+            Go to your assignments
+          </Button>
+          {running && queue.stopRequested && (
+            // Wording approved by Aidan (M7c review).
+            <p key="stopping" className="text-caption text-text-secondary">
+              Stopping after the plan being built now.
+            </p>
+          )}
+          {running && !queue.stopRequested && (
+            <Button key="stop" variant="tertiary" onClick={stop}>
+              Stop after this one
             </Button>
-            {queue.stopRequested ? (
-              // Wording approved by Aidan (M7c review).
-              <p className="text-caption text-text-secondary">Stopping after the plan being built now.</p>
-            ) : (
-              <Button variant="tertiary" onClick={queue.stopAfterCurrent}>
-                Stop after this one
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="flex flex-wrap items-center gap-4">
-            <Button variant="primary" onClick={goToList}>
-              Go to your assignments
+          )}
+          {!running && notBuilt && (
+            // Back to entry with the briefs not built, after Stop, a 429 or a failure (M7c risk review,
+            // finding 2; wording approved by Aidan).
+            <Button key="back" variant="tertiary" onClick={onEditBriefs}>
+              Back to your briefs
             </Button>
-            {notBuilt && (
-              // Back to entry with the briefs not built, after Stop, a 429 or a failure (M7c risk review,
-              // finding 2; wording approved by Aidan).
-              <Button variant="tertiary" onClick={onEditBriefs}>
-                Back to your briefs
-              </Button>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </main>
     </>
   );

@@ -419,4 +419,37 @@ describe("building several plans", () => {
     // A brief with only a deadline has nothing to build, so it isn't counted.
     expect(screen.getByRole("link", { name: "1 brief not built yet" })).toBeInTheDocument();
   });
+
+  describe("focus on the building screen (risk 9)", () => {
+    it("Stop after this one moves focus to Go to your assignments, which keeps it when the run ends", async () => {
+      const { source, calls } = controlledSource();
+      threeBriefs(source);
+      fireEvent.click(submitButton());
+      screen.getByRole("button", { name: "Stop after this one" }).focus();
+      fireEvent.click(screen.getByRole("button", { name: "Stop after this one" }));
+      const go = screen.getByRole("button", { name: "Go to your assignments" });
+      expect(go).toHaveFocus();
+      await calls[0].answer(plan("Lab report 5"));
+      expect(screen.getByRole("button", { name: "Go to your assignments" })).toHaveFocus();
+    });
+
+    it("Try again moves focus to that brief's row", async () => {
+      const { source, calls } = controlledSource();
+      threeBriefs(source);
+      fireEvent.click(submitButton());
+      await calls[0].answer({ ok: false, reason: "failed" });
+      fireEvent.click(screen.getByRole("button", { name: "Try again: brief 1" }));
+      expect(document.activeElement).toHaveTextContent("Brief 1 · waiting");
+    });
+
+    it("when the run ends with focus on Stop after this one, focus goes to Go to your assignments", async () => {
+      const { source, calls } = controlledSource();
+      threeBriefs(source);
+      fireEvent.click(submitButton());
+      await calls[0].answer(plan("Lab report 5"));
+      screen.getByRole("button", { name: "Stop after this one" }).focus();
+      await calls[1].answer(plan("Problem set 7"));
+      expect(screen.getByRole("button", { name: "Go to your assignments" })).toHaveFocus();
+    });
+  });
 });
