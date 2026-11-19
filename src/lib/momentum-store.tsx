@@ -34,6 +34,12 @@ export function useMomentumData(): MomentumStore {
   return store;
 }
 
+// The store, or null while local storage hasn't been read yet. For app-wide providers that mount
+// before the data is known (the build queue); screens use useMomentumData.
+export function useMomentumStoreOrNull(): MomentumStore | null {
+  return useContext(MomentumContext);
+}
+
 // The store for screens that need an open assignment (working step, final check, review, home).
 // Their pages wrap them in <WhenStarted>, which guarantees one.
 export function useMomentum(): MomentumStore & { assignment: Assignment } {
