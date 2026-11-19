@@ -1,0 +1,112 @@
+{
+  "checks": [
+    {
+      "name": "h1 focused on arrival",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "h2 groups",
+      "ok": true,
+      "detail": "[\"Up next\",\"After that\",\"No deadline\",\"Finished (2) · kept in this browser\"]"
+    },
+    {
+      "name": "order",
+      "ok": true,
+      "detail": "Lab report 4 | Problem set 6 | Reading response | Urban green spaces essay | Portfolio reflection"
+    },
+    {
+      "name": "600 px: no horizontal scroll",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "empty list shows Nothing in progress",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "first run: brief entry, no back link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "back link keeps the draft",
+      "ok": true,
+      "detail": "{\"text\":\"A half-typed brief\",\"deadline\":\"\"}"
+    },
+    {
+      "name": "draft restored on /new",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "row Open → /step/1 of Reading response",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Up next Resume → Lab report 4 step 2",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Review plan → /plan of Problem set 6",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "completion line after Finish review",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "completion line gone after reload",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "tab A stays on Reading response after tab B opens Lab report 4",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "tab B on Lab report 4",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "consoleErrors": [],
+  "axe": {
+    "mixed": {
+      "collapsed": [],
+      "expanded": []
+    },
+    "mixed600": [],
+    "emptyList": [],
+    "firstRun": []
+  },
+  "wrappedAt600": [
+    "Add assignments",
+    "Soonest deadline first. Time left adds up the estimates for steps you ",
+    "Done when five peer-reviewed sources are saved in your own notes, each",
+    "Resume step 2",
+    "View full plan",
+    "Review plan",
+    "Open",
+    "Open",
+    "Open",
+    "Finished (2) · kept in this browser",
+    "Finished (2) · kept in this browser"
+  ],
+  "tabOrder": [
+    "button: Add assignments",
+    "button: Resume step 2",
+    "button: View full plan",
+    "button: Review plan Problem set 6",
+    "button: Open Reading response",
+    "button: Open Urban green spaces essay",
+    "button: Open Portfolio reflection",
+    "button: Finished (2) · kept in this browser"
+  ]
+}

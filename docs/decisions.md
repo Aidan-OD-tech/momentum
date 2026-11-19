@@ -378,3 +378,18 @@ From the [compose and responsive review](reviews/2026-11-18-compose-responsive-m
 ### Known limit (for M7b)
 
 Which assignment is open is one shared value in storage. Two tabs on different assignments switch each other: when one opens an assignment, the other tab's `storage` listener loads that choice. M7b must decide how to handle this.
+
+### M7b: the home list (2026-11-18)
+
+- **Routes.** "/" shows brief entry only on first run (no assignments at all); otherwise the home list. It no longer redirects a plan in review to `/plan`: such a plan is on the list as "Ready to review". Brief entry for another assignment is `/new` (the existing `BriefFlow`), with "Back to your assignments", which saves the draft before leaving (a save still waiting for typing to pause would otherwise be dropped). A created plan goes to `/plan` explicitly. `/plan`, `/step/[n]`, `/final` and `/review` still act on the open assignment; every list button calls `openAssignment` first, then navigates.
+- **"/" decides once.** `HomeRoute` picks brief entry or the list when "/" opens, so a plan built from first-run entry goes straight to `/plan` without the list flashing up in between.
+- **Up next is the top of the priority order** (Aidan, 2026-11-18). It is today's home card (paused, next step, final check next), extracted as `UpNextCard`, with "· About X of steps left" on its progress line. A plan in review gets the title, meta, "Plan ready · N steps · About X" and "Review plan". The rest are rows under "After that" and "No deadline". Ordering stays only in `priority.ts`; the screen splits groups with `filter`, which keeps that order.
+- **The completion line replaces the completed home.** After Finish review, the list shows once: "<Title>: all steps done. Your plan and final check are kept in this browser. Submission happens in Turnitin. Momentum doesn’t submit or track it." It is in memory (`justFinishedId`, like `progressSaved`), shows only after a confirmed write, and a reload or the next change clears it.
+- **Due date passed** is the meta line's only change for a deadline before now: same color, no icon, no warning words.
+- **Row buttons** have an `aria-label` that starts with the visible word and adds the title ("Open Reading response"), so a list of buttons isn't five identical "Open"s (WCAG 2.5.3, label in name). A visually hidden span was tried first; its leading space was dropped from the accessible name because the button is a flex container.
+- **Headings:** h1 "Your assignments", h2 per group (Label style), h3 per assignment title (the Up next card's title moved from h2 to h3), h4 for the step title inside the card.
+- **`startNewAssignment` removed.** "Add assignments" goes to `/new`; nothing else needed to clear the open assignment.
+- **Two tabs.** The storage handler takes the other tab's data but keeps this tab's `activeAssignmentId` while that assignment still exists (otherwise it takes the incoming one). Writes are unchanged. **Remaining limit:** the open assignment is still one stored value, so after a reload whichever tab wrote last decides which assignment opens.
+- **Final-check state of Up next** shows no time left (it would read "About 0 min of steps left").
+- **Empty current list:** "Nothing in progress." with a Primary "Add assignments", as the prompt says. The header's Secondary "Add assignments" stays, so that state has two buttons with the same name (open for Aidan).
+

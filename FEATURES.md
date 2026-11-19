@@ -136,9 +136,9 @@ Marketing rows are written for the portfolio case study; Momentum has no product
 | Scale | supporting |
 | Status | built |
 | One-liner | See the finished assignment and start the next one. |
-| Short | The completed home makes "Start a new assignment" the primary action. Review shows the plan, each step's note and the final checklist as read-only. Completed records stay in the browser, with no archive interface. |
+| Short | Since M7b there is no completed home: after Finish review the home list shows a one-time line ("<Title>: all steps done. Your plan and final check are kept in this browser. Submission happens in Turnitin. Momentum doesn’t submit or track it.") and the assignment moves to the collapsed Finished group, whose Review opens it. Review shows the plan, each step's note and the final checklist as read-only. Completed records stay in the browser, with no archive interface. |
 | Marketing | Look back at what you did, then start the next one. |
-| Technical | Route `/review`. `startNewAssignment` keeps the completed record and creates a new active one (a sample copy until M3). |
+| Technical | Route `/review`, on the open assignment (the Finished row calls `openAssignment` first). `startNewAssignment` was removed in M7b; "Add assignments" goes to `/new`. |
 
 ## Saving
 
