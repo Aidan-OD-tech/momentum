@@ -10,7 +10,6 @@ Claude Code ran the M5 axe walkthrough again on the production build of `feat/m6
 
 Files:
 - results: [test-results/axe-m6.json](test-results/axe-m6.json);
-- scripts: [test-results/m6-scripts/](test-results/m6-scripts/);
 - screenshots: `docs/evidence/screenshots/m6-<screen>-<1280|600>.png`.
 
 | Result | 1280×800 | 600×800 |
@@ -74,7 +73,6 @@ Run by Claude Code on 2026-11-18 on the production build of `feat/m5-evaluation`
 
 - Raw axe results: [test-results/axe-m5.json](test-results/axe-m5.json). For each screen and width it holds the full `violations` and `incomplete`; passes and inapplicable rules are listed by id. The file also has the walkthrough's checks.
 - Keyboard pass: [test-results/keyboard-m5.json](test-results/keyboard-m5.json). Every key press, the focused element, the focus indicator seen, whether the element was inside the viewport, and controls under 24 px.
-- Scripts: [test-results/m5-scripts/](test-results/m5-scripts/) (`walk.mjs`: axe and screenshots; `keyboard.mjs`; `tabs.mjs`: the two-tab check).
 - Screenshots: `docs/evidence/screenshots/m5-<screen>-<1280|600>.png`.
 
 ## axe (axe-core 4.11, tags wcag2a/aa, wcag21a/aa, wcag22aa, best-practice)

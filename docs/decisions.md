@@ -274,7 +274,7 @@ From [reviews/2026-11-18-risk-generation.md](reviews/2026-11-18-risk-generation.
 
 **Heuristic evaluation reviewed.** (Aidan, 2026-11-18) H-01 confirmed as severity 3. H-04, H-07 and the severity-1 items are "watch in sessions", not committed M6 work.
 
-**Session guide and template.** (Aidan, 2026-11-18) The guide is in the repo as [evidence/feedback/session-guide.md](evidence/feedback/session-guide.md). `session-template.md` uses its observation sheet's fields exactly, plus a separate section for the Vercel log lines (README step 4).
+**Session guide.** (Aidan, 2026-11-18) The guide is in the repo as [evidence/session-guide.md](evidence/session-guide.md), with its observation sheet and browser-reset steps.
 
 ### Open for Aidan
 

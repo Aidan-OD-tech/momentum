@@ -43,5 +43,5 @@ Routes: `/` brief entry on first run, otherwise the list of assignments; `/new` 
 - [FEATURES.md](FEATURES.md): feature inventory with build status
 - [docs/status.md](docs/status.md): milestones, what is built and what was checked
 - [docs/decisions.md](docs/decisions.md): dated decisions
-- [docs/evidence/](docs/evidence/): measurement, heuristic evaluation, accessibility pass, session feedback
+- [docs/evidence/](docs/evidence/): measurement, heuristic evaluation, accessibility pass, session guide
 - [CLAUDE.md](CLAUDE.md): rules for AI coding sessions
