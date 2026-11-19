@@ -364,5 +364,4 @@ The prioritized home list. Branched from `feat/m7a-multi-assignment-model` (PR #
 ### Known limitations
 
 - After a reload, whichever tab wrote last decides which assignment opens.
-- With nothing in progress, "Add assignments" appears twice (header and empty state).
 

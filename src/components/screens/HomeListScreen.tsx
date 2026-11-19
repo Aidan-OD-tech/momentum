@@ -82,7 +82,8 @@ export function HomeListScreen() {
             <h1 ref={headingRef} tabIndex={-1} className="text-display text-text-primary focus-visible:shadow-none">
               Your assignments
             </h1>
-            {addAssignments("secondary")}
+            {/* With nothing in progress, the empty state's Primary button is the only one. */}
+            {upNext && addAssignments("secondary")}
           </div>
           <p className="text-body text-text-secondary">
             Soonest deadline first. Time left adds up the estimates for steps you haven’t finished, so it’s approximate.

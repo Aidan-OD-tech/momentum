@@ -118,6 +118,8 @@ describe("home list", () => {
 
   it("Add assignments goes to /new", () => {
     renderList();
+    // With a current assignment, the header's button is the only one.
+    expect(screen.getAllByRole("button", { name: "Add assignments" })).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: "Add assignments" }));
     expect(router.push).toHaveBeenCalledWith("/new");
   });
@@ -194,7 +196,8 @@ describe("home list", () => {
       renderList(data);
       expect(screen.queryByRole("region", { name: "Up next" })).not.toBeInTheDocument();
       expect(screen.getByText("Nothing in progress.")).toBeInTheDocument();
-      expect(screen.getAllByRole("button", { name: "Add assignments" })).toHaveLength(2);
+      // Only the empty state's Primary button; the header one is hidden.
+      expect(screen.getAllByRole("button", { name: "Add assignments" })).toHaveLength(1);
       expect(screen.getByRole("button", { name: "Finished (2) · kept in this browser" })).toBeInTheDocument();
     });
   });

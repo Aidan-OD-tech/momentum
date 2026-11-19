@@ -391,5 +391,5 @@ Which assignment is open is one shared value in storage. Two tabs on different a
 - **`startNewAssignment` removed.** "Add assignments" goes to `/new`; nothing else needed to clear the open assignment.
 - **Two tabs.** The storage handler takes the other tab's data but keeps this tab's `activeAssignmentId` while that assignment still exists (otherwise it takes the incoming one). Writes are unchanged. **Remaining limit:** the open assignment is still one stored value, so after a reload whichever tab wrote last decides which assignment opens.
 - **Final-check state of Up next** shows no time left (it would read "About 0 min of steps left").
-- **Empty current list:** "Nothing in progress." with a Primary "Add assignments", as the prompt says. The header's Secondary "Add assignments" stays, so that state has two buttons with the same name (open for Aidan).
+- **Empty current list:** "Nothing in progress." with a Primary "Add assignments". The header's Secondary "Add assignments" is hidden in that state, so there is only one (Aidan, 2026-11-18, after review).
 
