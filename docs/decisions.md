@@ -430,3 +430,12 @@ From [reviews/2026-11-19-risk-weekly-upload.md](reviews/2026-11-19-risk-weekly-u
 - **Risk 10, one IP can use more of the shared hourly limit** (S2 × P1 × D2 = 4). At 12 per 10 minutes one address can use 72 of the 100 an hour (30 at 5), and each Vercel instance counts separately. The OpenAI monthly budget stays the hard cap: check it and its alert before the sessions, and look for 429s in the `[api/plan]` log lines after each session day.
 - **Risk 12, brief numbers change after Edit brief** (S1 × P2 × D1 = 2). Entry renumbers the briefs left, so "Brief 2" on the building screen can become "Brief 1". Revisit only if sessions show confusion, for example by naming rows with the brief's first words.
 
+### M7d: session guide (2026-11-19)
+
+- **Measures unchanged.** The primary measure (n of N built a plan and began step 1 without help) and the complementary one (n of N resumed the right step after the pause without help) are as they were.
+- **Task-level wording changed, because the product changed:**
+  - Task 2's return now asks the participant to find the assignment to work on next on the list.
+  - Task 3's end point is the list with the completion line, since the completed home is gone.
+- **Task 4 (weekly upload)** has its own success line (all three added and built without help). It isn't a new study measure. It observes whether participants understand the order and the time-left estimate, plus one question: "What did 'About 2 h of steps left' mean to you?"
+- **The three Task 4 briefs were drafted by Claude Code.** They are not from any course. Aidan checks or replaces them before the first session.
+
