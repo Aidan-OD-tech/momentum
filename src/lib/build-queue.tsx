@@ -30,6 +30,9 @@ export type QueueItem = {
 
 export type QueueBrief = { id: string; text: string; deadline: string; number: number };
 
+// One change of an item's state, for the screen's live region. seq only grows, so it can be a key.
+export type QueueChange = { seq: number; item: QueueItem };
+
 type BuildQueue = {
   items: QueueItem[];
   // A request is out, or the next one is about to be sent.
@@ -38,6 +41,8 @@ type BuildQueue = {
   stopRequested: boolean;
   // The last run stopped on a 429. No automatic retry.
   rateLimited: boolean;
+  // The latest changes of an item's state (newest last), so a screen reader hears each one once.
+  changes: QueueChange[];
   start: (briefs: QueueBrief[], source: PlanSource) => void;
   stopAfterCurrent: () => void;
   retry: (draftId: string) => void;
@@ -59,6 +64,8 @@ export function BuildQueueProvider({ children }: { children: React.ReactNode }) 
   const [running, setRunning] = useState(false);
   const [stopRequested, setStopRequested] = useState(false);
   const [rateLimited, setRateLimited] = useState(false);
+  const [changes, setChanges] = useState<QueueChange[]>([]);
+  const nextSeq = useRef(0);
 
   // Read by the running loop between awaits, so it always sees the latest values.
   const itemsRef = useRef<QueueItem[]>([]);
@@ -76,8 +83,14 @@ export function BuildQueueProvider({ children }: { children: React.ReactNode }) 
   useEffect(() => () => abortRef.current?.abort(), []);
 
   const update = useCallback((draftId: string, patch: Partial<QueueItem>) => {
+    const before = itemsRef.current.find((item) => item.draftId === draftId);
     itemsRef.current = itemsRef.current.map((item) => (item.draftId === draftId ? { ...item, ...patch } : item));
     setItems(itemsRef.current);
+    const after = itemsRef.current.find((item) => item.draftId === draftId);
+    if (after && before?.state !== after.state) {
+      const change = { seq: nextSeq.current++, item: after };
+      setChanges((list) => [...list.slice(-4), change]);
+    }
   }, []);
 
   const run = useCallback(async () => {
@@ -165,9 +178,10 @@ export function BuildQueueProvider({ children }: { children: React.ReactNode }) 
     if (runningRef.current) return;
     itemsRef.current = [];
     setItems([]);
+    setChanges([]);
     setRateLimited(false);
   }, []);
 
-  const value = { items, running, stopRequested, rateLimited, start, stopAfterCurrent, retry, clear };
+  const value = { items, running, stopRequested, rateLimited, changes, start, stopAfterCurrent, retry, clear };
   return <BuildQueueContext.Provider value={value}>{children}</BuildQueueContext.Provider>;
 }
