@@ -359,4 +359,47 @@ describe("building several plans", () => {
     expect(screen.getByText("Couldn’t save in this browser")).toBeInTheDocument();
     vi.restoreAllMocks();
   });
+
+  it("after the run, the list says which briefs weren't built and links back to /new (risk 1)", async () => {
+    const { source, calls } = controlledSource();
+    withAssignment();
+    function App({ route }: { route: "/new" | "/" }) {
+      return (
+        <AppProviders source={source}>
+          <WhenLoaded>{route === "/new" ? <BriefFlow atNew /> : <HomeRoute />}</WhenLoaded>
+        </AppProviders>
+      );
+    }
+    const { rerender } = render(<App route="/new" />);
+    addBrief();
+    addBrief();
+    typeIn(1, "First brief text");
+    typeIn(2, "Second brief text");
+    typeIn(3, "Third brief text");
+    fireEvent.click(submitButton());
+    rerender(<App route="/" />);
+    // While it runs, only the building line.
+    expect(screen.queryByRole("link", { name: /not built yet/ })).not.toBeInTheDocument();
+    await calls[0].answer({ ok: false, reason: "unreadable" });
+    await calls[1].answer({ ok: false, reason: "failed" });
+    await calls[2].answer(plan("Problem set 7"));
+    const line = screen.getByRole("link", { name: "2 briefs not built yet" });
+    expect(line).toHaveAttribute("href", "/new");
+  });
+
+  it("after a reload, kept briefs show as one line on the list", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ version: 1, activeAssignmentId: "a1", assignments: [makeAssignment("a1", 1)], briefDrafts: [{ id: "x", text: "Kept", deadline: "" }, { id: "y", text: "", deadline: "2026-12-01T09:00" }] }),
+    );
+    render(
+      <AppProviders>
+        <WhenLoaded>
+          <HomeRoute />
+        </WhenLoaded>
+      </AppProviders>,
+    );
+    // A brief with only a deadline has nothing to build, so it isn't counted.
+    expect(screen.getByRole("link", { name: "1 brief not built yet" })).toBeInTheDocument();
+  });
 });
