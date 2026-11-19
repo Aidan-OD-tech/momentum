@@ -129,7 +129,7 @@ export function BriefFlow() {
               heading="We couldn’t build your plan just now."
               body={
                 phase.reason === "rateLimited"
-                  ? // The route allows 5 plans per IP address in 10 minutes (and 100 an hour in all), so no
+                  ? // The route allows 12 plans per IP address in 10 minutes (and 100 an hour in all), so no
                     // promise of an exact wait. Wording approved by Aidan (decisions.md, M6, item 5).
                     "Too many plans were built from this network. Try again in about 10 minutes."
                   : "Something went wrong on our side, not with your brief. Try again in a moment."

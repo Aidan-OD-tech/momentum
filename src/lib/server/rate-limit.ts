@@ -1,7 +1,8 @@
 import "server-only";
 
 // Small in-memory request limits: a number per IP address in a window, and a number from everyone
-// together in a longer window. Plans: 5 per 10 minutes per IP, 100 per hour overall. Events (M5):
+// together in a longer window. Plans: 12 per 10 minutes per IP (raised from 5 in M7c, so a week's upload
+// of up to 8 briefs, one request each, fits with room for a retry), 100 per hour overall. Events (M5):
 // 10 per 10 minutes per IP, 300 per hour overall, kept apart so events never use up plan requests.
 //
 // Best effort only. On Vercel each running instance has its own memory, and a cold start resets it,
@@ -9,7 +10,7 @@ import "server-only";
 // project (docs/deploy.md).
 
 const MINUTE = 60_000;
-export const PER_IP_LIMIT = 5;
+export const PER_IP_LIMIT = 12;
 export const PER_IP_WINDOW_MS = 10 * MINUTE;
 export const GLOBAL_LIMIT = 100;
 export const GLOBAL_WINDOW_MS = 60 * MINUTE;

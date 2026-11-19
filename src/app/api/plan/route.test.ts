@@ -223,11 +223,11 @@ describe("POST /api/plan: request checks", () => {
     expect((await post({ brief })).status).toBe(200);
   });
 
-  it("the 6th request from one IP in 10 minutes is 429; another IP still works", async () => {
-    for (let i = 0; i < 5; i++) expect((await post({ brief: "A brief" }, { ip: "198.51.100.7" })).status).toBe(200);
-    const sixth = await post({ brief: "A brief" }, { ip: "198.51.100.7" });
-    expect(sixth.status).toBe(429);
-    expect(await sixth.json()).toEqual({ reason: "rateLimited" });
+  it("the 13th request from one IP in 10 minutes is 429; another IP still works (M7c: 12 per IP)", async () => {
+    for (let i = 0; i < 12; i++) expect((await post({ brief: "A brief" }, { ip: "198.51.100.7" })).status).toBe(200);
+    const thirteenth = await post({ brief: "A brief" }, { ip: "198.51.100.7" });
+    expect(thirteenth.status).toBe(429);
+    expect(await thirteenth.json()).toEqual({ reason: "rateLimited" });
     expect((await post({ brief: "A brief" }, { ip: "198.51.100.8" })).status).toBe(200);
   });
 });
