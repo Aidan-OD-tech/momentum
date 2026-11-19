@@ -11,3 +11,6 @@ export const BRIEF_COUNT_FROM = Math.round(MAX_BRIEF_CHARS * 0.9);
 export function briefLength(text: string): number {
   return text.trim().length;
 }
+
+// The most briefs one upload can hold (M7c). Each is one /api/plan request, sent one at a time.
+export const MAX_BRIEFS = 8;

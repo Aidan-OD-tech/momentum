@@ -7,6 +7,7 @@ import { BriefEntryScreen } from "@/components/screens/BriefEntryScreen";
 import { BuildingScreen } from "@/components/screens/BuildingScreen";
 import { TopBar } from "@/components/TopBar";
 import { sampleAssignment } from "@/data/sample-assignment";
+import { readBriefDrafts } from "@/lib/brief-drafts";
 import { briefLength, MAX_BRIEF_CHARS } from "@/lib/brief-limits";
 import { showSampleBrief } from "@/lib/flags";
 import { useMomentumData } from "@/lib/momentum-store";
@@ -27,8 +28,9 @@ export function BriefFlow() {
   const { data, act } = useMomentumData();
   const router = useRouter();
   const source = usePlanSource();
-  const [text, setText] = useState(data.briefDraft?.text ?? "");
-  const [deadline, setDeadline] = useState(data.briefDraft?.deadline ?? "");
+  const [stored] = useState(() => readBriefDrafts(data)[0] ?? { id: crypto.randomUUID(), text: "", deadline: "" });
+  const [text, setText] = useState(stored.text);
+  const [deadline, setDeadline] = useState(stored.deadline);
   const [phase, setPhase] = useState<Phase>({ name: "entry", focus: "heading" });
   const [entryError, setEntryError] = useState<"empty" | "tooLong" | null>(null);
   const [focusKey, setFocusKey] = useState(0);
@@ -39,9 +41,9 @@ export function BriefFlow() {
     (nextText: string, nextDeadline: string) => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
       saveTimer.current = null;
-      act({ type: "setBriefDraft", draft: { text: nextText, deadline: nextDeadline } });
+      act({ type: "setBriefDrafts", drafts: [{ id: stored.id, text: nextText, deadline: nextDeadline }] });
     },
-    [act],
+    [act, stored.id],
   );
 
   // Save the draft once typing pauses. A pending save is dropped when the screen goes away.
