@@ -56,8 +56,9 @@ function BriefEntryFlow({ atNew, onQueueStarted }: { atNew: boolean; onQueueStar
   });
   const [phase, setPhase] = useState<Phase>({ name: "entry" });
   const [emptyError, setEmptyError] = useState(false);
-  // The last brief with text that was removed, for Undo (this visit only).
-  const [removed, setRemoved] = useState<{ brief: BriefDraftItem; index: number } | null>(null);
+  // Briefs with text removed this visit, oldest first, so Undo can bring them all back (M7c risk review,
+  // finding 8). Each index is where the brief was when it was removed.
+  const [removed, setRemoved] = useState<{ brief: BriefDraftItem; index: number }[]>([]);
   const [focus, setFocus] = useState<EntryFocus>({ target: "heading" });
   const [focusKey, setFocusKey] = useState(0);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -102,7 +103,7 @@ function BriefEntryFlow({ atNew, onQueueStarted }: { atNew: boolean; onQueueStar
 
   // A removed brief that can still be undone keeps its place among the 8, so Undo always fits and
   // the list never passes 8 (Aidan, M7c risk review, finding 3).
-  const canAdd = briefs.length + (removed ? 1 : 0) < MAX_BRIEFS;
+  const canAdd = briefs.length + removed.length < MAX_BRIEFS;
 
   function add() {
     if (!canAdd) return;
@@ -117,7 +118,8 @@ function BriefEntryFlow({ atNew, onQueueStarted }: { atNew: boolean; onQueueStar
     const next = briefs.filter((b) => b.id !== id);
     setBriefs(next);
     // A brief with words in it can be brought back; an empty one just goes.
-    setRemoved(brief.text.trim() ? { brief, index } : null);
+    // Removing an empty one keeps the briefs already waiting for Undo.
+    if (brief.text.trim()) setRemoved([...removed, { brief, index }]);
     // Focus goes to the card that took its place, or to Add another brief. With one brief left there
     // are no card headings, so focus goes to Add another brief.
     const following = next[index];
@@ -125,12 +127,14 @@ function BriefEntryFlow({ atNew, onQueueStarted }: { atNew: boolean; onQueueStar
   }
 
   function undoRemove() {
-    if (!removed) return;
+    if (removed.length === 0) return;
+    // Newest first, each back where it was. (An empty brief removed in between can shift a position by
+    // one; the text is always kept.)
     const next = [...briefs];
-    next.splice(Math.min(removed.index, next.length), 0, removed.brief);
+    for (const { brief, index } of [...removed].reverse()) next.splice(Math.min(index, next.length), 0, brief);
     setBriefs(next);
-    setRemoved(null);
-    moveFocus({ target: "brief", id: removed.brief.id });
+    setRemoved([]);
+    moveFocus({ target: "brief", id: removed[0].brief.id });
   }
 
   function fillSample() {
@@ -178,7 +182,7 @@ function BriefEntryFlow({ atNew, onQueueStarted }: { atNew: boolean; onQueueStar
       return;
     }
     setEmptyError(false);
-    setRemoved(null);
+    setRemoved([]);
     saveDrafts(briefs);
 
     // In development, "?simulate=" can stand in for the source (for screenshots). Never in production.
@@ -249,7 +253,11 @@ function BriefEntryFlow({ atNew, onQueueStarted }: { atNew: boolean; onQueueStar
       onAdd={add}
       canAdd={canAdd}
       onRemove={remove}
-      removed={removed && { index: removed.index, number: removed.index + 1, onUndo: undoRemove }}
+      removed={
+        removed.length > 0
+          ? { index: removed[removed.length - 1].index, count: removed.length, number: removed[0].index + 1, onUndo: undoRemove }
+          : null
+      }
       // Saves the drafts now: a save still waiting for typing to pause would be dropped on leaving.
       onBack={data.assignments.length > 0 ? () => saveDrafts(briefs) : undefined}
       onUseSample={showSampleBrief() ? fillSample : undefined}

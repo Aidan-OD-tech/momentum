@@ -20,11 +20,12 @@ type BriefEntryScreenProps = {
   briefs: BriefDraftItem[];
   onChange: (id: string, change: BriefChange) => void;
   onAdd: () => void;
-  // False at 8 briefs, counting a removed one that can still be undone.
+  // False at 8 briefs, counting removed ones that can still be undone.
   canAdd: boolean;
   onRemove: (id: string) => void;
-  // A brief with text that was just removed, shown in its place with Undo. Null when there is none.
-  removed: { index: number; number: number; onUndo: () => void } | null;
+  // Briefs with text removed this visit, shown with one Undo where the latest was. `number` is the
+  // brief's number when only one was removed. Null when there are none.
+  removed: { index: number; count: number; number: number; onUndo: () => void } | null;
   // Shows "Back to your assignments" (to "/") when given; called before leaving, e.g. to save the drafts.
   // Leave out on first run, when there is no list to go back to.
   onBack?: () => void;
@@ -81,7 +82,10 @@ export function BriefEntryScreen(props: BriefEntryScreenProps) {
       Math.min(removed.index, fields.length),
       0,
       <div key="removed" role="status" className="flex items-center justify-between gap-4 rounded-md bg-surface-subtle p-4">
-        <p className="text-body text-text-primary">Brief {removed.number} removed.</p>
+        <p className="text-body text-text-primary">
+          {/* Wording approved by Aidan (M7c risk review, finding 8). */}
+          {removed.count === 1 ? `Brief ${removed.number} removed.` : `${removed.count} briefs removed.`}
+        </p>
         <Button id={UNDO_REMOVE_ID} variant="tertiary" onClick={removed.onUndo}>
           Undo
         </Button>

@@ -125,6 +125,24 @@ describe("brief entry with several briefs", () => {
     expect(brief(3)).toHaveValue("Third brief text");
   });
 
+  it("removing two briefs with text shows 2 briefs removed; Undo brings both back in place (risk 8)", () => {
+    threeBriefs();
+    typeIn(2, "Second brief text");
+    fireEvent.click(screen.getByRole("button", { name: "Remove brief 1" }));
+    expect(screen.getByText("Brief 1 removed.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Remove brief 2" }));
+    expect(screen.getByText("2 briefs removed.")).toBeInTheDocument();
+    expect(screen.getByLabelText("Assignment brief")).toHaveValue("Second brief text");
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect([brief(1), brief(2), brief(3)].map((t) => (t as HTMLTextAreaElement).value)).toEqual([
+      "First brief text",
+      "Second brief text",
+      "Third brief text",
+    ]);
+    expect(brief(1)).toHaveFocus();
+    expect(screen.queryByText(/removed\./)).not.toBeInTheDocument();
+  });
+
   it("removing an empty brief needs no undo; removing the last one focuses Add another brief", () => {
     threeBriefs();
     fireEvent.click(screen.getByRole("button", { name: "Remove brief 2" }));
